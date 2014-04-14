@@ -60,7 +60,7 @@ class cardView(QGraphicsRectItem):
         '''
         super(cardView, self).__init__()
         
-        ## TODO: Använd metoder i cardModel för getColor och getValue
+        ## TODO: Anvand metoder i cardModel for getColor och getValue
         self.color = random.randint(1,4)
         self.value = random.randint(1,13)
 
