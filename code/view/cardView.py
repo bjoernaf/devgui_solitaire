@@ -5,11 +5,9 @@ Created on 7 apr 2014
 cardView is an QGraphicsRectItem representing a card. 
 '''
 
-from PyQt5.QtCore import (QLineF, QMimeData, QPoint, QPointF, qrand, QRectF,
-        qsrand, Qt, QTime, QTimeLine)
-from PyQt5.QtGui import (QBrush, QColor, QDrag, QImage, QPainter, QPen,
-        QPixmap, QTransform, QFont)
-from PyQt5.QtWidgets import (QApplication, QGraphicsItem, QGraphicsTextItem, QGraphicsRectItem, QGraphicsScene, QGraphicsView)
+from PyQt5.QtCore import (Qt)
+from PyQt5.QtGui import (QFont)
+from PyQt5.QtWidgets import (QGraphicsTextItem, QGraphicsRectItem)
 
 import random
 

@@ -4,9 +4,16 @@ Created on 13 apr 2014
 @author: Sven, Bjorn
 '''
 
+'''
+Basic imports, save to use later.
+from PyQt5.QtCore import (QLineF, QMimeData, QPoint, QPointF, qrand, QRectF,
+        qsrand, Qt, QTime, QTimeLine)
 from PyQt5.QtGui import (QBrush, QColor, QDrag, QImage, QPainter, QPen,
-        QPixmap, QTransform, QIcon)
-from PyQt5.QtWidgets import (QApplication, QGraphicsItem, QGraphicsScene, QGraphicsView, QMainWindow, QToolBar, QAction)
+        QPixmap, QTransform, QFont)
+from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsTextItem, QGraphicsScene, QGraphicsView, QApplication)
+'''
+
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QAction)
 
 from view import boardView
 

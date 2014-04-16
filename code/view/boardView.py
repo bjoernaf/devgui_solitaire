@@ -9,11 +9,9 @@ The boardView contains a QGraphicsScene that displays stacks (created in stackVi
 '''
 
 # Can remove lots of imports later, might use some of them soon
-from PyQt5.QtCore import (QLineF, QMimeData, QPoint, QPointF, qrand, QRectF,
-        qsrand, Qt, QTime, QTimeLine)
-from PyQt5.QtGui import (QBrush, QColor, QDrag, QImage, QPainter, QPen,
-        QPixmap, QTransform, QFont)
-from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsTextItem, QGraphicsScene, QGraphicsView)
+from PyQt5.QtCore import (Qt)
+from PyQt5.QtGui import (QFont)
+from PyQt5.QtWidgets import (QGraphicsTextItem, QGraphicsScene, QGraphicsView)
 from view import cardView
 
 class boardView(QGraphicsView):
@@ -49,7 +47,7 @@ class boardView(QGraphicsView):
         
         #Create and add cards (move to stackView)
         card2 = cardView.cardView()
-        card2.setPos(15,15)
+        card2.setPos(25,30)
         self.scene.addItem(card2)
         
         #Create and add cards (move to stackView)
