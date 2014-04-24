@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsTextItem, QGraphicsScene, Q
 '''
 
 from PyQt5.QtCore import (QSettings, QSize, QVariant, QPoint)
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QAction, QMessageBox)
+from PyQt5.QtWidgets import (QMainWindow, QAction, QMessageBox)
 
 from view import boardView
 
@@ -38,7 +38,7 @@ class solitaireWindow(QMainWindow):
         super(solitaireWindow,self).__init__()
 
         settings = QSettings()
-        size = settings.value("MainWindow/Size")
+        size = settings.value("MainWindow/Size", QSize(800,600))
         #, QVariant(QSize(500, 300))).toSize()
         self.resize(size)
         position = settings.value("MainWindow/Position", QVariant(QPoint(0, 0)))
@@ -48,7 +48,6 @@ class solitaireWindow(QMainWindow):
         #Create a boardView with self (parent) as argument, set it's position and att it to the scene
         bView = boardView.boardView(500, 300)
         #                            size.width(), size.height())
-        #boardView.setTransform(QTransform.fromScale(1.2, 1.2), True)
         self.setCentralWidget(bView)
         self.setWindowTitle(title)
         self.createUI()
@@ -74,7 +73,7 @@ class solitaireWindow(QMainWindow):
         # Populate FileMenu
         exitAction = QAction('Exit', self)        
         exitAction.setShortcut('Ctrl+Q')
-        exitAction.triggered.connect(QApplication.quit)
+        exitAction.triggered.connect(self.close)
         fileMenu.addAction(exitAction)
         
         # Populate EditMenu with actions

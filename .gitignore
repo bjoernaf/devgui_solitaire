@@ -17,6 +17,7 @@
 *.egg-info
 dist
 build
+runnable
 eggs
 parts
 var
