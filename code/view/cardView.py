@@ -5,13 +5,24 @@ Created on 7 apr 2014
 cardView is an QGraphicsRectItem representing a card. 
 '''
 
-from PyQt5.QtCore import (Qt)
-from PyQt5.QtGui import (QFont)
-from PyQt5.QtWidgets import (QGraphicsTextItem, QGraphicsRectItem)
+from PyQt5.QtCore import (
+    Qt,
+    QRectF,
+    QMimeData,
+    QPoint
+)
+from PyQt5.QtGui import (
+    QFont,
+    QDrag,
+    QPixmap,
+    #QFont, QColor, QPen, QPixmap, QPainter, QBrush
+    QPainter
+)
+from PyQt5.QtWidgets import (QGraphicsTextItem, QGraphicsItem)
 
 import random
 
-class cardView(QGraphicsRectItem):
+class cardView(QGraphicsItem):
     '''
     classdocs
     '''
@@ -22,6 +33,11 @@ class cardView(QGraphicsRectItem):
     cardXRad = 9.0
     cardYRad = 9.0
     
+
+
+
+    def boundingRect(self):
+        return QRectF(0, 0, self.cardWidth, self.cardHeight)
     
     def paint(self, painter, option, widget=None): 
         '''
@@ -30,9 +46,9 @@ class cardView(QGraphicsRectItem):
         painter.setPen(Qt.black)
         painter.setBrush(Qt.white)
         painter.drawRoundedRect(0, 0, cardView.cardWidth, cardView.cardHeight, cardView.cardXRad, cardView.cardYRad, Qt.AbsoluteSize)
-        
-    # Override boundingRect ????
-    
+        txt = self.drawContent()
+        painter.drawText(txt.boundingRect(), Qt.AlignCenter, txt.toPlainText())
+           
     def drawContent(self):
         '''
         Draw the contents of the card
@@ -48,6 +64,8 @@ class cardView(QGraphicsRectItem):
         cardNumber.setDefaultTextColor(Qt.red)
         cardNumber.setPos(3,3)
         cardNumber.setParentItem(self)
+        
+        return cardNumber;
         
         #TODO add more stuff such as animation etc
     
@@ -67,3 +85,8 @@ class cardView(QGraphicsRectItem):
         
         # ???
         self.shape()
+        
+        self.setFlag(QGraphicsItem.ItemIsSelectable);
+        self.setFlag(QGraphicsItem.ItemIsMovable);
+        self.setFlag(QGraphicsItem.ItemSendsGeometryChanges);
+        
