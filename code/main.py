@@ -16,6 +16,10 @@ def main():
     # Create an application
     app = QApplication(sys.argv)
     
+    app.setOrganizationName("Group 13")
+    app.setOrganizationDomain("group13.se")
+    app.setApplicationName("Solitaire")
+    
     # Create and show the main window,
     solWin = solitaireWindow.solitaireWindow("Solitaire")
     solWin.show()

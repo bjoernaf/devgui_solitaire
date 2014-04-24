@@ -13,7 +13,8 @@ from PyQt5.QtGui import (QBrush, QColor, QDrag, QImage, QPainter, QPen,
 from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsTextItem, QGraphicsScene, QGraphicsView, QApplication)
 '''
 
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QAction)
+from PyQt5.QtCore import (QSettings, QSize, QVariant, QPoint)
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QAction, QMessageBox)
 
 from view import boardView
 
@@ -24,9 +25,9 @@ class solitaireWindow(QMainWindow):
     
     winTitle = ""
     
-    ' Move to config file in a later step '
-    windowWidth = 500
-    windowHeight = 300
+#    ' Move to config file in a later step '
+#    windowWidth = 500
+#    windowHeight = 300
 
 
     def __init__(self, title):
@@ -35,12 +36,21 @@ class solitaireWindow(QMainWindow):
         '''
         
         super(solitaireWindow,self).__init__()
+
+        settings = QSettings()
+        size = settings.value("MainWindow/Size")
+        #, QVariant(QSize(500, 300))).toSize()
+        self.resize(size)
+        position = settings.value("MainWindow/Position", QVariant(QPoint(0, 0)))
+        #.toPoint()
+        self.move(position)
         
         #Create a boardView with self (parent) as argument, set it's position and att it to the scene
-        bView = boardView.boardView(self.windowWidth, self.windowHeight)
+        bView = boardView.boardView(500, 300)
+        #                            size.width(), size.height())
         #boardView.setTransform(QTransform.fromScale(1.2, 1.2), True)
         self.setCentralWidget(bView)
-        self.winTitle = title
+        self.setWindowTitle(title)
         self.createUI()
         self.createMenu()
 
@@ -90,4 +100,19 @@ class solitaireWindow(QMainWindow):
     
     #def getWindowHeight(self):
     #    return self.windowHeight
-        
+    
+    def closeEvent(self, event):
+        if self.okToContinue():
+            settings = QSettings()
+            settings.setValue("MainWindow/Size", QVariant(self.size()))
+            settings.setValue("MainWindow/Position", QVariant(self.pos()))
+        else:
+            event.ignore()
+
+    def okToContinue(self):
+        reply = QMessageBox.question(self, "Exit?", "Do you want to exit Solitaire?",
+                                     QMessageBox.Yes|QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            return True
+        else:
+            return False
