@@ -5,7 +5,7 @@ Created on 7 apr 2014
 '''
 
 from view import solitaireWindow
-from model import boardModel
+#from model import boardModel
 
 from PyQt5.QtCore import QPointF
 
