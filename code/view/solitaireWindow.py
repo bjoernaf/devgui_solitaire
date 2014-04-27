@@ -30,7 +30,7 @@ class solitaireWindow(QMainWindow):
 #    windowHeight = 300
 
 
-    def __init__(self, title):
+    def __init__(self, title, gameStateController):
         '''
         Init function, create a graphicsScene spawning a boardView and attach it to a graphicsView
         '''
@@ -39,23 +39,27 @@ class solitaireWindow(QMainWindow):
 
         settings = QSettings()
         size = settings.value("MainWindow/Size", QSize(800,600))
-        #, QVariant(QSize(500, 300))).toSize()
-        self.resize(size)
         position = settings.value("MainWindow/Position", QVariant(QPoint(0, 0)))
-        #.toPoint()
+    
+        self.resize(size)
         self.move(position)
         
         #Create a boardView with self (parent) as argument, set it's position and att it to the scene
-        bView = boardView.boardView(500, 300)
+        bView = boardView.boardView(500, 300, gameStateController)
         #                            size.width(), size.height())
         self.setCentralWidget(bView)
         self.setWindowTitle(title)
         self.createUI()
         self.createMenu()
+        self.show()
 
     
     def createUI(self):
+        '''
+        Creates UI... (sets window title only... unnessecary?)
+        '''
         self.setWindowTitle(self.winTitle)
+        
         
     def createMenu(self):
         '''
@@ -90,6 +94,29 @@ class solitaireWindow(QMainWindow):
         # Populate HelpMenu
         helpMenu.addAction('About')
     
+    def closeEvent(self, event):
+        '''
+        Overrides closeEvent to provide confirm dialogue and save settings
+        '''
+        if self.okToContinue():
+            settings = QSettings()
+            settings.setValue("MainWindow/Size", QVariant(self.size()))
+            settings.setValue("MainWindow/Position", QVariant(self.pos()))
+        else:
+            event.ignore()
+
+    def okToContinue(self):
+        '''
+        Creates a QMessageBox that prompts users if they wish to exit or not
+        Returns True if yes, else False.
+        '''
+        reply = QMessageBox.question(self, "Exit?", "Do you want to exit Solitaire?",
+                                     QMessageBox.Yes|QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            return True
+        else:
+            return False
+        
     #def resizeEvent(self, event):
     #    self.windowWidth = event.size().width
     #    self.windowHeight = event.size().height
@@ -100,18 +127,3 @@ class solitaireWindow(QMainWindow):
     #def getWindowHeight(self):
     #    return self.windowHeight
     
-    def closeEvent(self, event):
-        if self.okToContinue():
-            settings = QSettings()
-            settings.setValue("MainWindow/Size", QVariant(self.size()))
-            settings.setValue("MainWindow/Position", QVariant(self.pos()))
-        else:
-            event.ignore()
-
-    def okToContinue(self):
-        reply = QMessageBox.question(self, "Exit?", "Do you want to exit Solitaire?",
-                                     QMessageBox.Yes|QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            return True
-        else:
-            return False

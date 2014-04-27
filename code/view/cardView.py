@@ -19,6 +19,7 @@ from PyQt5.QtGui import (
     QPainter
 )
 from PyQt5.QtWidgets import (QGraphicsTextItem, QGraphicsItem)
+from view import communicator
 
 import random
 
@@ -38,6 +39,17 @@ class cardView(QGraphicsItem):
 
     def boundingRect(self):
         return QRectF(0, 0, self.cardWidth, self.cardHeight)
+    
+
+    
+    def mousePressEvent(self, event):
+        '''
+        Override mousePressedEvent to send signal, then call default
+        '''
+        print("Clicked card in view")
+        self.com.signal.emit(self.color, self.value, self.pos())
+        QGraphicsItem.mousePressEvent(self, event)
+        
     
     def paint(self, painter, option, widget=None): 
         '''
@@ -69,12 +81,17 @@ class cardView(QGraphicsItem):
         
         #TODO add more stuff such as animation etc
     
-    def __init__(self):
+    def __init__(self, gameStateController):
         '''
         Constructor:
         Creates the card with random color & value, then calls drawContent to draw items on the card
         '''
         super(cardView, self).__init__()
+        
+        # Create communicator, move somewhere else???
+        self.com = communicator.communicator()
+        # Connect slot (signalInterpreter) to signal (com.signal)
+        self.com.signal.connect(gameStateController.signalInterpreter)
         
         ## TODO: Anvand metoder i cardModel for getColor och getValue
         self.color = random.randint(1,4)

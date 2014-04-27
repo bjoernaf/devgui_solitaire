@@ -19,7 +19,7 @@ class boardView(QGraphicsView):
     classdocs
     '''
         
-    def drawContent(self):
+    def drawContent(self, gameStateController):
         '''
         set up the graphics scene and add items to it (stacks eventually, for now cards)
         '''
@@ -41,33 +41,34 @@ class boardView(QGraphicsView):
         #TODO Add stacks
         
         #Create and add cards (move to stackView)
-        card1 = cardView.cardView()
+        card1 = cardView.cardView(gameStateController)
         card1.setPos(10,10)
         self.scene.addItem(card1)
         
         #Create and add cards (move to stackView)
-        card2 = cardView.cardView()
+        card2 = cardView.cardView(gameStateController)
         card2.setPos(25,30)
         self.scene.addItem(card2)
         
         #Create and add cards (move to stackView)
-        card3 = cardView.cardView()
+        card3 = cardView.cardView(gameStateController)
         card3.setPos(350,150)
         self.scene.addItem(card3)
         
         
 
-    def __init__(self, windowWidth, windowHeight):
+    def __init__(self, windowWidth, windowHeight, gameStateController):
         '''
         Constructor:
         Creates a graphicsScene, calls drawContent and sets the scene as active scene in boardView
         '''
         super(boardView,self).__init__()
+        
 
         # Create a scene based on the parent's size
         # TODO TODO Scene never grows so far, fix resize event
         self.scene = QGraphicsScene(0, 0, windowWidth, windowHeight)
         
         # Call drawContent to draw stacks etc, then set scene as active in the view (boardView)
-        self.drawContent()
+        self.drawContent(gameStateController)
         self.setScene(self.scene)

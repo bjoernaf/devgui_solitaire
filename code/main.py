@@ -1,29 +1,27 @@
 '''
 Created on 7 apr 2014
 
-@author: Sven, Bjorn
+@author: Sven, Bjorn, Martin
 '''
 
 import sys
-from view import solitaireWindow
+from controller import gameStateController
 from PyQt5.QtWidgets import QApplication
  
 def main():
     '''
-    Main, creates an app and a MainWindow with title as parameter.
+    Main, creates an app and a gameStateController
     '''
     
-    # Create an application
+    # Create an application and set properties
     app = QApplication(sys.argv)
-    
     app.setOrganizationName("Group 13")
     app.setOrganizationDomain("group13.se")
     app.setApplicationName("Solitaire")
     
-    # Create and show the main window,
-    solWin = solitaireWindow.solitaireWindow("Solitaire")
-    solWin.show()
-    
+    # Create gameStateController (controller in MVC)
+    gsc = gameStateController.gameStateController()
+
     sys.exit(app.exec_())
 
 if __name__ == '__main__':

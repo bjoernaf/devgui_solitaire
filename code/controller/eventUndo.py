@@ -1,16 +1,18 @@
 '''
 Created on 7 apr 2014
 
-@author: Sven, Björn
+@author: Sven, Bjorn
 '''
 
-class MyClass(object):
+class eventUndo(object):
     '''
-    classdocs
+    Stores past events on a stack for undo/redo
     '''
+    
+    eventStack = []
 
 
-    def __init__(self, params):
+    def __init__(self):
         '''
         Constructor
         '''
