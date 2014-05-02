@@ -49,6 +49,7 @@ class gameStateController(object):
         Slot receiving a signal from the Edit menu's undo function.
         Calls the undo function of the undoStack
         '''
+        print("Controller: Undo()")
         self.undoStack.undo()
         
     def redo(self):
@@ -57,6 +58,7 @@ class gameStateController(object):
         Calls the redo function of the undoStack
         TODO: Find out how this works
         '''
+        print("Controller: Redo()")
         self.undoStack.redo()
         
     def moveCard(self, fromStack, toStack, cardID):
