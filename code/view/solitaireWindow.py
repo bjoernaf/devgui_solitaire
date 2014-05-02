@@ -36,17 +36,21 @@ class solitaireWindow(QMainWindow):
         '''
         
         super(solitaireWindow,self).__init__()
+        
+        # GameStateController needed for menu to Undo/Redo
+        self.gameStateController = gameStateController
 
+        # Set up settings to store properties (width, height etc)
         settings = QSettings()
+        
+        # Get size and position, resize and move accordingly
         size = settings.value("MainWindow/Size", QSize(800,600))
         position = settings.value("MainWindow/Position", QVariant(QPoint(0, 0)))
-    
         self.resize(size)
         self.move(position)
         
-        #Create a boardView with self (parent) as argument, set it's position and att it to the scene
+        #Create a boardView and set it as central widget, create Menu
         bView = boardView.boardView(500, 300, gameStateController)
-        #                            size.width(), size.height())
         self.setCentralWidget(bView)
         self.setWindowTitle(title)
         self.createUI()
@@ -60,6 +64,23 @@ class solitaireWindow(QMainWindow):
         '''
         self.setWindowTitle(self.winTitle)
         
+    def updateMenuUndo(self, canUndo):
+        '''
+        Slot called by Controller if possibility to Undo changes
+        Enables undo in Menu>Edit if there are commands to undo and
+        disables undo in Menu>Edit if there are no commands to undo.
+        '''
+        print("Can undo changed: " + str(canUndo))
+        self.undoAction.setEnabled(canUndo)
+        
+    def updateMenuRedo(self, canRedo):
+        '''
+        Slot called by Controller if possibility to Redo changes
+        Enables redo in Menu>Edit if there are commands to redo and
+        disables redo in Menu>Edit if there are no commands to redo.
+        '''
+        print("Can redo changed: " + str(canRedo))
+        self.redoAction.setEnabled(canRedo)
         
     def createMenu(self):
         '''
@@ -67,28 +88,32 @@ class solitaireWindow(QMainWindow):
         '''
         
         # Create MenuBar
-        menuBar = self.menuBar()
+        self.menuBar = self.menuBar()
         
         # Create Menus
-        fileMenu = menuBar.addMenu('&File')
-        editMenu = menuBar.addMenu('&Edit')
-        helpMenu = menuBar.addMenu('&Help')
+        fileMenu = self.menuBar.addMenu('&File')
+        editMenu = self.menuBar.addMenu('&Edit')
+        helpMenu = self.menuBar.addMenu('&Help')
         
         # Populate FileMenu
-        exitAction = QAction('Exit', self)        
-        exitAction.setShortcut('Ctrl+Q')
-        exitAction.triggered.connect(self.close)
-        fileMenu.addAction(exitAction)
+        self.exitAction = QAction('Exit', self)        
+        self.exitAction.setShortcut('Ctrl+Q')
+        self.exitAction.triggered.connect(self.close)
+        fileMenu.addAction(self.exitAction)
         
         # Populate EditMenu with actions
-        undoAction = QAction('Undo', self)        
-        undoAction.setShortcut('Ctrl+Z')
+        self.undoAction = QAction('Undo', self)        
+        self.undoAction.setShortcut('Ctrl+Z')
+        self.undoAction.setEnabled(False)
+        self.undoAction.triggered.connect(self.gameStateController.undo)
         
-        redoAction = QAction('Redo', self)        
-        redoAction.setShortcut('Ctrl+Y')
+        self.redoAction = QAction('Redo', self)        
+        self.redoAction.setShortcut('Ctrl+Y')
+        self.redoAction.setEnabled(False)
+        self.redoAction.triggered.connect(self.gameStateController.redo)
         
-        editMenu.addAction(undoAction)
-        editMenu.addAction(redoAction)
+        editMenu.addAction(self.undoAction)
+        editMenu.addAction(self.redoAction)
         editMenu.addAction('Preferences')
         
         # Populate HelpMenu

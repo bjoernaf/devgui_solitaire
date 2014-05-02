@@ -28,12 +28,15 @@ class gameStateController(object):
         # TODO TODO REMOVE COMMENT WHEN MODEL WORKS
         self.model = boardModel.boardModel()
         
-        # Create undoStack
-        self.undoStack = QUndoStack()
-        
         # Create the main window (View), pass controller as parameter
         self.solWin = solitaireWindow.solitaireWindow("Solitaire", self)
         self.solWin.show()
+        
+        # Create undoStack
+        self.undoStack = QUndoStack()
+        # Send signal if possibility to undo/redo changes
+        self.undoStack.canUndoChanged.connect(self.solWin.updateMenuUndo)
+        self.undoStack.canRedoChanged.connect(self.solWin.updateMenuRedo)
         
         self.testUndo()
         
