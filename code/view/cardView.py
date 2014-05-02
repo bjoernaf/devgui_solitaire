@@ -34,7 +34,7 @@ class cardView(QGraphicsItem):
     cardXRad = 9.0
     cardYRad = 9.0
     
-
+    opacity = 1.0
 
 
     def boundingRect(self):
@@ -49,12 +49,34 @@ class cardView(QGraphicsItem):
         print("Clicked card in view")
         self.com.signal.emit(self.color, self.value, self.pos())
         QGraphicsItem.mousePressEvent(self, event)
+        self.opacity = 0.1
+        drag = QDrag(event.widget())
+        mime = QMimeData()
+        drag.setMimeData(mime)
+        drag.exec_()
+ 
+ 
+    def mouseReleaseEvent(self, event):
+        '''
+        Override mousePressedEvent to send signal, then call default
+        '''
+        print("card mouse release event")
+        #self.com.signal.emit(self.color, self.value, self.pos())
+        QGraphicsItem.mouseReleaseEvent(self, event)
+        self.opacity = 1.0
         
+    def dropEvent(self, event):
+        print("drop")
+        
+    def dragEnterEvent(self, event):
+        print("drag")
     
     def paint(self, painter, option, widget=None): 
         '''
         Override of the default paint function to draw a rounded rectangle instead of a regular rectangle
-        ''' 
+        '''
+        #print("card paint")
+        painter.setOpacity(self.opacity)
         painter.setPen(Qt.black)
         painter.setBrush(Qt.white)
         painter.drawRoundedRect(0, 0, cardView.cardWidth, cardView.cardHeight, cardView.cardXRad, cardView.cardYRad, Qt.AbsoluteSize)
@@ -106,4 +128,5 @@ class cardView(QGraphicsItem):
         self.setFlag(QGraphicsItem.ItemIsSelectable);
         self.setFlag(QGraphicsItem.ItemIsMovable);
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges);
+        self.setAcceptDrops(True)
         
