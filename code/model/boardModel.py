@@ -84,7 +84,18 @@ class boardModel(object):
             
             print("MODEL: findTopCardInStack: Top card in stack " + str(stack) + " is card " + str(oldCard) + ".")
             return oldCard
+    
+    
+    def findStackOfCard(self, card):
+        '''
+        Returns the stack card belongs to.
+        '''
+        tempCard = card
+
+        while(self.cardOrderDict[tempCard][0] >= 0):
+            tempCard = self.cardOrderDict[tempCard][0]
         
+        return self.cardOrderDict[tempCard][0]
         
     def getCard(self, card):
         '''
@@ -120,7 +131,13 @@ class boardModel(object):
         '''
         
         print("MODEL: MoveCard: Entering moveCard with arguments (" + str(fromStack) + ", " + str(toStack) + ", " + str(card) + ").");
-        print("MODEL: MoveCard: DEBUG: The fromStack argument doesn't do anything and should be removed --Bjorn")
+        
+        'Make sure fromStack is sane.'
+        if(self.findStackOfCard(card) != fromStack):
+            print("MODEL: MoveCard: Sanity check: Card " + str(card) + " is NOT in Stack " + str(fromStack) + " -- ABORTING.")
+            return False
+        else:
+            print("MODEL: MoveCard: Sanity check: Card " + str(card) + " is in Stack " + str(fromStack) + " -- continue.")
         
         'These are the cards that will be affected by the move, in addition to card.'
         oldPrev = self.cardOrderDict[card][0]
@@ -132,7 +149,7 @@ class boardModel(object):
             print("MODEL: MoveCard: Move card " + str(card) + " to empty stack " + str(toStack) + ".");
         else:
             self.cardOrderDict[card] = (newPrev, self.cardOrderDict[card][1])
-            self.cardOrderDict[newPrev] = (self.cardOrderDict[newPrev], card)
+            self.cardOrderDict[newPrev] = (self.cardOrderDict[newPrev][0], card)
             print("MODEL: MoveCard: Move card " + str(card) + " to non-empty stack " + str(toStack) + ". Put on " + str(newPrev) + ".");
         
         try:
@@ -141,7 +158,7 @@ class boardModel(object):
             print("MODEL: MoveCard: Stack " + str(oldPrev) + " is now empty.");
         
         print("MODEL: MoveCard: Finished.");
-
+        return True
         
         
     def createSortedDeck(self):
