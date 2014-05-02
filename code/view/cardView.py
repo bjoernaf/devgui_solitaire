@@ -114,6 +114,11 @@ class cardView(QGraphicsItem):
         self.com = communicator.communicator()
         # Connect slot (signalInterpreter) to signal (com.signal)
         self.com.signal.connect(gameStateController.signalInterpreter)
+        # Connect slot (moveCard) to signal (com.moveCardSignal).
+        # Call as self.com.moveCardSignal.emit(fromStack, toStack, cardID)
+        self.com.moveCardSignal.connect(gameStateController.moveCard)
+        
+
         
         ## TODO: Anvand metoder i cardModel for getColor och getValue
         self.color = random.randint(1,4)

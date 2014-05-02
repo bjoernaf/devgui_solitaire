@@ -39,4 +39,16 @@ class gameStateController(object):
         print("Signal received in controller from card:")
         print("Color: ", color,  " Value: ",  value, " X-coord: ", point.x(), " Y-coord:", point.y())
         
+    def moveCard(self, fromStack, toStack, cardID):
+        '''
+        Slot receiving signals from view. Creates a moveCardCommand(QUndoCommand)
+        and pushes it on the undoStack.
+        '''
+        # Temporary print until implemented
+        print("Controller: moveCardCommand(fromStack:" + str(fromStack) + ", toStack:" + str(toStack) + ", cardID:" + str(cardID) + ")")
+        
+        # Create moveCardCommand
+        
+        # Push command to undoStack
+        
         

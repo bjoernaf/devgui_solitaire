@@ -12,6 +12,10 @@ class communicator(QObject):
     '''
     # just a test signal to move a card
     signal = pyqtSignal(int, int, QPointF, name='cardInfo')
+    
+    # signal to move cards.
+    # call as moveCardSignal(fromStack, toStack, cardID)
+    moveCardSignal = pyqtSignal(int, int, int, name='moveCard')
 
 
     def __init__(self):
