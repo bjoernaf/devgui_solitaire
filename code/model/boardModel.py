@@ -5,9 +5,9 @@ Created on 7 apr 2014
 '''
 
 from model import cardModel
-from enum import Enum
+#from enum import Enum
 
-class boardStacks(Enum):
+class boardStacks(object):
     '''
     This class contains the id numbers of the stacks, for use in the internal representation and API
     to the board model itself.
