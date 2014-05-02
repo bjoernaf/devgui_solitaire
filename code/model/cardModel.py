@@ -8,7 +8,9 @@ class cardModel(object):
     '''
     classdocs
     '''
-
+    color = None
+    value = None
+    
 
     def __init__(self, color, value):
         '''
