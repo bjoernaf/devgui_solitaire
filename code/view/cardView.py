@@ -10,23 +10,21 @@ from PyQt5.QtCore import (
     Qt,
     QRectF,
     QMimeData,
-    QPoint
+    #QPoint
 )
 from PyQt5.QtGui import (
-    QFont,
+    #QFont,
     QDrag,
     QPixmap,
     #QFont, QColor, QPen, QPixmap, QPainter, QBrush
     QPainter
 )
-from PyQt5.QtWidgets import (QGraphicsTextItem, QGraphicsItem)
+from PyQt5.QtWidgets import QGraphicsItem
 from view import communicator
-
-import random
 
 class cardView(QGraphicsItem):
     '''
-    classdocs
+    Class to create and display one single card in the QGraphicsView
     '''
 
     ## TODO: Smartare size
@@ -52,7 +50,7 @@ class cardView(QGraphicsItem):
         This is called when an object is moved with the mouse pressed down
         '''
         
-        # Make object invisible during drag
+        # TODO: Make object invisible during drag
         #self.setVisible(False)
         
         #Create a drag event and a mime to go with it??
@@ -66,6 +64,7 @@ class cardView(QGraphicsItem):
         
         # Create a pixmap to paint the move on
         pixmap = QPixmap(self.cardWidth, self.cardHeight)
+        pixmap.fill(Qt.transparent)
         
         # Create a painter for the pixmap
         painter = QPainter(pixmap)
@@ -79,6 +78,7 @@ class cardView(QGraphicsItem):
         painter.end()
         self.opacity = 1
         
+        
         # Set Pixmap and HotSpot to mouse location
         drag.setPixmap(pixmap)
         drag.setHotSpot(event.pos().toPoint())
@@ -86,8 +86,6 @@ class cardView(QGraphicsItem):
         #Execute drag etc
         drag.exec_()
         self.setCursor(Qt.OpenHandCursor)
-        
-        QGraphicsItem.mouseMoveEvent(self, event)
  
  
     def mouseReleaseEvent(self, event):
