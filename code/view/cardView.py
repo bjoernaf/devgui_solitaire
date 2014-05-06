@@ -109,30 +109,12 @@ class cardView(QGraphicsItem):
         painter.setBrush(Qt.white)
         painter.setRenderHint(QPainter.Antialiasing)
         painter.drawRoundedRect(0, 0, self.cardWidth, self.cardHeight, self.cardXRad, self.cardYRad, Qt.AbsoluteSize)
-        txt = self.drawContent()
-        painter.drawText(txt.boundingRect(), Qt.AlignCenter, txt.toPlainText())
-           
-    def drawContent(self):
-        '''
-        Draw the contents of the card
-        '''
         
-        # Set font and size
-        font=QFont('Decorative')
-        font.setPointSize(8)
-        
-        #Add red card value to upper left corner of it's parent (self), TEMPORARY STUFF
-        cardNumber = QGraphicsTextItem(str(self.value))
-        cardNumber.setFont(font)
-        cardNumber.setDefaultTextColor(Qt.red)
-        cardNumber.setPos(3,3)
-        cardNumber.setParentItem(self)
-        
-        return cardNumber;
-        
-        #TODO add more stuff such as animation etc
+        #TODO print in correct color etc
+        painter.drawText(5, 15, str(self.value))
+
     
-    def __init__(self, gameStateController, color, value, id):
+    def __init__(self, gameStateController, color, value, cardId):
         '''
         Constructor:
         Creates the card with random color & value, then calls drawContent to draw items on the card
@@ -150,10 +132,7 @@ class cardView(QGraphicsItem):
         ## TODO: Anvand metoder i cardModel for getColor och getValue
         self.color = color
         self.value = value
-        self.id = id
-
-        # Call function to draw stuff on the card        
-        self.drawContent()       
+        self.id = cardId     
         
         # ???
         self.shape()
@@ -161,6 +140,5 @@ class cardView(QGraphicsItem):
         self.setFlags(QGraphicsItem.ItemIsSelectable);
         self.setFlag(QGraphicsItem.ItemIsMovable);
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges);
-        #self.setAcceptDrops(True)
         self.setCursor(Qt.OpenHandCursor)
         

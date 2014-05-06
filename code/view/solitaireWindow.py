@@ -52,10 +52,8 @@ class solitaireWindow(QMainWindow):
         #Create a boardView and set it as central widget, create Menu
         self.bView = boardView.boardView(500, 300, gameStateController)
         self.setCentralWidget(self.bView)
-        self.setWindowTitle(title)
         self.createUI()
         self.createMenu()
-        self.show()
 
     
     def createUI(self):

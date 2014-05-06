@@ -40,9 +40,6 @@ class boardView(QGraphicsView):
         #Set background color to dark green
         self.scene.setBackgroundBrush(Qt.darkGreen)
         
-        #TODO Add stacks
-        
-        
         
         # Create stacks as
         # stackView.stackView(parent, gameStateController, boardStacks.boardStacks.STACKID, x-offset, y-offset, [faceUp])
@@ -94,19 +91,17 @@ class boardView(QGraphicsView):
         '''
         super(boardView,self).__init__()
         
+        # List to store all cards in
         self.cardList = list()
+        
         # Create cards in cardList
         index = 0
         for color in range(1, 5):
             for number in range(1,14):
                 self.cardList.append(cardView.cardView(gameStateController, color, number, index))
                 index += 1
-        
-        # Get list of stacks
-        
 
         # Create a scene based on the parent's size
-        # TODO TODO Scene never grows so far, fix resize event
         self.scene = QGraphicsScene(0, 0, windowWidth, windowHeight)
         
         # Call drawContent to draw stacks etc, then set scene as active in the view (boardView)
