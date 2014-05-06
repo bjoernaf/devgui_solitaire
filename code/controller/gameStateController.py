@@ -122,9 +122,24 @@ class gameStateController(object):
         
         
     def printOut(self):
+        '''
+        Debug function that prints the drawable stack.
+        '''
         print("--BEGIN PRINTOUT--")
         aList = self.model.getStack(boardModel.boardStacks.Drawable)
         for i in range(0, len(aList)):
             aCard = self.model.getCard(aList[i])
             print(str(aCard.getColor()) + " : " + str(aCard.getValue()))
         print("--END PRINTOUT--")
+
+    def getCard(self, cardId):
+        '''
+        Returns the cardModel representation of the card with id cardId.
+        '''
+        return model.getCard(cardId)
+
+    def getStack(self, stackId):
+        '''
+        Returns a list of all card id:s in stack stackId, from bottom to top.
+        '''
+        return model.getStack(stackId)
