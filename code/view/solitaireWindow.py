@@ -50,8 +50,8 @@ class solitaireWindow(QMainWindow):
         self.move(position)
         
         #Create a boardView and set it as central widget, create Menu
-        bView = boardView.boardView(500, 300, gameStateController)
-        self.setCentralWidget(bView)
+        self.bView = boardView.boardView(500, 300, gameStateController)
+        self.setCentralWidget(self.bView)
         self.setWindowTitle(title)
         self.createUI()
         self.createMenu()
@@ -129,6 +129,15 @@ class solitaireWindow(QMainWindow):
             settings.setValue("MainWindow/Position", QVariant(self.pos()))
         else:
             event.ignore()
+            
+    def resizeEvent(self, event):
+        '''
+        Overrides resizeEvent to resize the QGraphicsScene as well
+        '''
+        #print("SOLWIN: resizeEvent")
+        #print("SOLWIN: Size: ", event.size())
+        self.bView.resizeEvent(event)
+        QMainWindow.resizeEvent(self, event)
 
     def okToContinue(self):
         '''
@@ -141,14 +150,3 @@ class solitaireWindow(QMainWindow):
             return True
         else:
             return False
-        
-    #def resizeEvent(self, event):
-    #    self.windowWidth = event.size().width
-    #    self.windowHeight = event.size().height
-        
-    #def getWindowWidth(self):
-    #    return self.windowWidth
-    
-    #def getWindowHeight(self):
-    #    return self.windowHeight
-    
