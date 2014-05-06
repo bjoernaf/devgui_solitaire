@@ -111,3 +111,13 @@ class boardView(QGraphicsView):
         # Call drawContent to draw stacks etc, then set scene as active in the view (boardView)
         self.drawContent(gameStateController)
         self.setScene(self.scene)
+        
+        
+    def resizeEvent(self, event):
+        '''
+        Override of resizeEvent called from solWin to match size
+        '''
+        #print("BOARDVIEW: ResizeEvent")
+        self.scene.setSceneRect(0, 0, event.size().width(), event.size().height())
+        #print("BOARDVIEW: Actual size:", self.scene.width(), self.scene.height())
+        QGraphicsView.resizeEvent(self, event)

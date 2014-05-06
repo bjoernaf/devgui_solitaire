@@ -16,7 +16,8 @@ from PyQt5.QtGui import (
     QDrag,
     QPixmap,
     #QFont, QColor, QPen, QPixmap, QPainter, QBrush
-    QPainter
+    QPainter,
+    QCursor
 )
 from PyQt5.QtWidgets import (QGraphicsTextItem, QGraphicsItem)
 from view import communicator
@@ -40,21 +41,50 @@ class cardView(QGraphicsItem):
     def boundingRect(self):
         return QRectF(0, 0, self.cardWidth, self.cardHeight)
     
-
-    
     def mousePressEvent(self, event):
-        '''
-        Override mousePressEvent to send signal, then call default
-        '''
-        print("Clicked card in view")
+        self.setCursor(Qt.ClosedHandCursor)
         self.com.signal.emit(self.color, self.value, self.pos())
         QGraphicsItem.mousePressEvent(self, event)
-        self.opacity = 0.1
-      #  drag = QDrag(event.widget())
-        drag = QDrag(self)
+    
+    def mouseMoveEvent(self, event):
+        '''
+        This is called when an object is moved with the mouse pressed down
+        '''
+        
+        # Make object invisible during drag
+        self.setVisible(False)
+        
+        #Create a drag event and a mime to go with it??
+        drag = QDrag(event.widget())
         mime = QMimeData()
         drag.setMimeData(mime)
+        mime.setText("Card")
+        
+        # Create a pixmap to paint the move on
+        pixmap = QPixmap(self.cardWidth, self.cardHeight)
+        
+        # Create a painter for the pixmap
+        painter = QPainter(pixmap)
+        
+        # Translate coord system (snygg flytt indikation typ)
+        #painter.translate(5,5)
+        painter.setRenderHint(QPainter.Antialiasing)
+        
+        # Set opacity to 30%, paint and then set it to 100% again
+        self.opacity = 0.3
+        self.paint(painter, 0)
+        painter.end()
+        self.opacity = 1
+        
+        # Set Pixmap and HotSpot to mouse location
+        drag.setPixmap(pixmap)
+        drag.setHotSpot(event.pos().toPoint())
+        
+        #Execute drag etc
         drag.exec_()
+        self.setCursor(Qt.OpenHandCursor)
+        
+        QGraphicsItem.mouseMoveEvent(self, event)
  
  
     def mouseReleaseEvent(self, event):
@@ -63,11 +93,13 @@ class cardView(QGraphicsItem):
         '''
         print("card mouse release event")
         #self.com.signal.emit(self.color, self.value, self.pos())
+        self.setCursor(Qt.OpenHandCursor)
         QGraphicsItem.mouseReleaseEvent(self, event)
-        self.opacity = 1.0
+        
         
     def dropEvent(self, event):
         print("drop")
+        self.opacity = 1.0
         
     def dragEnterEvent(self, event):
         print("drag")
@@ -76,7 +108,6 @@ class cardView(QGraphicsItem):
         '''
         Override of the default paint function to draw a rounded rectangle instead of a regular rectangle
         '''
-        #print("card paint")
         painter.setOpacity(self.opacity)
         painter.setPen(Qt.black)
         painter.setBrush(Qt.white)
@@ -119,8 +150,6 @@ class cardView(QGraphicsItem):
         # Call as self.com.moveCardSignal.emit(fromStack, toStack, cardID)
         self.com.moveCardSignal.connect(gameStateController.moveCard)
         
-
-        
         ## TODO: Anvand metoder i cardModel for getColor och getValue
         self.color = random.randint(1,4)
         self.value = random.randint(1,13)
@@ -131,8 +160,9 @@ class cardView(QGraphicsItem):
         # ???
         self.shape()
         
-        self.setFlag(QGraphicsItem.ItemIsSelectable);
+        self.setFlags(QGraphicsItem.ItemIsSelectable);
         self.setFlag(QGraphicsItem.ItemIsMovable);
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges);
         self.setAcceptDrops(True)
+        self.setCursor(Qt.OpenHandCursor)
         
