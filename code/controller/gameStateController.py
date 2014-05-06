@@ -11,6 +11,8 @@ from PyQt5.QtCore import QPointF
 from PyQt5.QtWidgets import QUndoStack
 
 from controller import moveCardCommand
+from controller import communicator
+from view import boardView
 
 class gameStateController(object):
     '''
@@ -24,9 +26,12 @@ class gameStateController(object):
         '''
         super(gameStateController,self).__init__()
         
+        # Initialize communicator
+        self.com = communicator.communicator()
+        
         # Create the model, pass controller as parameter
         # TODO TODO REMOVE COMMENT WHEN MODEL WORKS
-        self.model = boardModel.boardModel()
+        self.model = boardModel.boardModel(gameStateController)
         
         # Create the main window (View), pass controller as parameter
         self.solWin = solitaireWindow.solitaireWindow("Solitaire", self)
@@ -37,6 +42,11 @@ class gameStateController(object):
         # Send signal if possibility to undo/redo changes
         self.undoStack.canUndoChanged.connect(self.solWin.updateMenuUndo)
         self.undoStack.canRedoChanged.connect(self.solWin.updateMenuRedo)
+        
+        # Connect updateStacks to slot in model
+        self.com.updateSignal.connect(self.solWin.bView.updateStacks)
+        
+        
         
         self.testUndo()
         
@@ -77,6 +87,14 @@ class gameStateController(object):
         
         # Push command to undoStack, undoStack automatically performs command redo()
         self.undoStack.push(aMoveCardCommand)
+        
+    def updateStacks(self, stacks):
+        '''
+        Slot receiving stack update from model
+        '''
+        print("Stacks", stacks)
+        self.com.updateSignal.emit(stacks)
+        
         
     def testUndo(self):
         '''

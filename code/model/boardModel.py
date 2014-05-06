@@ -6,6 +6,7 @@ Created on 7 apr 2014
 
 from model import cardModel
 #from enum import Enum
+from model import communicator
 
 class boardStacks(object):
     '''
@@ -43,10 +44,12 @@ class boardModel(object):
     cardOrderDict = dict()
     
     
-    def __init__(self):
+    def __init__(self, gameStateController):
         '''
         Constructor
         '''
+        
+        self.gameStateController = gameStateController
         
         # Create cards in cardList
         for color in range(1, 5):
@@ -54,6 +57,11 @@ class boardModel(object):
                 self.cardList.append(cardModel.cardModel(color, number))
         
         self.createSortedDeck()
+        
+        # Set up communicator
+        self.com = communicator.communicator()
+        # Connect signal to slot
+        self.com.updateSignal.connect(gameStateController.updateStacks)
         
     
     def findRootCardInStack(self, stack):
@@ -158,6 +166,10 @@ class boardModel(object):
             print("MODEL: MoveCard: Stack " + str(oldPrev) + " is now empty.");
         
         print("MODEL: MoveCard: Finished.");
+        
+        # Create dictionary and send in signal to controller
+        self.com.updateSignal.emit(1, self.getStackDict())
+        
         return True
         
         
@@ -170,6 +182,14 @@ class boardModel(object):
             self.cardOrderDict[i] = (i-1,i+1)
         self.cardOrderDict[len(self.cardList) - 1] = (len(self.cardList) - 2, None);
         
-    
-
+    def getStackDict(self):
+        '''
+        Creates a dictionary with (stackID, list[cardID]) and returns it
+        '''
+        stackDict = dict()
+        
+        for stack in vars(boardStacks):
+            if not callable(stack) and not stack.startswith("__"):
+                stackDict[getattr(boardStacks, stack)] = self.getStack(getattr(boardStacks, stack))
             
+        return stackDict

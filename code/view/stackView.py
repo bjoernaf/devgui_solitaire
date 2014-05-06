@@ -4,7 +4,7 @@ Created on 7 apr 2014
 @author: Sven, Bjorn, Martin
 '''
 
-from PyQt5.QtCore import Qt, QRectF
+from PyQt5.QtCore import Qt, QRectF, pyqtSignal
 from PyQt5.QtGui import QPen
 from PyQt5.QtWidgets import (QGraphicsItem)
 from view import communicator
@@ -39,10 +39,14 @@ class stackView(QGraphicsItem):
         
         # Accept drops on the stacks
         self.setAcceptDrops(True)
+        
 
     def boundingRect(self):
         return QRectF(self.rectx, self.recty,
                       self.rectWidth, self.rectHeight) 
+    
+        
+    
 
     def paint(self, painter, option, widget=None):
         pen = QPen()
@@ -70,3 +74,6 @@ class stackView(QGraphicsItem):
         DropEvent when an item is dropped on the stack
         '''
         print("Dropped item: " + event.mimeData().text())
+        
+        # Update stack to add moved cards
+        #self.com.moveCardSignal.emit(fromStack, toStack, cardID)

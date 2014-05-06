@@ -112,7 +112,11 @@ class boardView(QGraphicsView):
         self.drawContent(gameStateController)
         self.setScene(self.scene)
         
-        
+    def updateStacks(self, stacks):
+        '''
+        Slot for signal in controller. Receives new stack content if changes have occured.
+        '''
+                
     def resizeEvent(self, event):
         '''
         Override of resizeEvent called from solWin to match size
