@@ -16,8 +16,7 @@ from PyQt5.QtGui import (
     QDrag,
     QPixmap,
     #QFont, QColor, QPen, QPixmap, QPainter, QBrush
-    QPainter,
-    QCursor
+    QPainter
 )
 from PyQt5.QtWidgets import (QGraphicsTextItem, QGraphicsItem)
 from view import communicator
@@ -35,6 +34,7 @@ class cardView(QGraphicsItem):
     cardXRad = 9.0
     cardYRad = 9.0
     
+    # Opacity flag used in paint function
     opacity = 1.0
 
 
@@ -68,7 +68,6 @@ class cardView(QGraphicsItem):
         
         # Translate coord system (snygg flytt indikation typ)
         #painter.translate(5,5)
-        painter.setRenderHint(QPainter.Antialiasing)
         
         # Set opacity to 30%, paint and then set it to 100% again
         self.opacity = 0.3
@@ -111,7 +110,8 @@ class cardView(QGraphicsItem):
         painter.setOpacity(self.opacity)
         painter.setPen(Qt.black)
         painter.setBrush(Qt.white)
-        painter.drawRoundedRect(0, 0, cardView.cardWidth, cardView.cardHeight, cardView.cardXRad, cardView.cardYRad, Qt.AbsoluteSize)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.drawRoundedRect(0, 0, self.cardWidth, self.cardHeight, self.cardXRad, self.cardYRad, Qt.AbsoluteSize)
         txt = self.drawContent()
         painter.drawText(txt.boundingRect(), Qt.AlignCenter, txt.toPlainText())
            

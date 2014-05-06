@@ -6,7 +6,7 @@ Created on 7 apr 2014
 
 from PyQt5.QtCore import Qt, QRectF
 from PyQt5.QtGui import QPen
-from PyQt5.QtWidgets import (QGraphicsTextItem, QGraphicsItem)
+from PyQt5.QtWidgets import (QGraphicsItem)
 from view import communicator
 
 class stackView(QGraphicsItem):
@@ -19,6 +19,11 @@ class stackView(QGraphicsItem):
     height = 130
     xRadius = 9
     yRadius = 9
+    
+    rectx = penWidth/2
+    recty = penWidth/2 
+    rectWidth = width + penWidth
+    rectHeight = height + penWidth
 
     def __init__(self, gameStateController):
         '''
@@ -36,9 +41,8 @@ class stackView(QGraphicsItem):
         self.setAcceptDrops(True)
 
     def boundingRect(self):
-        return QRectF(-stackView.penWidth/2, -stackView.penWidth/2,
-                      stackView.width + stackView.penWidth,
-                      stackView.height + stackView.penWidth) 
+        return QRectF(self.rectx, self.recty,
+                      self.rectWidth, self.rectHeight) 
 
     def paint(self, painter, option, widget=None):
         pen = QPen()
