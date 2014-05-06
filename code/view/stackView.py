@@ -124,9 +124,12 @@ class stackView(QGraphicsItem):
     def setParents(self):
         offset_x = 0
         offset_y = 0
+        index = 0
         for card in self.stackCardList:
             offset_x += self.offset_x
             offset_y += self.offset_y
             self.parent.cardList[card].setPos(offset_x, offset_y)
             self.parent.cardList[card].setParentItem(self)
+            self.parent.cardList[card].setZValue(index)
+            index += 1
         self.update()
