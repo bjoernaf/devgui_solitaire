@@ -12,7 +12,7 @@ The boardView contains a QGraphicsScene that displays stacks (created in stackVi
 from PyQt5.QtCore import (Qt)
 from PyQt5.QtGui import (QFont)
 from PyQt5.QtWidgets import (QGraphicsTextItem, QGraphicsScene, QGraphicsView)
-from view import cardView
+from view import cardView, stackView
 
 class boardView(QGraphicsView):
     '''
@@ -32,7 +32,8 @@ class boardView(QGraphicsView):
         centerText=QGraphicsTextItem('Solitaire')
         centerText.setFont(font)
         centerText.setDefaultTextColor(Qt.white)
-        centerText.setPos(180,120)
+#        centerText.setPos(180,120)
+        centerText.setPos(270, 170)
         self.scene.addItem(centerText)
         
         #Set background color to dark green
@@ -42,20 +43,58 @@ class boardView(QGraphicsView):
         
         #Create and add cards (move to stackView)
         card1 = cardView.cardView(gameStateController)
-        card1.setPos(10,10)
+#        card1.setPos(10,10)
+        card1.setPos(600, 10)
         self.scene.addItem(card1)
         
         #Create and add cards (move to stackView)
         card2 = cardView.cardView(gameStateController)
-        card2.setPos(25,30)
+#        card2.setPos(25,30)
+        card2.setPos(615, 30)
         self.scene.addItem(card2)
         
         #Create and add cards (move to stackView)
+        #card3 = cardView.cardView(gameStateController)
         card3 = cardView.cardView(gameStateController)
-        card3.setPos(350,150)
+#        card3.setPos(350,150)
+        card3.setPos(630, 50)
         self.scene.addItem(card3)
         
+        deckStackView = stackView.stackView(gameStateController)
+        deckStackView.setPos(10, 120)
+        self.scene.addItem(deckStackView)
+
+        topLLStackView = stackView.stackView(gameStateController)
+        topLLStackView.setPos(120, 10)
+        self.scene.addItem(topLLStackView)        
+
+        topMLStackView = stackView.stackView(gameStateController)
+        topMLStackView.setPos(230, 10)
+        self.scene.addItem(topMLStackView)
         
+        topMRStackView = stackView.stackView(gameStateController)
+        topMRStackView.setPos(340, 10)
+        self.scene.addItem(topMRStackView)
+        
+        topRRStackView = stackView.stackView(gameStateController)
+        topRRStackView.setPos(450, 10)
+        self.scene.addItem(topRRStackView)
+
+        bottomLLStackView = stackView.stackView(gameStateController)
+        bottomLLStackView.setPos(120, 240)
+        self.scene.addItem(bottomLLStackView)        
+
+        bottomMLStackView = stackView.stackView(gameStateController)
+        bottomMLStackView.setPos(230, 240)
+        self.scene.addItem(bottomMLStackView)
+        
+        bottomMRStackView = stackView.stackView(gameStateController)
+        bottomMRStackView.setPos(340, 240)
+        self.scene.addItem(bottomMRStackView)
+        
+        bottomRRStackView = stackView.stackView(gameStateController)
+        bottomRRStackView.setPos(450, 240)
+        self.scene.addItem(bottomRRStackView)
 
     def __init__(self, windowWidth, windowHeight, gameStateController):
         '''

@@ -44,13 +44,14 @@ class cardView(QGraphicsItem):
     
     def mousePressEvent(self, event):
         '''
-        Override mousePressedEvent to send signal, then call default
+        Override mousePressEvent to send signal, then call default
         '''
         print("Clicked card in view")
         self.com.signal.emit(self.color, self.value, self.pos())
         QGraphicsItem.mousePressEvent(self, event)
         self.opacity = 0.1
-        drag = QDrag(event.widget())
+      #  drag = QDrag(event.widget())
+        drag = QDrag(self)
         mime = QMimeData()
         drag.setMimeData(mime)
         drag.exec_()
@@ -58,7 +59,7 @@ class cardView(QGraphicsItem):
  
     def mouseReleaseEvent(self, event):
         '''
-        Override mousePressedEvent to send signal, then call default
+        Override mouseReleaseEvent to send signal, then call default
         '''
         print("card mouse release event")
         #self.com.signal.emit(self.color, self.value, self.pos())

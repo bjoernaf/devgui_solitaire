@@ -44,13 +44,13 @@ class solitaireWindow(QMainWindow):
         settings = QSettings()
         
         # Get size and position, resize and move accordingly
-        size = settings.value("MainWindow/Size", QSize(800,600))
+        size = settings.value("MainWindow/Size", QSize(900,600))
         position = settings.value("MainWindow/Position", QVariant(QPoint(0, 0)))
         self.resize(size)
         self.move(position)
         
         #Create a boardView and set it as central widget, create Menu
-        bView = boardView.boardView(500, 300, gameStateController)
+        bView = boardView.boardView(800, 500, gameStateController)
         self.setCentralWidget(bView)
         self.setWindowTitle(title)
         self.createUI()
