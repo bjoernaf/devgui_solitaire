@@ -31,6 +31,9 @@ class stackView(QGraphicsItem):
         # Connect slot (moveCard) to signal (com.moveCardSignal).
         # Call as self.com.moveCardSignal.emit(fromStack, toStack, cardID)
         self.com.moveCardSignal.connect(gameStateController.moveCard)
+        
+        # Accept drops on the stacks
+        self.setAcceptDrops(True)
 
     def boundingRect(self):
         return QRectF(-stackView.penWidth/2, -stackView.penWidth/2,
@@ -45,3 +48,21 @@ class stackView(QGraphicsItem):
         painter.setPen(pen)
         painter.drawRoundedRect(0, 0, 90, 130, 9.0, 9.0, Qt.AbsoluteSize)
         painter.setPen(Qt.white)
+        
+        
+    def dragEnterEvent(self, event):
+        '''
+        Run when a drag object enters the bounding rectangle of a stack
+        Set event to accepted, drop will then generate dropEvent
+        '''
+        if event.mimeData().text() == "Card":
+            event.setAccepted(True)
+            print("Event drop accepted")
+        else:
+            print("Event drop ignored")
+            
+    def dropEvent(self, event):
+        '''
+        DropEvent when an item is dropped on the stack
+        '''
+        print("Dropped item: " + event.mimeData().text())
