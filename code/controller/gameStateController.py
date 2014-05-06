@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import QUndoStack
 from controller import moveCardCommand
 from controller import communicator
 from view import boardView
+from model import boardStacks
 
 class gameStateController(object):
     '''
@@ -31,7 +32,7 @@ class gameStateController(object):
         
         # Create the model, pass controller as parameter
         # TODO TODO REMOVE COMMENT WHEN MODEL WORKS
-        self.model = boardModel.boardModel(gameStateController)
+        self.model = boardModel.boardModel(self)
         
         # Create the main window (View), pass controller as parameter
         self.solWin = solitaireWindow.solitaireWindow("Solitaire", self)
@@ -74,6 +75,13 @@ class gameStateController(object):
         print("Controller: Redo()")
         self.undoStack.redo()
         
+    def updateControllerStacks(self, stacks):
+        '''
+        Slot receiving stack update from model
+        '''
+        # Forward stacks to view
+        self.com.updateSignal.emit(stacks)
+        
     def moveCard(self, fromStack, toStack, cardID):
         '''
         Slot receiving signals from view. Creates a moveCardCommand(QUndoCommand)
@@ -88,13 +96,6 @@ class gameStateController(object):
         # Push command to undoStack, undoStack automatically performs command redo()
         self.undoStack.push(aMoveCardCommand)
         
-    def updateStacks(self, stacks):
-        '''
-        Slot receiving stack update from model
-        '''
-        print("Stacks", stacks)
-        self.com.updateSignal.emit(stacks)
-        
         
     def testUndo(self):
         '''
@@ -107,13 +108,13 @@ class gameStateController(object):
             print(str(i) + ". " + str(aCard.getColor()) + " : " + str(aCard.getValue()))
             
         print("--BEGIN MOVE--")
-        self.moveCard(boardModel.boardStacks.Deck, boardModel.boardStacks.Drawable, 39)
+        self.moveCard(boardStacks.boardStacks.Deck, boardStacks.boardStacks.Drawable, 39)
         print("--END MOVE--")
         
         self.printOut()
         
         print("--BEGIN MOVE--")
-        self.moveCard(boardModel.boardStacks.Deck, boardModel.boardStacks.Drawable, 26)
+        self.moveCard(boardStacks.boardStacks.Deck, boardStacks.boardStacks.Drawable, 26)
         print("--END MOVE--")
         
         self.printOut()
@@ -144,7 +145,7 @@ class gameStateController(object):
         Debug function that prints the drawable stack.
         '''
         print("--BEGIN PRINTOUT--")
-        aList = self.model.getStack(boardModel.boardStacks.Drawable)
+        aList = self.model.getStack(boardStacks.boardStacks.Drawable)
         for i in range(0, len(aList)):
             aCard = self.model.getCard(aList[i])
             print(str(aCard.getColor()) + " : " + str(aCard.getValue()))

@@ -10,8 +10,8 @@ class communicator(QObject):
     '''
     Communicator for signals 
     '''
-    # Update stack signal)
-    updateSignal = pyqtSignal(int, dict, name='updateSignal')
+    # Update stack signal from model to view
+    updateStackSignal = pyqtSignal(dict, name='updateSignal')
 
 
     def __init__(self):

@@ -13,6 +13,7 @@ from PyQt5.QtCore import (Qt)
 from PyQt5.QtGui import (QFont)
 from PyQt5.QtWidgets import (QGraphicsTextItem, QGraphicsScene, QGraphicsView)
 from view import cardView, stackView
+from model import boardStacks
 
 class boardView(QGraphicsView):
     '''
@@ -41,60 +42,50 @@ class boardView(QGraphicsView):
         
         #TODO Add stacks
         
-        #Create and add cards (move to stackView)
-        card1 = cardView.cardView(gameStateController)
-#        card1.setPos(10,10)
-        card1.setPos(600, 10)
-        self.scene.addItem(card1)
         
-        #Create and add cards (move to stackView)
-        card2 = cardView.cardView(gameStateController)
-#        card2.setPos(25,30)
-        card2.setPos(615, 30)
-        self.scene.addItem(card2)
         
-        #Create and add cards (move to stackView)
-        #card3 = cardView.cardView(gameStateController)
-        card3 = cardView.cardView(gameStateController)
-#        card3.setPos(350,150)
-        card3.setPos(630, 50)
-        self.scene.addItem(card3)
+        # Create stacks as
+        # stackView.stackView(parent, gameStateController, boardStacks.boardStacks.STACKID, x-offset, y-offset, [faceUp])
+        self.deckStackView = stackView.stackView(self, gameStateController, boardStacks.boardStacks.Deck, 0, 0, False)
+        self.deckStackView.setPos(10, 120)
+        self.scene.addItem(self.deckStackView)
         
-        deckStackView = stackView.stackView(gameStateController)
-        deckStackView.setPos(10, 120)
-        self.scene.addItem(deckStackView)
+        self.drawableStackView = stackView.stackView(self, gameStateController, boardStacks.boardStacks.Drawable, 8, 0)
+        self.drawableStackView.setPos(10, 300)
+        self.scene.addItem(self.drawableStackView)
 
-        topLLStackView = stackView.stackView(gameStateController)
-        topLLStackView.setPos(120, 10)
-        self.scene.addItem(topLLStackView)        
+        self.topLLStackView = stackView.stackView(self, gameStateController, boardStacks.boardStacks.TopLL)
+        self.topLLStackView.setPos(120, 10)
+        self.scene.addItem(self.topLLStackView)        
 
-        topMLStackView = stackView.stackView(gameStateController)
-        topMLStackView.setPos(230, 10)
-        self.scene.addItem(topMLStackView)
+        self.topMLStackView = stackView.stackView(self, gameStateController, boardStacks.boardStacks.TopML)
+        self.topMLStackView.setPos(230, 10)
+        self.scene.addItem(self.topMLStackView)
         
-        topMRStackView = stackView.stackView(gameStateController)
-        topMRStackView.setPos(340, 10)
-        self.scene.addItem(topMRStackView)
+        self.topMRStackView = stackView.stackView(self, gameStateController, boardStacks.boardStacks.TopMR)
+        self.topMRStackView.setPos(340, 10)
+        self.scene.addItem(self.topMRStackView)
         
-        topRRStackView = stackView.stackView(gameStateController)
-        topRRStackView.setPos(450, 10)
-        self.scene.addItem(topRRStackView)
+        self.topRRStackView = stackView.stackView(self, gameStateController, boardStacks.boardStacks.TopRR)
+        self.topRRStackView.setPos(450, 10)
+        self.scene.addItem(self.topRRStackView)
 
-        bottomLLStackView = stackView.stackView(gameStateController)
-        bottomLLStackView.setPos(120, 240)
-        self.scene.addItem(bottomLLStackView)        
+        self.bottomLLStackView = stackView.stackView(self, gameStateController, boardStacks.boardStacks.BottomLL)
+        self.bottomLLStackView.setPos(120, 240)
+        self.scene.addItem(self.bottomLLStackView)        
 
-        bottomMLStackView = stackView.stackView(gameStateController)
-        bottomMLStackView.setPos(230, 240)
-        self.scene.addItem(bottomMLStackView)
+        self.bottomMLStackView = stackView.stackView(self, gameStateController, boardStacks.boardStacks.BottomML)
+        self.bottomMLStackView.setPos(230, 240)
+        self.scene.addItem(self.bottomMLStackView)
         
-        bottomMRStackView = stackView.stackView(gameStateController)
-        bottomMRStackView.setPos(340, 240)
-        self.scene.addItem(bottomMRStackView)
+        self.bottomMRStackView = stackView.stackView(self, gameStateController, boardStacks.boardStacks.BottomMR)
+        self.bottomMRStackView.setPos(340, 240)
+        self.scene.addItem(self.bottomMRStackView)
         
-        bottomRRStackView = stackView.stackView(gameStateController)
-        bottomRRStackView.setPos(450, 240)
-        self.scene.addItem(bottomRRStackView)
+        self.bottomRRStackView = stackView.stackView(self, gameStateController, boardStacks.boardStacks.BottomRR)
+        self.bottomRRStackView.setPos(450, 240)
+        self.scene.addItem(self.bottomRRStackView)
+        
 
     def __init__(self, windowWidth, windowHeight, gameStateController):
         '''
@@ -102,6 +93,16 @@ class boardView(QGraphicsView):
         Creates a graphicsScene, calls drawContent and sets the scene as active scene in boardView
         '''
         super(boardView,self).__init__()
+        
+        self.cardList = list()
+        # Create cards in cardList
+        index = 0
+        for color in range(1, 5):
+            for number in range(1,14):
+                self.cardList.append(cardView.cardView(gameStateController, color, number, index))
+                index += 1
+        
+        # Get list of stacks
         
 
         # Create a scene based on the parent's size
@@ -116,6 +117,16 @@ class boardView(QGraphicsView):
         '''
         Slot for signal in controller. Receives new stack content if changes have occured.
         '''
+        print("BOARDVIREW: ", stacks)
+        
+        for key in stacks.keys():
+            print(key)
+            if(key == boardStacks.boardStacks.Deck):
+                self.deckStackView.updateStackList(stacks[key])
+            if(key == boardStacks.boardStacks.Drawable):
+                self.drawableStackView.updateStackList(stacks[key])
+            if(key == boardStacks.boardStacks.TopLL):
+                self.topLLStackView.updateStackList(stacks[key])
                 
     def resizeEvent(self, event):
         '''

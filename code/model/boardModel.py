@@ -5,29 +5,8 @@ Created on 7 apr 2014
 '''
 
 from model import cardModel
-#from enum import Enum
 from model import communicator
-
-class boardStacks(object):
-    '''
-    This class contains the id numbers of the stacks, for use in the internal representation and API
-    to the board model itself.
-    '''
-    
-    Deck = -1
-    Drawable = -2
-    
-    TopLL = -11
-    TopML = -12
-    TopMR = -13
-    TopRR = -14
-    
-    BottomLL = -21
-    BottomML = -22
-    BottomMR = -23
-    BottomRR = -24
-    
-    DragCard = -30
+from model import boardStacks
 
 
 class boardModel(object):
@@ -48,20 +27,19 @@ class boardModel(object):
         '''
         Constructor
         '''
-        
-        self.gameStateController = gameStateController
+        # Set up communicator
+        self.com = communicator.communicator()
+        # Connect signal to slot
+        self.com.updateStackSignal.connect(gameStateController.updateControllerStacks)
         
         # Create cards in cardList
         for color in range(1, 5):
             for number in range(1,14):
                 self.cardList.append(cardModel.cardModel(color, number))
         
+        # Create deck of cards and notify view
         self.createSortedDeck()
-        
-        # Set up communicator
-        self.com = communicator.communicator()
-        # Connect signal to slot
-        self.com.updateSignal.connect(gameStateController.updateStacks)
+        self.com.updateStackSignal.emit(self.getStackDict())
         
     
     def findRootCardInStack(self, stack):
@@ -168,7 +146,7 @@ class boardModel(object):
         print("MODEL: MoveCard: Finished.");
         
         # Create dictionary and send in signal to controller
-        self.com.updateSignal.emit(1, self.getStackDict())
+        self.com.updateStackSignal.emit(self.getStackDict())
         
         return True
         
@@ -177,10 +155,10 @@ class boardModel(object):
         '''
         Adds all cards in self.cardList to the Deck.
         '''
-        self.cardOrderDict[0] = (boardStacks.Deck, 1);
+        self.cardOrderDict[0] = (boardStacks.boardStacks.Deck, 1)
         for i in range(1, len(self.cardList) - 1):
             self.cardOrderDict[i] = (i-1,i+1)
-        self.cardOrderDict[len(self.cardList) - 1] = (len(self.cardList) - 2, None);
+        self.cardOrderDict[len(self.cardList) - 1] = (len(self.cardList) - 2, None)
         
     def getStackDict(self):
         '''
@@ -188,8 +166,8 @@ class boardModel(object):
         '''
         stackDict = dict()
         
-        for stack in vars(boardStacks):
+        for stack in vars(boardStacks.boardStacks):
             if not callable(stack) and not stack.startswith("__"):
-                stackDict[getattr(boardStacks, stack)] = self.getStack(getattr(boardStacks, stack))
+                stackDict[getattr(boardStacks.boardStacks, stack)] = self.getStack(getattr(boardStacks.boardStacks, stack))
             
         return stackDict

@@ -4,6 +4,7 @@ Created on 7 apr 2014
 @author: Sven, Bjorn
 cardView is an QGraphicsRectItem representing a card. 
 '''
+from model import boardStacks
 
 from PyQt5.QtCore import (
     Qt,
@@ -52,13 +53,16 @@ class cardView(QGraphicsItem):
         '''
         
         # Make object invisible during drag
-        self.setVisible(False)
+        #self.setVisible(False)
         
         #Create a drag event and a mime to go with it??
         drag = QDrag(event.widget())
         mime = QMimeData()
         drag.setMimeData(mime)
-        mime.setText("Card")
+        mime.setText(str(self.id))
+        
+        # TODO: RIMLIGT ATT ANVÄNDA PARENT? --BJORN
+        self.com.moveCardSignal.emit(self.parentItem().stackId, boardStacks.boardStacks.DragCard, self.id)
         
         # Create a pixmap to paint the move on
         pixmap = QPixmap(self.cardWidth, self.cardHeight)
@@ -95,13 +99,6 @@ class cardView(QGraphicsItem):
         self.setCursor(Qt.OpenHandCursor)
         QGraphicsItem.mouseReleaseEvent(self, event)
         
-        
-    def dropEvent(self, event):
-        print("drop")
-        self.opacity = 1.0
-        
-    def dragEnterEvent(self, event):
-        print("drag")
     
     def paint(self, painter, option, widget=None): 
         '''
@@ -135,7 +132,7 @@ class cardView(QGraphicsItem):
         
         #TODO add more stuff such as animation etc
     
-    def __init__(self, gameStateController):
+    def __init__(self, gameStateController, color, value, id):
         '''
         Constructor:
         Creates the card with random color & value, then calls drawContent to draw items on the card
@@ -151,8 +148,9 @@ class cardView(QGraphicsItem):
         self.com.moveCardSignal.connect(gameStateController.moveCard)
         
         ## TODO: Anvand metoder i cardModel for getColor och getValue
-        self.color = random.randint(1,4)
-        self.value = random.randint(1,13)
+        self.color = color
+        self.value = value
+        self.id = id
 
         # Call function to draw stuff on the card        
         self.drawContent()       
@@ -163,6 +161,6 @@ class cardView(QGraphicsItem):
         self.setFlags(QGraphicsItem.ItemIsSelectable);
         self.setFlag(QGraphicsItem.ItemIsMovable);
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges);
-        self.setAcceptDrops(True)
+        #self.setAcceptDrops(True)
         self.setCursor(Qt.OpenHandCursor)
         
