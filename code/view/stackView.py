@@ -96,10 +96,17 @@ class stackView(QGraphicsItem):
         Run when a drag object enters the bounding rectangle of a stack
         Set event to accepted, drop will then generate dropEvent
         '''
-        if int(event.mimeData().text()) < 52:
-            event.setAccepted(True)
-            print("Event drop accepted")
+        #If DragEvent originates from within Solitaire
+        if event.source() != None:
+            # Check that it contains a valid card id as text
+            if event.mimeData().hasText() and int(event.mimeData().text()) < 52:
+                event.accept()
+                print("Event drop accepted")
+            else:
+                event.ignore()
+                print("Event drop ignored")
         else:
+            event.ignore()
             print("Event drop ignored")
             
     def dropEvent(self, event):
@@ -115,13 +122,18 @@ class stackView(QGraphicsItem):
 
     def updateStackList(self, cardList):
         '''
-        Give the stack a new set of cards.
+        Slot called by controller when the model has changed.
+        Gives the stack a new set of cards.
         '''
-        
         self.stackCardList = cardList
         self.setParents()
         
     def setParents(self):
+        '''
+        Sets the stack as parent for all cards.
+        Sets the position of the card to display a stack properly.
+        Makes sure the cards are displayed in the correct order.
+        '''
         offset_x = 5
         offset_y = 5
         index = 0

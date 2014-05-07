@@ -59,7 +59,7 @@ class cardView(QGraphicsItem):
         drag.setMimeData(mime)
         mime.setText(str(self.id))
         
-        # TODO: RIMLIGT ATT ANVÄNDA PARENT? --BJORN
+        # TODO: RIMLIGT ATT ANVANDA PARENT? --BJORN
         self.com.moveCardSignal.emit(self.parentItem().stackId, boardStacks.boardStacks.DragCard, self.id)
         
         # Create a pixmap to paint the move on
