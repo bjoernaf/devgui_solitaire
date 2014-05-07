@@ -18,9 +18,12 @@ class boardStacks(object):
     TopMR = -13
     TopRR = -14
     
-    BottomLL = -21
-    BottomML = -22
-    BottomMR = -23
-    BottomRR = -24
+    Bottom1 = -21
+    Bottom2 = -22
+    Bottom3 = -23
+    Bottom4 = -24
+    Bottom5 = -25
+    Bottom6 = -26
+    Bottom7 = -27
     
     DragCard = -30

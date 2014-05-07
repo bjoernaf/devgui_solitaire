@@ -106,38 +106,52 @@ class gameStateController(object):
         for i in range(0,52):
             aCard = self.model.getCard(i)
             print(str(i) + ". " + str(aCard.getColor()) + " : " + str(aCard.getValue()))
-            
+
+# === ADDED BY MARTIN
+#       Makes sure that the cards are initially on the Deck stack, at the cost of
+#       introducing an extra move from Drawable to Deck.
+
         print("--BEGIN MOVE--")
-        self.moveCard(boardStacks.boardStacks.Deck, boardStacks.boardStacks.Drawable, 39)
+        self.moveCard(boardStacks.boardStacks.Drawable, boardStacks.boardStacks.Deck, 0)
         print("--END MOVE--")
         
         self.printOut()
-        
-        print("--BEGIN MOVE--")
-        self.moveCard(boardStacks.boardStacks.Deck, boardStacks.boardStacks.Drawable, 26)
-        print("--END MOVE--")
-        
-        self.printOut()
-        
-        print("--BEGIN MOVE--")
-        #board.moveCard(boardModel.boardStacks.Drawable, boardModel.boardStacks.Deck, 26)
-        self.undo()
-        print("--END MOVE--")
-        
-        
-        self.printOut()
-        
-        print("--BEGIN MOVE--")
+
         self.redo()
-        print("--END MOVE--")
-        
-        self.printOut()
-        
-        print("--BEGIN MOVE--")
-        self.undo()
-        print("--END MOVE--")
-        
-        self.printOut()
+
+# === END ADDED BY MARTIN
+            
+#         print("--BEGIN MOVE--")
+#         self.moveCard(boardStacks.boardStacks.Deck, boardStacks.boardStacks.Drawable, 39)
+#         print("--END MOVE--")
+#         
+#         self.printOut()
+#         
+#         print("--BEGIN MOVE--")
+#         self.moveCard(boardStacks.boardStacks.Deck, boardStacks.boardStacks.Drawable, 26)
+#         print("--END MOVE--")
+#         
+#         self.printOut()
+#         
+#         print("--BEGIN MOVE--")
+#         #board.moveCard(boardModel.boardStacks.Drawable, boardModel.boardStacks.Deck, 26)
+#         self.undo()
+#         print("--END MOVE--")
+#         
+#         
+#         self.printOut()
+#         
+#         print("--BEGIN MOVE--")
+#         self.redo()
+#         print("--END MOVE--")
+#         
+#         self.printOut()
+#         
+#         print("--BEGIN MOVE--")
+#         self.undo()
+#         print("--END MOVE--")
+#         
+#         self.printOut()
         
         
     def printOut(self):

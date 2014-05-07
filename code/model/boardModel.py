@@ -155,7 +155,11 @@ class boardModel(object):
         '''
         Adds all cards in self.cardList to the Deck.
         '''
-        self.cardOrderDict[0] = (boardStacks.boardStacks.Deck, 1)
+#       Temporarily commented out. In order to make the deck visible, it is
+#       created on the Drawable stack and then moved to Deck
+#       (in gameStateController).
+#        self.cardOrderDict[0] = (boardStacks.boardStacks.Deck, 1)
+        self.cardOrderDict[0] = (boardStacks.boardStacks.Drawable, 1)
         for i in range(1, len(self.cardList) - 1):
             self.cardOrderDict[i] = (i-1,i+1)
         self.cardOrderDict[len(self.cardList) - 1] = (len(self.cardList) - 2, None)

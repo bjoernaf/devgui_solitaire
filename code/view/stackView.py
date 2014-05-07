@@ -56,8 +56,8 @@ class stackView(QGraphicsItem):
         #card3 = cardView.cardView(gameStateController)
         #card = cardView.cardView(gameStateController)
         print(parent)
-        parent.cardList[2].setPos(5,5)
-        parent.cardList[2].setParentItem(self)
+        #parent.cardList[2].setPos(5,5)
+        #parent.cardList[2].setParentItem(self)
 #        card3.setPos(350,150)
         #card.setPos(5, 5)
         #card.setParentItem(self)
@@ -122,14 +122,14 @@ class stackView(QGraphicsItem):
         self.setParents()
         
     def setParents(self):
-        offset_x = 0
-        offset_y = 0
+        offset_x = 5
+        offset_y = 5
         index = 0
         for card in self.stackCardList:
-            offset_x += self.offset_x
-            offset_y += self.offset_y
             self.parent.cardList[card].setPos(offset_x, offset_y)
             self.parent.cardList[card].setParentItem(self)
             self.parent.cardList[card].setZValue(index)
+            offset_x += self.offset_x
+            offset_y += self.offset_y
             index += 1
         self.update()
