@@ -5,15 +5,18 @@ Created on 7 apr 2014
 '''
 
 from view import solitaireWindow
+from view import sliderWindow
 from model import boardModel
 
 from PyQt5.QtCore import QPointF
 from PyQt5.QtWidgets import QUndoStack
+from PyQt5.QtWidgets import QDialog
 
 from controller import moveCardCommand
 from controller import communicator
 from view import boardView
 from model import boardStacks
+
 
 class gameStateController(object):
     '''
@@ -21,8 +24,11 @@ class gameStateController(object):
     It interprets signals from the view and calls appropriate method in the model.
     '''
 
+    opacity = 100
+
     def __init__(self):
-        '''
+        '''face
+        
         Constructor
         '''
         super(gameStateController,self).__init__()
@@ -35,8 +41,13 @@ class gameStateController(object):
         self.model = boardModel.boardModel(self)
         
         # Create the main window (View), pass controller as parameter
-        self.solWin = solitaireWindow.solitaireWindow("Solitaire", self)
+        self.solWin = solitaireWindow.solitaireWindow("Solitaire", self)     
+        
         self.solWin.show()
+        
+        self.opacity = 100
+        self.slide = sliderWindow.sliderWindow("Opacity", self)
+        self.slide.show()
         
         # Create undoStack
         self.undoStack = QUndoStack()

@@ -34,10 +34,7 @@ class cardView(QGraphicsItem):
     cardHeight = 120
     cardXRad = 9.0
     cardYRad = 9.0
-    
-    # Opacity flag used in paint function
-    opacity = 1.0
-    
+       
     # Bounding rectangles to paint card number and images in
     boundingValueLeft = QRectF(4, 3, 12, 15)
     boundingValueRight = QRectF(-cardWidth+4, -cardHeight+3, 12, 15)
@@ -52,6 +49,7 @@ class cardView(QGraphicsItem):
         self.setCursor(Qt.ClosedHandCursor)
         self.com.signal.emit(self.color, self.value, self.pos())
         QGraphicsItem.mousePressEvent(self, event)
+        print(self.gsc.opacity)
     
     def mouseMoveEvent(self, event):
         '''
@@ -81,11 +79,8 @@ class cardView(QGraphicsItem):
         #painter.translate(5,5)
         
         # Set opacity to 30%, paint and then set it to 100% again
-        self.opacity = 0.3
         self.paint(painter, 0)
         painter.end()
-        self.opacity = 1
-        
         
         # Set Pixmap and HotSpot to mouse location
         drag.setPixmap(pixmap)
@@ -110,8 +105,7 @@ class cardView(QGraphicsItem):
         '''
         Override of the default paint function to draw a rounded rectangle instead of a regular rectangle
         '''
-        # Set opacity to paint entire card with
-        painter.setOpacity(self.opacity)
+        painter.setOpacity(self.gsc.opacity/100.0)
         
         # Set pen and color to paint card with
         painter.setPen(Qt.black)
@@ -178,7 +172,10 @@ class cardView(QGraphicsItem):
         ## TODO: Anvand metoder i cardModel for getColor och getValue
         self.color = color
         self.value = value
-        self.id = cardId   
+        self.id = cardId 
+        
+        #save game state controller instance
+        self.gsc = gameStateController  
         
         # Load image
         self.loadImage(self.color)  
