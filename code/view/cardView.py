@@ -10,14 +10,16 @@ from PyQt5.QtCore import (
     Qt,
     QRectF,
     QMimeData,
+    QSize,
     #QPoint
 )
 from PyQt5.QtGui import (
-    #QFont,
     QDrag,
     QPixmap,
-    #QFont, QColor, QPen, QPixmap, QPainter, QBrush
-    QPainter
+    QFont, 
+    #QColor, QPen, QBrush
+    QPainter,
+    QImage
 )
 from PyQt5.QtWidgets import QGraphicsItem
 from view import communicator
@@ -35,6 +37,12 @@ class cardView(QGraphicsItem):
     
     # Opacity flag used in paint function
     opacity = 1.0
+    
+    # Bounding rectangles to paint card number and images in
+    boundingValueLeft = QRectF(4, 3, 12, 15)
+    boundingValueRight = QRectF(-cardWidth+4, -cardHeight+3, 12, 15)
+    boundingImageLeft = QRectF(5.3, 16, 10, 10)
+    boundingImageRight = QRectF(-cardWidth+5.3, -cardHeight+16, 10, 10)
 
 
     def boundingRect(self):
@@ -102,14 +110,54 @@ class cardView(QGraphicsItem):
         '''
         Override of the default paint function to draw a rounded rectangle instead of a regular rectangle
         '''
+        # Set opacity to paint entire card with
         painter.setOpacity(self.opacity)
+        
+        # Set pen and color to paint card with
         painter.setPen(Qt.black)
         painter.setBrush(Qt.white)
+        
+        # Paint a rounded anti-aliased rectangle and fill it with white representing the card
         painter.setRenderHint(QPainter.Antialiasing)
         painter.drawRoundedRect(0, 0, self.cardWidth, self.cardHeight, self.cardXRad, self.cardYRad, Qt.AbsoluteSize)
         
-        #TODO print in correct color etc
-        painter.drawText(5, 15, str(self.value))
+        # Card value: Set font style and color
+        font = QFont("Helvetica")
+        font.setBold(True)
+        painter.setFont(font)
+        if self.color in range(2,4):
+            painter.setPen(Qt.red)
+            
+        # Paint upper left text and image
+        painter.drawText(self.boundingValueLeft, Qt.AlignTop | Qt.AlignHCenter, self.toStr(self.value))
+        painter.drawImage(self.boundingImageLeft, self.image)
+        
+        #Paint lower right text and image
+        painter.rotate(180)
+        painter.drawText(self.boundingValueRight, Qt.AlignTop | Qt.AlignHCenter, self.toStr(self.value))
+        painter.drawImage(self.boundingImageRight, self.image)
+        
+        
+    def loadImage(self, color):
+        '''
+        Loads an image from file with color.png as filename.
+        Stores image in self.image
+        '''
+        self.image = QImage("images/" + str(self.color) + "_small.png")
+        self.image = self.image.scaledToHeight(10)
+        if self.image.isNull():
+            print("Error loading image")
+            
+    def toStr(self, value):
+        '''
+        Returns correct string corresponding to a card value
+        '''
+        return {
+                1: "A",
+                11: "J",
+                12: "Q",
+                13: "K",
+                }.get(value, str(value))
 
     
     def __init__(self, gameStateController, color, value, cardId):
@@ -130,7 +178,10 @@ class cardView(QGraphicsItem):
         ## TODO: Anvand metoder i cardModel for getColor och getValue
         self.color = color
         self.value = value
-        self.id = cardId     
+        self.id = cardId   
+        
+        # Load image
+        self.loadImage(self.color)  
         
         # ???
         self.shape()
