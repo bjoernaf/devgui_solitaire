@@ -14,9 +14,10 @@ from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsTextItem, QGraphicsScene, Q
 '''
 
 from PyQt5.QtCore import (QSettings, QSize, QVariant, QPoint)
-from PyQt5.QtWidgets import (QMainWindow, QAction, QMessageBox)
+from PyQt5.QtWidgets import (QMainWindow, QAction, QMessageBox, QSlider)
 
 from view import boardView
+
 
 class solitaireWindow(QMainWindow):
     '''
@@ -42,18 +43,19 @@ class solitaireWindow(QMainWindow):
 
         # Set up settings to store properties (width, height etc)
         settings = QSettings()
-        
+          
         # Get size and position, resize and move accordingly
         size = settings.value("MainWindow/Size", QSize(900,600))
         position = settings.value("MainWindow/Position", QVariant(QPoint(0, 0)))
         self.resize(size)
         self.move(position)
-        
+                       
         #Create a boardView and set it as central widget, create Menu
         self.bView = boardView.boardView(500, 300, gameStateController)
         self.setCentralWidget(self.bView)
         self.createUI()
         self.createMenu()
+
 
     
     def createUI(self):
