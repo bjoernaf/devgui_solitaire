@@ -15,6 +15,7 @@ from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsTextItem, QGraphicsScene, Q
 
 from PyQt5.QtCore import (QSettings, QSize, QVariant, QPoint, Qt)
 from PyQt5.QtWidgets import (QMainWindow, QAction, QMessageBox, QToolBar)
+from PyQt5.QtGui import QIcon
 
 from view import boardView
 from view import transSlider
@@ -50,14 +51,19 @@ class solitaireWindow(QMainWindow):
         self.resize(size)
         self.move(position)
         
-        #Create a boardView and set it as central widget, create Menu
+        # Create a boardView and set it as central widget, create Menu
         self.bView = boardView.boardView(500, 300, gameStateController)
         self.setCentralWidget(self.bView)
         self.createUI()
         self.createMenu()
         
+        # Create a transparency slider for the cards
         self.slide = transSlider.transSlider(self.gameStateController)
+        # Create a toolbar and add appropriate actions and widgets to it
         self.toolbar = QToolBar()
+        self.toolbar.addAction(self.undoAction)
+        self.toolbar.addAction(self.redoAction)
+        self.toolbar.addSeparator()
         self.toolbar.addWidget(self.slide)
         self.addToolBar(Qt.TopToolBarArea, self.toolbar)
 
@@ -106,12 +112,12 @@ class solitaireWindow(QMainWindow):
         fileMenu.addAction(self.exitAction)
         
         # Populate EditMenu with actions
-        self.undoAction = QAction('Undo', self)        
+        self.undoAction = QAction(QIcon('images/undo.png'), 'Undo', self)        
         self.undoAction.setShortcut('Ctrl+Z')
         self.undoAction.setEnabled(False)
         self.undoAction.triggered.connect(self.gameStateController.undo)
         
-        self.redoAction = QAction('Redo', self)        
+        self.redoAction = QAction(QIcon('images/redo.png'), 'Redo', self)        
         self.redoAction.setShortcut('Ctrl+Y')
         self.redoAction.setEnabled(False)
         self.redoAction.triggered.connect(self.gameStateController.redo)
