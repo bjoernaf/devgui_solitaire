@@ -40,7 +40,6 @@ class boardView(QGraphicsView):
         #Set background color to dark green
         self.scene.setBackgroundBrush(Qt.darkGreen)
         
-        
         # Create stacks as
         # stackView.stackView(parent, gameStateController, boardStacks.boardStacks.STACKID, x-offset, y-offset, [faceUp])
         self.deckStackView = stackView.stackView(self, gameStateController,

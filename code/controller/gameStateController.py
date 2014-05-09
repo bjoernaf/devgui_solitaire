@@ -27,6 +27,8 @@ class gameStateController(object):
         '''
         super(gameStateController,self).__init__()
         
+        self.opacity = 100
+        
         # Initialize communicator
         self.com = communicator.communicator()
         

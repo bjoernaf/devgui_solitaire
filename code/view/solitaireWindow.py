@@ -1,7 +1,7 @@
 '''
 Created on 13 apr 2014
 
-@author: Sven, Bjorn
+@author: Sven, Bjorn, Max
 '''
 
 '''
@@ -13,10 +13,11 @@ from PyQt5.QtGui import (QBrush, QColor, QDrag, QImage, QPainter, QPen,
 from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsTextItem, QGraphicsScene, QGraphicsView, QApplication)
 '''
 
-from PyQt5.QtCore import (QSettings, QSize, QVariant, QPoint)
-from PyQt5.QtWidgets import (QMainWindow, QAction, QMessageBox)
+from PyQt5.QtCore import (QSettings, QSize, QVariant, QPoint, Qt)
+from PyQt5.QtWidgets import (QMainWindow, QAction, QMessageBox, QToolBar)
 
 from view import boardView
+from view import transSlider
 
 class solitaireWindow(QMainWindow):
     '''
@@ -54,6 +55,11 @@ class solitaireWindow(QMainWindow):
         self.setCentralWidget(self.bView)
         self.createUI()
         self.createMenu()
+        
+        self.slide = transSlider.transSlider(self.gameStateController)
+        self.toolbar = QToolBar()
+        self.toolbar.addWidget(self.slide)
+        self.addToolBar(Qt.TopToolBarArea, self.toolbar)
 
     
     def createUI(self):

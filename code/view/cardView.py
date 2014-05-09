@@ -81,10 +81,8 @@ class cardView(QGraphicsItem):
         #painter.translate(5,5)
         
         # Set opacity to 30%, paint and then set it to 100% again
-        self.opacity = 0.3
         self.paint(painter, 0)
         painter.end()
-        self.opacity = 1
         
         
         # Set Pixmap and HotSpot to mouse location
@@ -111,7 +109,7 @@ class cardView(QGraphicsItem):
         Override of the default paint function to draw a rounded rectangle instead of a regular rectangle
         '''
         # Set opacity to paint entire card with
-        painter.setOpacity(self.opacity)
+        painter.setOpacity(self.gsc.opacity/100.0)
         
         # Set pen and color to paint card with
         painter.setPen(Qt.black)
@@ -178,7 +176,10 @@ class cardView(QGraphicsItem):
         ## TODO: Anvand metoder i cardModel for getColor och getValue
         self.color = color
         self.value = value
-        self.id = cardId   
+        self.id = cardId
+        
+        # Save game state controller instance
+        self.gsc = gameStateController  
         
         # Load image
         self.loadImage(self.color)  
