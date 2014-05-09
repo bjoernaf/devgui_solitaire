@@ -19,9 +19,15 @@ class transSlider(QSlider):
         self.setMaximumWidth(200)
         self.setToolTip("Card Opacity")
     
-    def mouseMoveEvent(self, pos):
-        super(transSlider, self).mouseMoveEvent(pos)
+    def mouseMoveEvent(self, event):
+        super(transSlider, self).mouseMoveEvent(event)
         self.gsc.opacity = self.sliderPosition()
-        print("slider moved")
-        print(self.sliderPosition())
+    
+    def mousePressEvent(self, event):
         self.gsc.solWin.bView.scene.update()
+        posClicked = self.minimum() + ((self.maximum()-self.minimum()) * event.x()) / self.width()
+        if (self.sliderPosition() != posClicked):
+            self.setValue(posClicked)
+            self.gsc.opacity = self.sliderPosition()
+        QSlider.mousePressEvent(self, event)
+        # http://stackoverflow.com/questions/11132597/qslider-mouse-direct-jump
