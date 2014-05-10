@@ -29,14 +29,12 @@ class cardView(QGraphicsItem):
     Class to create and display one single card in the QGraphicsView
     '''
 
-    ## TODO: Smartare size
+    # Define card size and corner rounding
+    # TODO: Smartare size?
     cardWidth = 80
     cardHeight = 120
     cardXRad = 9.0
     cardYRad = 9.0
-    
-    # Opacity flag used in paint function
-    opacity = 1.0
     
     # Bounding rectangles to paint card number and images in
     boundingValueLeft = QRectF(4, 3, 12, 15)
@@ -46,31 +44,57 @@ class cardView(QGraphicsItem):
 
 
     def boundingRect(self):
+        '''
+        Returns a bounding rectangle covering the entire card.
+        '''
         return QRectF(0, 0, self.cardWidth, self.cardHeight)
     
     def mousePressEvent(self, event):
+        '''
+        Override mousePressEvent
+        When the mouse is pressed, change the cursor to a closed hand.
+        '''
         self.setCursor(Qt.ClosedHandCursor)
         self.com.signal.emit(self.color, self.value, self.pos())
         QGraphicsItem.mousePressEvent(self, event)
+        
+    def mouseReleaseEvent(self, event):
+        '''
+        Override mouseReleaseEvent
+        Changes cursor to open hand.
+        '''
+        self.setCursor(Qt.OpenHandCursor)
+        QGraphicsItem.mouseReleaseEvent(self, event)
     
     def mouseMoveEvent(self, event):
         '''
-        This is called when an object is moved with the mouse pressed down
+        This is called when an object is moved with the mouse pressed down.
+        A drag event and a pixmap is created. The pixmap is attached to a painter
+        that paints the card while it is being dragged.
         '''
         
-        # TODO: Make object invisible during drag
-        #self.setVisible(False)
-        
-        #Create a drag event and a mime to go with it??
+        #Create a drag event with attached mime data containing the card id
         drag = QDrag(event.widget())
         mime = QMimeData()
         drag.setMimeData(mime)
         mime.setText(str(self.id))
         
+        # Signal emitted when target of drop changes (to none specifically)
+        drag.targetChanged.connect(self.tcSlot)
+        
+        # Set drag stack to show on top to avoid repainting NOT NESSECARY?
+        #self.gsc.solWin.bView.dragCardStackView.setZValue(1)
+        
         # TODO: RIMLIGT ATT ANVANDA PARENT? --BJORN
+        # Emit a signal to the controller that a card is being moved
         self.com.moveCardSignal.emit(self.parentItem().stackId, boardStacks.boardStacks.DragCard, self.id)
         
-        # Create a pixmap to paint the move on
+        # Show the dragCardStackView (tempStack)
+        self.parentItem().show()
+        
+        # TODO: Old paint method, remove when sure it won't be needed
+        '''
+        # Create a pixmap to paint the moving card on
         pixmap = QPixmap(self.cardWidth, self.cardHeight)
         pixmap.fill(Qt.transparent)
         
@@ -80,33 +104,39 @@ class cardView(QGraphicsItem):
         # Translate coord system (snygg flytt indikation typ)
         #painter.translate(5,5)
         
-        # Set opacity to 30%, paint and then set it to 100% again
+        # Call the paint function with the created painter
         self.paint(painter, 0)
         painter.end()
-        
         
         # Set Pixmap and HotSpot to mouse location
         drag.setPixmap(pixmap)
         drag.setHotSpot(event.pos().toPoint())
+        '''
         
         #Execute drag etc
         drag.exec_()
         self.setCursor(Qt.OpenHandCursor)
- 
- 
-    def mouseReleaseEvent(self, event):
-        '''
-        Override mouseReleaseEvent to send signal, then call default
-        '''
-        print("card mouse release event")
-        #self.com.signal.emit(self.color, self.value, self.pos())
-        self.setCursor(Qt.OpenHandCursor)
-        QGraphicsItem.mouseReleaseEvent(self, event)
         
+    def dragEnterEvent(self, event):
+        '''
+        Run when a drag object enters the bounding rectangle of a card.
+        Forward event to the parent of the card, the stack it's currently on.
+        '''
+        self.parentItem().dragEnterEvent(event)
+    
+    def dropEvent(self, event):
+        '''
+        Run when an accepted event is dropped on the card.
+        Forward event to the parent of the card, the stack it's currently on.
+        '''
+        self.parentItem().dropEvent(event)
     
     def paint(self, painter, option, widget=None): 
         '''
-        Override of the default paint function to draw a rounded rectangle instead of a regular rectangle
+        Override of the default paint function.
+        Draws a rounded rectangle representing a card.
+        Draws card number and card color symbol in upper
+        and lower right corner.
         '''
         # Set opacity to paint entire card with
         painter.setOpacity(self.gsc.opacity/100.0)
@@ -115,7 +145,7 @@ class cardView(QGraphicsItem):
         painter.setPen(Qt.black)
         painter.setBrush(Qt.white)
         
-        # Paint a rounded anti-aliased rectangle and fill it with white representing the card
+        # Paint a rounded, anti-aliased rectangle representing the card
         painter.setRenderHint(QPainter.Antialiasing)
         painter.drawRoundedRect(0, 0, self.cardWidth, self.cardHeight, self.cardXRad, self.cardYRad, Qt.AbsoluteSize)
         
@@ -156,12 +186,25 @@ class cardView(QGraphicsItem):
                 12: "Q",
                 13: "K",
                 }.get(value, str(value))
+                
+    def tcSlot(self, target):
+        '''
+        Slot receiving signal when target of QDrag is changed.
+        If target is None, drop has not happened and move to tempStack should be undone.
+        '''
+        # If drop has failed
+        if target == None:
+            # Undo move to temp stack
+            self.gsc.undo()
+            # Hide the drag stack again
+            self.gsc.solWin.bView.dragCardStackView.hide()
 
     
     def __init__(self, gameStateController, color, value, cardId):
         '''
         Constructor:
-        Creates the card with random color & value, then calls drawContent to draw items on the card
+        Creates a Card in the GraphicsView.
+        Also loads the appropriate image for the card.
         '''
         super(cardView, self).__init__()
         
@@ -173,7 +216,7 @@ class cardView(QGraphicsItem):
         # Call as self.com.moveCardSignal.emit(fromStack, toStack, cardID)
         self.com.moveCardSignal.connect(gameStateController.moveCard)
         
-        ## TODO: Anvand metoder i cardModel for getColor och getValue
+        # Store color, value and card id
         self.color = color
         self.value = value
         self.id = cardId
@@ -183,12 +226,12 @@ class cardView(QGraphicsItem):
         
         # Load image
         self.loadImage(self.color)  
-        
-        # ???
-        self.shape()
-        
-        self.setFlags(QGraphicsItem.ItemIsSelectable);
-        self.setFlag(QGraphicsItem.ItemIsMovable);
-        self.setFlag(QGraphicsItem.ItemSendsGeometryChanges);
+
+        # Set flags (flag | flag | flag...) and cursor type       
+        self.setFlag(self.ItemIsMovable)
         self.setCursor(Qt.OpenHandCursor)
+        
+        # TODO: Currently not working to drop on cards.
+        # If enabled, tries to drop on self since tempStack is at mouse location with self as card
+        #self.setAcceptDrops(True)
         

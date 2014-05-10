@@ -6,7 +6,7 @@ Created on 7 apr 2014
 
 from model import boardStacks
 
-from PyQt5.QtCore import Qt, QRectF
+from PyQt5.QtCore import Qt, QRectF, QPointF
 from PyQt5.QtGui import QPen
 from PyQt5.QtWidgets import (QGraphicsItem)
 from view import communicator, cardView
@@ -17,8 +17,8 @@ class stackView(QGraphicsItem):
     '''
     
     penWidth = 4
-    width = 90
-    height = 130
+    width = 90.0
+    height = 130.0
     xRadius = 9
     yRadius = 9
     
@@ -42,6 +42,7 @@ class stackView(QGraphicsItem):
         self.offset_x = x_offset
         self.offset_y = y_offset
         self.parent = parent
+        self.gameStateController = gameStateController
         
         # Create communicator
         self.com = communicator.communicator()
@@ -49,18 +50,12 @@ class stackView(QGraphicsItem):
         # Call as self.com.moveCardSignal.emit(fromStack, toStack, cardID)
         self.com.moveCardSignal.connect(gameStateController.moveCard)
         
-        # Accept drops on the stacks
-        self.setAcceptDrops(True)
+        # Accept drops on the stacks unless stack is tempStack
+        if self.stackId != boardStacks.boardStacks.DragCard:
+            self.setAcceptDrops(True)
         
-        #Create and add cards (move to stackView)
-        #card3 = cardView.cardView(gameStateController)
-        #card = cardView.cardView(gameStateController)
+        # Print parent, remove later
         print(parent)
-        #parent.cardList[2].setPos(5,5)
-        #parent.cardList[2].setParentItem(self)
-#        card3.setPos(350,150)
-        #card.setPos(5, 5)
-        #card.setParentItem(self)
         
 
     def boundingRect(self):
@@ -82,13 +77,14 @@ class stackView(QGraphicsItem):
         Override of paint function. Paints a custom rounded rectangle
         representing a stack location.
         '''
-        pen = QPen()
-        pen.setStyle(Qt.DashLine)
-        pen.setColor(Qt.white)
-        pen.setWidth(4)
-        painter.setPen(pen)
-        painter.drawRoundedRect(0, 0, 90, 130, 9.0, 9.0, Qt.AbsoluteSize)
-        painter.setPen(Qt.white)
+        if self.stackId != boardStacks.boardStacks.DragCard:
+            pen = QPen()
+            pen.setStyle(Qt.DashLine)
+            pen.setColor(Qt.white)
+            pen.setWidth(4)
+            painter.setPen(pen)
+            painter.drawRoundedRect(0, 0, 90, 130, 9.0, 9.0, Qt.AbsoluteSize)
+            painter.setPen(Qt.white)
         
         
     def dragEnterEvent(self, event):
@@ -119,6 +115,9 @@ class stackView(QGraphicsItem):
         
         # Update stack to add moved cards
         self.com.moveCardSignal.emit(boardStacks.boardStacks.DragCard, self.stackId, cardId)
+        
+        # Hide the drag stack again
+        self.gameStateController.solWin.bView.dragCardStackView.hide()
 
     def updateStackList(self, cardList):
         '''
@@ -145,3 +144,13 @@ class stackView(QGraphicsItem):
             offset_y += self.offset_y
             index += 1
         self.update()
+        
+    def updatePos(self, pos):
+        '''
+        Called by boardScene, used to track mouse position
+        '''
+        # Translate received position to the middle of the stack, then update Pos
+        x = pos.x() - self.width/2
+        y = pos.y() - self.height/2
+        truePos = QPointF(x, y)
+        self.setPos(truePos)

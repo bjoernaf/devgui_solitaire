@@ -12,7 +12,7 @@ The boardView contains a QGraphicsScene that displays stacks (created in stackVi
 from PyQt5.QtCore import (Qt)
 from PyQt5.QtGui import (QFont)
 from PyQt5.QtWidgets import (QGraphicsTextItem, QGraphicsScene, QGraphicsView)
-from view import cardView, stackView
+from view import cardView, stackView, boardScene
 from model import boardStacks
 
 class boardView(QGraphicsView):
@@ -33,7 +33,6 @@ class boardView(QGraphicsView):
         centerText=QGraphicsTextItem('Solitaire')
         centerText.setFont(font)
         centerText.setDefaultTextColor(Qt.white)
-#        centerText.setPos(180,120)
         centerText.setPos(310, 170)
         self.scene.addItem(centerText)
         
@@ -105,7 +104,12 @@ class boardView(QGraphicsView):
         self.bottom7StackView = stackView.stackView(self, gameStateController,
                                                      boardStacks.boardStacks.Bottom7)
         self.bottom7StackView.setPos(670, 240)
-        self.scene.addItem(self.bottom7StackView)        
+        self.scene.addItem(self.bottom7StackView)
+        
+        # The dragCardStack with no location and temporarily hidden
+        self.dragCardStackView = stackView.stackView(self, gameStateController, boardStacks.boardStacks.DragCard)
+        self.scene.addItem(self.dragCardStackView)
+        self.dragCardStackView.hide()    
 
     def __init__(self, windowWidth, windowHeight, gameStateController):
         '''
@@ -125,7 +129,7 @@ class boardView(QGraphicsView):
                 index += 1
 
         # Create a scene based on the parent's size
-        self.scene = QGraphicsScene(0, 0, windowWidth, windowHeight)
+        self.scene = boardScene.boardScene(0, 0, windowWidth, windowHeight, gameStateController)
         
         # Call drawContent to draw stacks etc, then set scene as active in the view (boardView)
         self.drawContent(gameStateController)
@@ -134,36 +138,40 @@ class boardView(QGraphicsView):
     def updateStacks(self, stacks):
         '''
         Slot for signal in controller. Receives new stack content if changes have occured.
+        Notifies each stack of it's new content.
         '''
         print("BOARDVIEW: ", stacks)
         
         for key in stacks.keys():
             if(key == boardStacks.boardStacks.Deck):
                 self.deckStackView.updateStackList(stacks[key])
-            if(key == boardStacks.boardStacks.Drawable):
+            elif(key == boardStacks.boardStacks.Drawable):
                 self.drawableStackView.updateStackList(stacks[key])
-            if(key == boardStacks.boardStacks.TopLL):
+            elif(key == boardStacks.boardStacks.TopLL):
                 self.topLLStackView.updateStackList(stacks[key])
-            if(key == boardStacks.boardStacks.TopML):
+            elif(key == boardStacks.boardStacks.TopML):
                 self.topMLStackView.updateStackList(stacks[key])
-            if(key == boardStacks.boardStacks.TopMR):
+            elif(key == boardStacks.boardStacks.TopMR):
                 self.topMRStackView.updateStackList(stacks[key])
-            if(key == boardStacks.boardStacks.TopRR):
+            elif(key == boardStacks.boardStacks.TopRR):
                 self.topRRStackView.updateStackList(stacks[key])
-            if(key == boardStacks.boardStacks.Bottom1):
+            elif(key == boardStacks.boardStacks.Bottom1):
                 self.bottom1StackView.updateStackList(stacks[key])
-            if(key == boardStacks.boardStacks.Bottom2):
+            elif(key == boardStacks.boardStacks.Bottom2):
                 self.bottom2StackView.updateStackList(stacks[key])
-            if(key == boardStacks.boardStacks.Bottom3):
+            elif(key == boardStacks.boardStacks.Bottom3):
                 self.bottom3StackView.updateStackList(stacks[key])
-            if(key == boardStacks.boardStacks.Bottom4):
+            elif(key == boardStacks.boardStacks.Bottom4):
                 self.bottom4StackView.updateStackList(stacks[key])
-            if(key == boardStacks.boardStacks.Bottom5):
+            elif(key == boardStacks.boardStacks.Bottom5):
                 self.bottom5StackView.updateStackList(stacks[key])
-            if(key == boardStacks.boardStacks.Bottom6):
+            elif(key == boardStacks.boardStacks.Bottom6):
                 self.bottom6StackView.updateStackList(stacks[key])
-            if(key == boardStacks.boardStacks.Bottom7):
+            elif(key == boardStacks.boardStacks.Bottom7):
                 self.bottom7StackView.updateStackList(stacks[key])
+            elif(key == boardStacks.boardStacks.DragCard):
+                self.dragCardStackView.updateStackList(stacks[key])
+                
                 
     def resizeEvent(self, event):
         '''
