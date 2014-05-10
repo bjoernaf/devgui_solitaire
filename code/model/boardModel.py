@@ -4,9 +4,9 @@ Created on 7 apr 2014
 @author: Sven, Bjorn
 '''
 
-from model import cardModel
-from model import communicator
-from model import boardStacks
+from .cardModel import cardModel
+from .communicator import communicator
+from .boardStacks import boardStacks
 
 
 class boardModel(object):
@@ -28,14 +28,14 @@ class boardModel(object):
         Constructor
         '''
         # Set up communicator
-        self.com = communicator.communicator()
+        self.com = communicator()
         # Connect signal to slot
         self.com.updateStackSignal.connect(gameStateController.updateControllerStacks)
         
         # Create cards in cardList
         for color in range(1, 5):
             for number in range(1,14):
-                self.cardList.append(cardModel.cardModel(color, number))
+                self.cardList.append(cardModel(color, number))
         
         # Create deck of cards and notify view
         self.createSortedDeck()
@@ -155,11 +155,7 @@ class boardModel(object):
         '''
         Adds all cards in self.cardList to the Deck.
         '''
-#       Temporarily commented out. In order to make the deck visible, it is
-#       created on the Drawable stack and then moved to Deck
-#       (in gameStateController).
-#        self.cardOrderDict[0] = (boardStacks.boardStacks.Deck, 1)
-        self.cardOrderDict[0] = (boardStacks.boardStacks.Drawable, 1)
+        self.cardOrderDict[0] = (boardStacks.Deck, 1)
         for i in range(1, len(self.cardList) - 1):
             self.cardOrderDict[i] = (i-1,i+1)
         self.cardOrderDict[len(self.cardList) - 1] = (len(self.cardList) - 2, None)
@@ -170,8 +166,8 @@ class boardModel(object):
         '''
         stackDict = dict()
         
-        for stack in vars(boardStacks.boardStacks):
+        for stack in vars(boardStacks):
             if not callable(stack) and not stack.startswith("__"):
-                stackDict[getattr(boardStacks.boardStacks, stack)] = self.getStack(getattr(boardStacks.boardStacks, stack))
+                stackDict[getattr(boardStacks, stack)] = self.getStack(getattr(boardStacks, stack))
             
         return stackDict

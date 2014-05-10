@@ -138,7 +138,6 @@ class boardView(QGraphicsView):
         print("BOARDVIEW: ", stacks)
         
         for key in stacks.keys():
-            print(key)
             if(key == boardStacks.boardStacks.Deck):
                 self.deckStackView.updateStackList(stacks[key])
             if(key == boardStacks.boardStacks.Drawable):

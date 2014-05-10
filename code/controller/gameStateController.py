@@ -32,10 +32,6 @@ class gameStateController(object):
         # Initialize communicator
         self.com = communicator.communicator()
         
-        # Create the model, pass controller as parameter
-        # TODO TODO REMOVE COMMENT WHEN MODEL WORKS
-        self.model = boardModel.boardModel(self)
-        
         # Create the main window (View), pass controller as parameter
         self.solWin = solitaireWindow.solitaireWindow("Solitaire", self)
         self.solWin.show()
@@ -46,12 +42,11 @@ class gameStateController(object):
         self.undoStack.canUndoChanged.connect(self.solWin.updateMenuUndo)
         self.undoStack.canRedoChanged.connect(self.solWin.updateMenuRedo)
         
-        # Connect updateStacks to slot in model
+        # Connect updateSignal to slot in view
         self.com.updateSignal.connect(self.solWin.bView.updateStacks)
         
-        
-        
-        self.testUndo()
+        # Create the model, pass controller as parameter
+        self.model = boardModel.boardModel(self)
         
     def signalInterpreter(self, color, value, point):
         '''
@@ -109,51 +104,37 @@ class gameStateController(object):
             aCard = self.model.getCard(i)
             print(str(i) + ". " + str(aCard.getColor()) + " : " + str(aCard.getValue()))
 
-# === ADDED BY MARTIN
-#       Makes sure that the cards are initially on the Deck stack, at the cost of
-#       introducing an extra move from Drawable to Deck.
-
         print("--BEGIN MOVE--")
-        self.moveCard(boardStacks.boardStacks.Drawable, boardStacks.boardStacks.Deck, 0)
+        self.moveCard(boardStacks.boardStacks.Deck, boardStacks.boardStacks.Drawable, 39)
         print("--END MOVE--")
-        
+         
         self.printOut()
-
+         
+        print("--BEGIN MOVE--")
+        self.moveCard(boardStacks.boardStacks.Deck, boardStacks.boardStacks.Drawable, 26)
+        print("--END MOVE--")
+         
+        self.printOut()
+         
+        print("--BEGIN MOVE--")
+        #board.moveCard(boardModel.boardStacks.Drawable, boardModel.boardStacks.Deck, 26)
+        self.undo()
+        print("--END MOVE--")
+         
+         
+        self.printOut()
+         
+        print("--BEGIN MOVE--")
         self.redo()
-
-# === END ADDED BY MARTIN
-            
-#         print("--BEGIN MOVE--")
-#         self.moveCard(boardStacks.boardStacks.Deck, boardStacks.boardStacks.Drawable, 39)
-#         print("--END MOVE--")
-#         
-#         self.printOut()
-#         
-#         print("--BEGIN MOVE--")
-#         self.moveCard(boardStacks.boardStacks.Deck, boardStacks.boardStacks.Drawable, 26)
-#         print("--END MOVE--")
-#         
-#         self.printOut()
-#         
-#         print("--BEGIN MOVE--")
-#         #board.moveCard(boardModel.boardStacks.Drawable, boardModel.boardStacks.Deck, 26)
-#         self.undo()
-#         print("--END MOVE--")
-#         
-#         
-#         self.printOut()
-#         
-#         print("--BEGIN MOVE--")
-#         self.redo()
-#         print("--END MOVE--")
-#         
-#         self.printOut()
-#         
-#         print("--BEGIN MOVE--")
-#         self.undo()
-#         print("--END MOVE--")
-#         
-#         self.printOut()
+        print("--END MOVE--")
+         
+        self.printOut()
+         
+        print("--BEGIN MOVE--")
+        self.undo()
+        print("--END MOVE--")
+         
+        self.printOut()
         
         
     def printOut(self):
