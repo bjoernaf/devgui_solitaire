@@ -1,10 +1,10 @@
 '''
-Created on 7 apr 2014
+Created on 12 maj 2014
 
-@author: Sven, Björn
+@author: Sven
 '''
 
-class MyClass(object):
+class rotating(object):
     '''
     classdocs
     '''
