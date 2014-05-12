@@ -15,11 +15,11 @@ class boardModel(object):
     to move cards between stacks.
     '''
     
-    'cardList contains a list of all cards present in the game, and is used to reference cards by id numbers.'
+    #cardList contains a list of all cards present in the game, and is used to reference cards by id numbers.
     cardList = list()
     
-    'cardOrderDict keeps a linked list-like representation of the neighbors of each card.'
-    'Representation: cardOrderDict[currentCard] = (previousCard, nextCard)'
+    #cardOrderDict keeps a linked list-like representation of the neighbors of each card.
+    #Representation: cardOrderDict[currentCard] = (previousCard, nextCard)
     cardOrderDict = dict()
     
     
@@ -118,18 +118,23 @@ class boardModel(object):
         
         print("MODEL: MoveCard: Entering moveCard with arguments (" + str(fromStack) + ", " + str(toStack) + ", " + str(card) + ").");
         
-        'Make sure fromStack is sane.'
+        # Make sure that the card is not moved to the same stack.
+        if(fromStack == toStack):
+        	print("MODEL: MoveCard: Sanity check: Source and Destination stacks are the same -- ABORTING.")
+        	return False
+        
+        # Make sure fromStack is sane.
         if(self.findStackOfCard(card) != fromStack):
-            print("MODEL: MoveCard: Sanity check: Card " + str(card) + " is NOT in Stack " + str(fromStack) + " -- ABORTING.")
+            print("MODEL: MoveCard: Sanity check: Card", card, "is NOT in Stack", fromStack, " -- ABORTING.")
             return False
         else:
-            print("MODEL: MoveCard: Sanity check: Card " + str(card) + " is in Stack " + str(fromStack) + " -- continue.")
+            print("MODEL: MoveCard: Sanity check: Card", card, "is in Stack", fromStack, " -- continue.")
         
-        'These are the cards that will be affected by the move, in addition to card.'
+        # These are the cards that will be affected by the move, in addition to card.
         oldPrev = self.cardOrderDict[card][0]
         newPrev = self.findTopCardInStack(toStack)
         
-        'Ensure that we keep the previous and next relationships sane.'
+        # Ensure that we keep the previous and next relationships sane.
         if(newPrev == None):
             self.cardOrderDict[card] = (toStack, self.cardOrderDict[card][1])
             print("MODEL: MoveCard: Move card " + str(card) + " to empty stack " + str(toStack) + ".");

@@ -122,10 +122,13 @@ class stackView(QGraphicsItem):
         cardId = int(rawMetaData[0])
         fromStack = int(rawMetaData[1])
         
-        self.parent.clearTempStack()
         
-        # Update stack to add moved cards
-        self.com.moveCardSignal.emit(fromStack, self.stackId, cardId)
+        # Update stack to add moved cards, unless same stack.
+        if(fromStack == self.stackId):
+        	self.parent.cancelTempStack()
+        else:
+	        self.parent.clearTempStack()
+	        self.com.moveCardSignal.emit(fromStack, self.stackId, cardId)
         
         # Hide the drag stack again
         self.parent.dragCardStackView.hide()
