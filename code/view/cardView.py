@@ -77,7 +77,7 @@ class cardView(QGraphicsItem):
         drag = QDrag(event.widget())
         mime = QMimeData()
         drag.setMimeData(mime)
-        mime.setText(str(self.id))
+        mime.setText(str(self.id) + "," + str(self.parentItem().stackId))
         
         # Signal emitted when target of drop changes (to none specifically)
         drag.targetChanged.connect(self.tcSlot)
@@ -87,7 +87,8 @@ class cardView(QGraphicsItem):
         
         # TODO: RIMLIGT ATT ANVANDA PARENT? --BJORN
         # Emit a signal to the controller that a card is being moved
-        self.com.moveCardSignal.emit(self.parentItem().stackId, boardStacks.boardStacks.DragCard, self.id)
+        #self.com.moveCardSignal.emit(self.parentItem().stackId, boardStacks.boardStacks.DragCard, self.id)
+        self.boardView.updateTempStack(self.id, self.parentItem().stackId)
         
         # Show the dragCardStackView (tempStack)
         self.parentItem().show()
@@ -195,12 +196,12 @@ class cardView(QGraphicsItem):
         # If drop has failed
         if target == None:
             # Undo move to temp stack
-            self.gsc.undo()
-            # Hide the drag stack again
-            self.gsc.solWin.bView.dragCardStackView.hide()
+            self.parentItem().hide()
+            print("tcSlot:", self.parentItem().stackId)
+            self.boardView.cancelTempStack()
 
     
-    def __init__(self, gameStateController, color, value, cardId):
+    def __init__(self, gameStateController, boardView, color, value, cardId):
         '''
         Constructor:
         Creates a Card in the GraphicsView.
@@ -222,7 +223,8 @@ class cardView(QGraphicsItem):
         self.id = cardId
         
         # Save game state controller instance
-        self.gsc = gameStateController  
+        self.gsc = gameStateController
+        self.boardView = boardView
         
         # Load image
         self.loadImage(self.color)  

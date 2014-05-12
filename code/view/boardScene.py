@@ -23,9 +23,10 @@ class boardScene(QGraphicsScene):
         #If DragEvent originates from within Solitaire
         if event.source() != None:
             # Check that it contains a valid card id as text
-            if event.mimeData().hasText() and int(event.mimeData().text()) < 52:
+            if event.mimeData().hasText() and "," in event.mimeData().text():
                 # Update position of the dragStack
                 self.gameStateController.solWin.bView.dragCardStackView.updatePos(event.scenePos())
+       			
         # Call super        
         QGraphicsScene.dragMoveEvent(self, event)
         

@@ -71,6 +71,12 @@ class stackView(QGraphicsItem):
         Returns stackId
         '''
         return self.stackId
+        
+    def getStack(self):
+    	'''
+    	Returns the card list of the stack.
+    	'''
+    	return self.stackCardList
 
     def paint(self, painter, option, widget=None):
         '''
@@ -95,7 +101,7 @@ class stackView(QGraphicsItem):
         #If DragEvent originates from within Solitaire
         if event.source() != None:
             # Check that it contains a valid card id as text
-            if event.mimeData().hasText() and int(event.mimeData().text()) < 52:
+            if event.mimeData().hasText() and "," in event.mimeData().text():
                 event.accept()
                 print("Event drop accepted")
             else:
@@ -111,13 +117,18 @@ class stackView(QGraphicsItem):
         '''
         print("Dropped cardId " + event.mimeData().text())
         
-        cardId = int(event.mimeData().text())
+        rawMetaData = event.mimeData().text().split(",")
+        
+        cardId = int(rawMetaData[0])
+        fromStack = int(rawMetaData[1])
+        
+        self.parent.clearTempStack()
         
         # Update stack to add moved cards
-        self.com.moveCardSignal.emit(boardStacks.boardStacks.DragCard, self.stackId, cardId)
+        self.com.moveCardSignal.emit(fromStack, self.stackId, cardId)
         
         # Hide the drag stack again
-        self.gameStateController.solWin.bView.dragCardStackView.hide()
+        self.parent.dragCardStackView.hide()
 
     def updateStackList(self, cardList):
         '''
