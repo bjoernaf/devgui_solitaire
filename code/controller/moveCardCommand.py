@@ -25,11 +25,13 @@ class moveCardCommand(QUndoCommand):
         self.toStack = toStack
         self.cardID = cardID
     
+    
     def redo(self):
         '''
         Call to perform or redo a moveCardCommand
         '''
         self.model.moveCard(self.fromStack, self.toStack, self.cardID)
+        
         
     def undo(self):
         '''

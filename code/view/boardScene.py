@@ -11,9 +11,14 @@ class boardScene(QGraphicsScene):
     A Scene to display in q QGraphicsView
     Only contains override of mouseMoveEvent to detect cursor position
     '''
-    def __init__(self, x, y, width, height, gsc):
+    
+    def __init__(self, x, y, width, height, boardView):
+        '''
+        Constructor
+        '''
         super(boardScene,self).__init__()
-        self.gameStateController = gsc
+        self.boardView = boardView
+    
     
     def dragMoveEvent(self, event):
         '''
@@ -25,14 +30,15 @@ class boardScene(QGraphicsScene):
             # Check that it contains a valid card id as text
             if event.mimeData().hasText() and "," in event.mimeData().text():
                 # Update position of the dragStack
-                self.gameStateController.solWin.bView.dragCardStackView.updatePos(event.scenePos())
+                self.boardView.tempStackView.updatePos(event.scenePos())
        			
         # Call super        
         QGraphicsScene.dragMoveEvent(self, event)
+        
         
     def mouseMoveEvent(self, event):
         '''
         When the mouse is moved, update the position of dragCardStackView.
         '''
-        self.gameStateController.solWin.bView.dragCardStackView.updatePos(event.scenePos())
+        self.boardView.tempStackView.updatePos(event.scenePos())
         QGraphicsScene.mouseMoveEvent(self, event)

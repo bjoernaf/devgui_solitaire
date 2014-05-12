@@ -20,6 +20,73 @@ class boardView(QGraphicsView):
     classdocs
     '''
         
+        
+    def __init__(self, windowWidth, windowHeight, gameStateController):
+        '''
+        Constructor:
+        Creates a graphicsScene, calls drawContent and sets the scene as active scene in boardView
+        '''
+        super(boardView,self).__init__()
+        
+        # List to store all cards in
+        self.cardList = list()
+        
+        # Create cards in cardList
+        index = 0
+        for color in range(1, 5):
+            for number in range(1,14):
+                self.cardList.append(cardView.cardView(gameStateController, self, color, number, index))
+                index += 1
+
+        # Create a scene based on the parent's size
+        self.scene = boardScene.boardScene(0, 0, windowWidth, windowHeight, self)
+        
+        # Call drawContent to draw stacks etc, then set scene as active in the view (boardView)
+        self.drawContent(gameStateController)
+        self.setScene(self.scene)
+        
+    def updateStacks(self, stacks):
+        '''
+        Slot for signal in controller. Receives new stack content if changes have occured.
+        Notifies each stack of it's new content.
+        '''
+        print("BOARDVIEW : updateStacks: New stacks from MODEL:", stacks)
+        
+        # Clear the temp stack.
+        self.clearTempStack()
+        
+        for key in stacks.keys():
+            
+            if(key == boardStacks.boardStacks.Deck):
+                self.deckStackView.updateStackList(stacks[key])
+            elif(key == boardStacks.boardStacks.Drawable):
+                self.drawableStackView.updateStackList(stacks[key])
+            elif(key == boardStacks.boardStacks.TopLL):
+                self.topLLStackView.updateStackList(stacks[key])
+            elif(key == boardStacks.boardStacks.TopML):
+                self.topMLStackView.updateStackList(stacks[key])
+            elif(key == boardStacks.boardStacks.TopMR):
+                self.topMRStackView.updateStackList(stacks[key])
+            elif(key == boardStacks.boardStacks.TopRR):
+                self.topRRStackView.updateStackList(stacks[key])
+            elif(key == boardStacks.boardStacks.Bottom1):
+                self.bottom1StackView.updateStackList(stacks[key])
+            elif(key == boardStacks.boardStacks.Bottom2):
+                self.bottom2StackView.updateStackList(stacks[key])
+            elif(key == boardStacks.boardStacks.Bottom3):
+                self.bottom3StackView.updateStackList(stacks[key])
+            elif(key == boardStacks.boardStacks.Bottom4):
+                self.bottom4StackView.updateStackList(stacks[key])
+            elif(key == boardStacks.boardStacks.Bottom5):
+                self.bottom5StackView.updateStackList(stacks[key])
+            elif(key == boardStacks.boardStacks.Bottom6):
+                self.bottom6StackView.updateStackList(stacks[key])
+            elif(key == boardStacks.boardStacks.Bottom7):
+                self.bottom7StackView.updateStackList(stacks[key])
+            else:
+                print("BOARDVIEW : UpdateStacks: INVALID STACK:", key)
+                
+                
     def drawContent(self, gameStateController):
         '''
         set up the graphics scene and add items to it (stacks eventually, for now cards)
@@ -107,38 +174,15 @@ class boardView(QGraphicsView):
         self.scene.addItem(self.bottom7StackView)
         
         
-        # The dragCardStack with no location and temporarily hidden
-        self.dragCardStackView = stackView.stackView(self, gameStateController, boardStacks.boardStacks.DragCard)
-        self.scene.addItem(self.dragCardStackView)
-        self.dragCardStackView.hide()
+        # The tempStack with no location and temporarily hidden
+        self.tempStackView = stackView.stackView(self, gameStateController, boardStacks.boardStacks.tempStack)
+        self.scene.addItem(self.tempStackView)
+        self.tempStackView.hide()
     
     
         # Initialize the tempstack
         self.clearTempStack()
 
-    def __init__(self, windowWidth, windowHeight, gameStateController):
-        '''
-        Constructor:
-        Creates a graphicsScene, calls drawContent and sets the scene as active scene in boardView
-        '''
-        super(boardView,self).__init__()
-        
-        # List to store all cards in
-        self.cardList = list()
-        
-        # Create cards in cardList
-        index = 0
-        for color in range(1, 5):
-            for number in range(1,14):
-                self.cardList.append(cardView.cardView(gameStateController, self, color, number, index))
-                index += 1
-
-        # Create a scene based on the parent's size
-        self.scene = boardScene.boardScene(0, 0, windowWidth, windowHeight, gameStateController)
-        
-        # Call drawContent to draw stacks etc, then set scene as active in the view (boardView)
-        self.drawContent(gameStateController)
-        self.setScene(self.scene)
 
     def updateTempStack(self, cardid, stackid):
         '''
@@ -148,63 +192,112 @@ class boardView(QGraphicsView):
         if(stackid == boardStacks.boardStacks.Deck):
             newStacks = self.splitStackOnCard(cardid, self.deckStackView.getStack())
             self.deckStackView.updateStackList(newStacks[0])
-            self.dragCardStackView.updateStackList(newStacks[1])
+            self.tempStackView.updateStackList(newStacks[1])
         elif(stackid == boardStacks.boardStacks.Drawable):
             newStacks = self.splitStackOnCard(cardid, self.drawableStackView.getStack())
             self.drawableStackView.updateStackList(newStacks[0])
-            self.dragCardStackView.updateStackList(newStacks[1])
+            self.tempStackView.updateStackList(newStacks[1])
         elif(stackid == boardStacks.boardStacks.TopLL):
             newStacks = self.splitStackOnCard(cardid, self.topLLStackView.getStack())
             self.topLLStackView.updateStackList(newStacks[0])
-            self.dragCardStackView.updateStackList(newStacks[1])
+            self.tempStackView.updateStackList(newStacks[1])
         elif(stackid == boardStacks.boardStacks.TopML):
             newStacks = self.splitStackOnCard(cardid, self.topMLStackView.getStack())
             self.topMLStackView.updateStackList(newStacks[0])
-            self.dragCardStackView.updateStackList(newStacks[1])
+            self.tempStackView.updateStackList(newStacks[1])
         elif(stackid == boardStacks.boardStacks.TopMR):
             newStacks = self.splitStackOnCard(cardid, self.topMRStackView.getStack())
             self.topMRStackView.updateStackList(newStacks[0])
-            self.dragCardStackView.updateStackList(newStacks[1])
+            self.tempStackView.updateStackList(newStacks[1])
         elif(stackid == boardStacks.boardStacks.TopRR):
             newStacks = self.splitStackOnCard(cardid, self.topRRStackView.getStack())
             self.topRRStackView.updateStackList(newStacks[0])
-            self.dragCardStackView.updateStackList(newStacks[1])
+            self.tempStackView.updateStackList(newStacks[1])
         elif(stackid == boardStacks.boardStacks.Bottom1):
             newStacks = self.splitStackOnCard(cardid, self.bottom1StackView.getStack())
             self.bottom1StackView.updateStackList(newStacks[0])
-            self.dragCardStackView.updateStackList(newStacks[1])
+            self.tempStackView.updateStackList(newStacks[1])
         elif(stackid == boardStacks.boardStacks.Bottom2):
             newStacks = self.splitStackOnCard(cardid, self.bottom2StackView.getStack())
             self.bottom2StackView.updateStackList(newStacks[0])
-            self.dragCardStackView.updateStackList(newStacks[1])
+            self.tempStackView.updateStackList(newStacks[1])
         elif(stackid == boardStacks.boardStacks.Bottom3):
             newStacks = self.splitStackOnCard(cardid, self.bottom3StackView.getStack())
             self.bottom3StackView.updateStackList(newStacks[0])
-            self.dragCardStackView.updateStackList(newStacks[1])
+            self.tempStackView.updateStackList(newStacks[1])
         elif(stackid == boardStacks.boardStacks.Bottom4):
             newStacks = self.splitStackOnCard(cardid, self.bottom4StackView.getStack())
             self.bottom4StackView.updateStackList(newStacks[0])
-            self.dragCardStackView.updateStackList(newStacks[1])
+            self.tempStackView.updateStackList(newStacks[1])
         elif(stackid == boardStacks.boardStacks.Bottom5):
             newStacks = self.splitStackOnCard(cardid, self.bottom5StackView.getStack())
             self.bottom5StackView.updateStackList(newStacks[0])
-            self.dragCardStackView.updateStackList(newStacks[1])
+            self.tempStackView.updateStackList(newStacks[1])
         elif(stackid == boardStacks.boardStacks.Bottom6):
             newStacks = self.splitStackOnCard(cardid, self.bottom6StackView.getStack())
             self.bottom6StackView.updateStackList(newStacks[0])
-            self.dragCardStackView.updateStackList(newStacks[1])
+            self.tempStackView.updateStackList(newStacks[1])
         elif(stackid == boardStacks.boardStacks.Bottom7):
             newStacks = self.splitStackOnCard(cardid, self.bottom7StackView.getStack())
             self.bottom7StackView.updateStackList(newStacks[0])
-            self.dragCardStackView.updateStackList(newStacks[1])
+            self.tempStackView.updateStackList(newStacks[1])
         else:
-            print("BOARDVIEW: UpdateTempStack: INVALID STACK!!", stackid)
+            print("BOARDVIEW : UpdateTempStack: INVALID STACK!!", stackid)
             return
         
-        self.dragCardStackView.updateStackList([cardid])
-        self.dragCardStackRoot = cardid
-        self.dragCardFromStack = stackid
+        self.tempStackView.updateStackList([cardid])
+        self.tempStackRoot = cardid
+        self.tempStackFromStack = stackid
         
+    
+    def cancelTempStack(self):
+        '''
+        Return the data on the temp stack to the previous stack.
+        '''
+        
+        if(self.tempStackRoot > 0):
+        
+            if(self.tempStackFromStack == boardStacks.boardStacks.Deck):
+                self.deckStackView.updateStackList(self.deckStackView.getStack() + self.tempStackView.getStack())
+            elif(self.tempStackFromStack == boardStacks.boardStacks.Drawable):
+                self.drawableStackView.updateStackList(self.drawableStackView.getStack() + self.tempStackView.getStack())
+            elif(self.tempStackFromStack == boardStacks.boardStacks.TopLL):
+                self.topLLStackView.updateStackList(self.topLLStackView.getStack() + self.tempStackView.getStack())
+            elif(self.tempStackFromStack == boardStacks.boardStacks.TopML):
+                self.topMLStackView.updateStackList(self.topMLStackView.getStack() + self.tempStackView.getStack())
+            elif(self.tempStackFromStack == boardStacks.boardStacks.TopMR):
+                self.topMRStackView.updateStackList(self.topMRStackView.getStack() + self.tempStackView.getStack())
+            elif(self.tempStackFromStack == boardStacks.boardStacks.TopRR):
+                self.topRRStackView.updateStackList(self.topRRStackView.getStack() + self.tempStackView.getStack())
+            elif(self.tempStackFromStack == boardStacks.boardStacks.Bottom1):
+                self.bottom1StackView.updateStackList(self.bottom1StackView.getStack() + self.tempStackView.getStack())
+            elif(self.tempStackFromStack == boardStacks.boardStacks.Bottom2):
+                self.bottom2StackView.updateStackList(self.bottom2StackView.getStack() + self.tempStackView.getStack())
+            elif(self.tempStackFromStack == boardStacks.boardStacks.Bottom3):
+                self.bottom3StackView.updateStackList(self.bottom3StackView.getStack() + self.tempStackView.getStack())
+            elif(self.tempStackFromStack == boardStacks.boardStacks.Bottom4):
+                self.bottom4StackView.updateStackList(self.bottom4StackView.getStack() + self.tempStackView.getStack())
+            elif(self.tempStackFromStack == boardStacks.boardStacks.Bottom5):
+                self.bottom5StackView.updateStackList(self.bottom5StackView.getStack() + self.tempStackView.getStack())
+            elif(self.tempStackFromStack == boardStacks.boardStacks.Bottom6):
+                self.bottom6StackView.updateStackList(self.bottom6StackView.getStack() + self.tempStackView.getStack())
+            elif(self.tempStackFromStack == boardStacks.boardStacks.Bottom7):
+                self.bottom7StackView.updateStackList(self.bottom7StackView.getStack() + self.tempStackView.getStack())
+            else:
+                print("BOARDVIEW : CancelTempStack: INVALID STACK!!", self.tempStackFromStack)
+                return
+        
+            self.clearTempStack()
+    
+    
+    def clearTempStack(self):
+        '''
+        Clear the temporary stack.
+        '''
+        self.tempStackView.updateStackList([])
+        self.tempStackRoot = -1
+
+
     def splitStackOnCard(self, cardid, stack):
         '''
         INTERNAL: Split a stack list, returning both halves, where the second list
@@ -212,100 +305,11 @@ class boardView(QGraphicsView):
         '''
         if(cardid in stack):
             return (stack[0:stack.index(cardid)], stack[stack.index(cardid):])
-    
-    def cancelTempStack(self):
-        '''
-        Return the data on the temp stack to the previous stack.
-        '''
-        
-        if(self.dragCardStackRoot > 0):
-        
-            if(self.dragCardFromStack == boardStacks.boardStacks.Deck):
-                self.deckStackView.updateStackList(self.deckStackView.getStack() + self.dragCardStackView.getStack())
-            elif(self.dragCardFromStack == boardStacks.boardStacks.Drawable):
-                self.drawableStackView.updateStackList(self.drawableStackView.getStack() + self.dragCardStackView.getStack())
-            elif(self.dragCardFromStack == boardStacks.boardStacks.TopLL):
-                self.topLLStackView.updateStackList(self.topLLStackView.getStack() + self.dragCardStackView.getStack())
-            elif(self.dragCardFromStack == boardStacks.boardStacks.TopML):
-                self.topMLStackView.updateStackList(self.topMLStackView.getStack() + self.dragCardStackView.getStack())
-            elif(self.dragCardFromStack == boardStacks.boardStacks.TopMR):
-                self.topMRStackView.updateStackList(self.topMRStackView.getStack() + self.dragCardStackView.getStack())
-            elif(self.dragCardFromStack == boardStacks.boardStacks.TopRR):
-                self.topRRStackView.updateStackList(self.topRRStackView.getStack() + self.dragCardStackView.getStack())
-            elif(self.dragCardFromStack == boardStacks.boardStacks.Bottom1):
-                self.bottom1StackView.updateStackList(self.bottom1StackView.getStack() + self.dragCardStackView.getStack())
-            elif(self.dragCardFromStack == boardStacks.boardStacks.Bottom2):
-                self.bottom2StackView.updateStackList(self.bottom2StackView.getStack() + self.dragCardStackView.getStack())
-            elif(self.dragCardFromStack == boardStacks.boardStacks.Bottom3):
-                self.bottom3StackView.updateStackList(self.bottom3StackView.getStack() + self.dragCardStackView.getStack())
-            elif(self.dragCardFromStack == boardStacks.boardStacks.Bottom4):
-                self.bottom4StackView.updateStackList(self.bottom4StackView.getStack() + self.dragCardStackView.getStack())
-            elif(self.dragCardFromStack == boardStacks.boardStacks.Bottom5):
-                self.bottom5StackView.updateStackList(self.bottom5StackView.getStack() + self.dragCardStackView.getStack())
-            elif(self.dragCardFromStack == boardStacks.boardStacks.Bottom6):
-                self.bottom6StackView.updateStackList(self.bottom6StackView.getStack() + self.dragCardStackView.getStack())
-            elif(self.dragCardFromStack == boardStacks.boardStacks.Bottom7):
-                self.bottom7StackView.updateStackList(self.bottom7StackView.getStack() + self.dragCardStackView.getStack())
-            else:
-                print("VIEW: CancelTempStack: INVALID STACK!!", self.dragCardFromStack)
-                return
-        
-            self.clearTempStack()
-    
-    def clearTempStack(self):
-        '''
-        Clear the temporary stack.
-        '''
-        self.dragCardStackView.updateStackList([])
-        self.dragCardStackRoot = -1
-
-    def updateStacks(self, stacks):
-        '''
-        Slot for signal in controller. Receives new stack content if changes have occured.
-        Notifies each stack of it's new content.
-        '''
-        print("BOARDVIEW: updateStacks: New stacks from Model: ", stacks)
-        
-        # Clear the temp stack.
-        self.clearTempStack()
-        
-        for key in stacks.keys():
-            
-            if(key == boardStacks.boardStacks.Deck):
-                self.deckStackView.updateStackList(stacks[key])
-            elif(key == boardStacks.boardStacks.Drawable):
-                self.drawableStackView.updateStackList(stacks[key])
-            elif(key == boardStacks.boardStacks.TopLL):
-                self.topLLStackView.updateStackList(stacks[key])
-            elif(key == boardStacks.boardStacks.TopML):
-                self.topMLStackView.updateStackList(stacks[key])
-            elif(key == boardStacks.boardStacks.TopMR):
-                self.topMRStackView.updateStackList(stacks[key])
-            elif(key == boardStacks.boardStacks.TopRR):
-                self.topRRStackView.updateStackList(stacks[key])
-            elif(key == boardStacks.boardStacks.Bottom1):
-                self.bottom1StackView.updateStackList(stacks[key])
-            elif(key == boardStacks.boardStacks.Bottom2):
-                self.bottom2StackView.updateStackList(stacks[key])
-            elif(key == boardStacks.boardStacks.Bottom3):
-                self.bottom3StackView.updateStackList(stacks[key])
-            elif(key == boardStacks.boardStacks.Bottom4):
-                self.bottom4StackView.updateStackList(stacks[key])
-            elif(key == boardStacks.boardStacks.Bottom5):
-                self.bottom5StackView.updateStackList(stacks[key])
-            elif(key == boardStacks.boardStacks.Bottom6):
-                self.bottom6StackView.updateStackList(stacks[key])
-            elif(key == boardStacks.boardStacks.Bottom7):
-                self.bottom7StackView.updateStackList(stacks[key])
-            else:
-                print("BOARDVIEW: UpdateStacks: INVALID STACK:", key)
                 
                 
     def resizeEvent(self, event):
         '''
         Override of resizeEvent called from solWin to match size
         '''
-        #print("BOARDVIEW: ResizeEvent")
         self.scene.setSceneRect(0, 0, event.size().width(), event.size().height())
-        #print("BOARDVIEW: Actual size:", self.scene.width(), self.scene.height())
         QGraphicsView.resizeEvent(self, event)

@@ -25,11 +25,7 @@ class solitaireWindow(QMainWindow):
     solitaireWindow is a QMainWindow. It has a menu
     '''
     
-    winTitle = ""
-    
-#    ' Move to config file in a later step '
-#    windowWidth = 500
-#    windowHeight = 300
+    winTitle = "Group 13 Solitaire"
 
 
     def __init__(self, title, gameStateController):
@@ -74,14 +70,16 @@ class solitaireWindow(QMainWindow):
         '''
         self.setWindowTitle(self.winTitle)
         
+        
     def updateMenuUndo(self, canUndo):
         '''
         Slot called by Controller if possibility to Undo changes
         Enables undo in Menu>Edit if there are commands to undo and
         disables undo in Menu>Edit if there are no commands to undo.
         '''
-        print("Can undo changed: " + str(canUndo))
+        print("SOLITAIREW: UpdateMenuUndo: Can undo changed: " + str(canUndo))
         self.undoAction.setEnabled(canUndo)
+        
         
     def updateMenuRedo(self, canRedo):
         '''
@@ -89,8 +87,9 @@ class solitaireWindow(QMainWindow):
         Enables redo in Menu>Edit if there are commands to redo and
         disables redo in Menu>Edit if there are no commands to redo.
         '''
-        print("Can redo changed: " + str(canRedo))
+        print("SOLITAIREW: updateMenuRedo: Can redo changed: " + str(canRedo))
         self.redoAction.setEnabled(canRedo)
+        
         
     def createMenu(self):
         '''
@@ -129,6 +128,7 @@ class solitaireWindow(QMainWindow):
         # Populate HelpMenu
         helpMenu.addAction('About')
     
+    
     def closeEvent(self, event):
         '''
         Overrides closeEvent to provide confirm dialogue and save settings
@@ -139,15 +139,15 @@ class solitaireWindow(QMainWindow):
             settings.setValue("MainWindow/Position", QVariant(self.pos()))
         else:
             event.ignore()
+         
             
     def resizeEvent(self, event):
         '''
         Overrides resizeEvent to resize the QGraphicsScene as well
         '''
-        #print("SOLWIN: resizeEvent")
-        #print("SOLWIN: Size: ", event.size())
         self.bView.resizeEvent(event)
         QMainWindow.resizeEvent(self, event)
+
 
     def okToContinue(self):
         '''

@@ -27,50 +27,53 @@ class stackView(QGraphicsItem):
     rectWidth = width + penWidth
     rectHeight = height + penWidth
 
-    def __init__(self, parent, gameStateController, stackId, x_offset = 0, y_offset = 5, faceUp = True):
+
+    def __init__(self, boardView, gameStateController, id, x_offset = 0, y_offset = 5, faceUp = True):
         '''
         Constructor
         '''
         super(stackView, self).__init__()
         
         # The id of the stack (negative int as defined in boardStacks)
-        self.stackId = stackId
+        self.id = id
 
         # The cards in the stack.
         self.stackCardList = list()
         
+        # Set card placement rules.
         self.offset_x = x_offset
         self.offset_y = y_offset
-        self.parent = parent
+        
+        # Set up parent objects
+        self.boardView = boardView
         self.gameStateController = gameStateController
         
         # Create communicator
         self.com = communicator.communicator()
+        
         # Connect slot (moveCard) to signal (com.moveCardSignal).
         # Call as self.com.moveCardSignal.emit(fromStack, toStack, cardID)
         self.com.moveCardSignal.connect(gameStateController.moveCard)
         
         # Accept drops on the stacks unless stack is tempStack
-        if self.stackId != boardStacks.boardStacks.DragCard:
+        if self.id != boardStacks.boardStacks.tempStack:
             self.setAcceptDrops(True)
         
-        # Print parent, remove later
-        print(parent)
         
-
-    def boundingRect(self):
+    def updateStackList(self, cardList):
         '''
-        Override defining the bounding rectangle for a stack
+        Slot called by controller when the model has changed.
+        Gives the stack a new set of cards.
         '''
-        return QRectF(self.rectx, self.recty,
-                      self.rectWidth, self.rectHeight) 
-    
+        self.stackCardList = cardList
+        self.setParents()
         
-    def getStackId(self):
+        
+    def getid(self):
         '''
-        Returns stackId
+        Returns id
         '''
-        return self.stackId
+        return self.id
         
     def getStack(self):
     	'''
@@ -83,7 +86,7 @@ class stackView(QGraphicsItem):
         Override of paint function. Paints a custom rounded rectangle
         representing a stack location.
         '''
-        if self.stackId != boardStacks.boardStacks.DragCard:
+        if self.id != boardStacks.boardStacks.tempStack:
             pen = QPen()
             pen.setStyle(Qt.DashLine)
             pen.setColor(Qt.white)
@@ -92,6 +95,14 @@ class stackView(QGraphicsItem):
             painter.drawRoundedRect(0, 0, 90, 130, 9.0, 9.0, Qt.AbsoluteSize)
             painter.setPen(Qt.white)
         
+        
+    def boundingRect(self):
+        '''
+        Override defining the bounding rectangle for a stack
+        '''
+        return QRectF(self.rectx, self.recty,
+                      self.rectWidth, self.rectHeight) 
+
         
     def dragEnterEvent(self, event):
         '''
@@ -103,43 +114,33 @@ class stackView(QGraphicsItem):
             # Check that it contains a valid card id as text
             if event.mimeData().hasText() and "," in event.mimeData().text():
                 event.accept()
-                print("Event drop accepted")
             else:
                 event.ignore()
-                print("Event drop ignored")
         else:
             event.ignore()
-            print("Event drop ignored")
+            
             
     def dropEvent(self, event):
         '''
         DropEvent when an item is dropped on the stack
         '''
-        print("Dropped cardId " + event.mimeData().text())
-        
+        # Extract metadata from dropped card.
         rawMetaData = event.mimeData().text().split(",")
-        
         cardId = int(rawMetaData[0])
         fromStack = int(rawMetaData[1])
         
+        print("STACKVIEW : dropEvent: Dropped card (", cardId, ",", fromStack, ")")
         
         # Update stack to add moved cards, unless same stack.
-        if(fromStack == self.stackId):
-        	self.parent.cancelTempStack()
+        if(fromStack == self.id):
+        	self.boardView.cancelTempStack()
         else:
-	        self.parent.clearTempStack()
-	        self.com.moveCardSignal.emit(fromStack, self.stackId, cardId)
+	        self.boardView.clearTempStack()
+	        self.com.moveCardSignal.emit(fromStack, self.id, cardId)
         
         # Hide the drag stack again
-        self.parent.dragCardStackView.hide()
-
-    def updateStackList(self, cardList):
-        '''
-        Slot called by controller when the model has changed.
-        Gives the stack a new set of cards.
-        '''
-        self.stackCardList = cardList
-        self.setParents()
+        self.boardView.tempStackView.hide()
+        
         
     def setParents(self):
         '''
@@ -151,13 +152,14 @@ class stackView(QGraphicsItem):
         offset_y = 5
         index = 0
         for card in self.stackCardList:
-            self.parent.cardList[card].setPos(offset_x, offset_y)
-            self.parent.cardList[card].setParentItem(self)
-            self.parent.cardList[card].setZValue(index)
+            self.boardView.cardList[card].setPos(offset_x, offset_y)
+            self.boardView.cardList[card].setParentItem(self)
+            self.boardView.cardList[card].setZValue(index)
             offset_x += self.offset_x
             offset_y += self.offset_y
             index += 1
         self.update()
+        
         
     def updatePos(self, pos):
         '''
@@ -168,3 +170,4 @@ class stackView(QGraphicsItem):
         y = pos.y() - self.height/2
         truePos = QPointF(x, y)
         self.setPos(truePos)
+                

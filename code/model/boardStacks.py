@@ -26,4 +26,4 @@ class boardStacks(object):
     Bottom6 = -26
     Bottom7 = -27
     
-    DragCard = -30
+    tempStack = -30

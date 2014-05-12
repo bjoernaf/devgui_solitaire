@@ -10,14 +10,12 @@ from PyQt5.QtCore import (
     Qt,
     QRectF,
     QMimeData,
-    QSize,
-    #QPoint
+    QSize
 )
 from PyQt5.QtGui import (
     QDrag,
     QPixmap,
     QFont, 
-    #QColor, QPen, QBrush
     QPainter,
     QImage
 )
@@ -38,25 +36,68 @@ class cardView(QGraphicsItem):
     
     # Bounding rectangles to paint card number and images in
     boundingValueLeft = QRectF(4, 3, 12, 15)
-    boundingValueRight = QRectF(-cardWidth+4, -cardHeight+3, 12, 15)
+    boundingValueRight = QRectF(-cardWidth + 4, -cardHeight + 3, 12, 15)
     boundingImageLeft = QRectF(5.3, 16, 10, 10)
-    boundingImageRight = QRectF(-cardWidth+5.3, -cardHeight+16, 10, 10)
+    boundingImageRight = QRectF(-cardWidth + 5.3, -cardHeight + 16, 10, 10)
 
 
-    def boundingRect(self):
+    def __init__(self, gameStateController, boardView, color, value, cardId):
         '''
-        Returns a bounding rectangle covering the entire card.
+        Constructor:
+        Creates a Card in the GraphicsView.
+        Also loads the appropriate image for the card.
         '''
-        return QRectF(0, 0, self.cardWidth, self.cardHeight)
-    
+        super(cardView, self).__init__()
+        
+        # Create communicator, move somewhere else???
+        self.com = communicator.communicator()
+        
+        # Connect slot (moveCard) to signal (com.moveCardSignal).
+        # Call as self.com.moveCardSignal.emit(fromStack, toStack, cardID)
+        self.com.moveCardSignal.connect(gameStateController.moveCard)
+        
+        # Store color, value and card id
+        self.color = color
+        self.value = value
+        self.id = cardId
+        
+        # Save game state controller instance
+        self.gsc = gameStateController
+        self.boardView = boardView
+        
+        # Load image
+        self.loadImage(self.color)  
+
+        # Set flags (flag | flag | flag...) and cursor type       
+        self.setFlag(self.ItemIsMovable)
+        self.setCursor(Qt.OpenHandCursor)
+        
+        # TODO: Currently not working to drop on cards.
+        # If enabled, tries to drop on self since tempStack is at mouse location with self as card
+        #self.setAcceptDrops(True)
+        
+
+    def illegalDropSlot(self, target):
+        '''
+        Slot receiving signal when target of QDrag is changed.
+        If target is None, drop has not happened and move to tempStack should be undone.
+        '''
+        # If drop has failed
+        if target == None:
+            # Undo move to temp stack
+            self.parentItem().hide()
+            print("CARDVIEW  : IllegalDropSlot: Illegal drop, cancel drag.")
+            self.boardView.cancelTempStack()
+
+
     def mousePressEvent(self, event):
         '''
         Override mousePressEvent
         When the mouse is pressed, change the cursor to a closed hand.
         '''
         self.setCursor(Qt.ClosedHandCursor)
-        self.com.signal.emit(self.color, self.value, self.pos())
         QGraphicsItem.mousePressEvent(self, event)
+        
         
     def mouseReleaseEvent(self, event):
         '''
@@ -66,6 +107,7 @@ class cardView(QGraphicsItem):
         self.setCursor(Qt.OpenHandCursor)
         QGraphicsItem.mouseReleaseEvent(self, event)
     
+    
     def mouseMoveEvent(self, event):
         '''
         This is called when an object is moved with the mouse pressed down.
@@ -73,50 +115,25 @@ class cardView(QGraphicsItem):
         that paints the card while it is being dragged.
         '''
         
-        #Create a drag event with attached mime data containing the card id
+        # Create a drag event with attached mime data containing the card id and fromstack
         drag = QDrag(event.widget())
         mime = QMimeData()
         drag.setMimeData(mime)
-        mime.setText(str(self.id) + "," + str(self.parentItem().stackId))
+        mime.setText(str(self.id) + "," + str(self.parentItem().id))
         
         # Signal emitted when target of drop changes (to none specifically)
-        drag.targetChanged.connect(self.tcSlot)
+        drag.targetChanged.connect(self.illegalDropSlot)
         
-        # Set drag stack to show on top to avoid repainting NOT NESSECARY?
-        #self.gsc.solWin.bView.dragCardStackView.setZValue(1)
-        
-        # TODO: RIMLIGT ATT ANVANDA PARENT? --BJORN
-        # Emit a signal to the controller that a card is being moved
-        #self.com.moveCardSignal.emit(self.parentItem().stackId, boardStacks.boardStacks.DragCard, self.id)
-        self.boardView.updateTempStack(self.id, self.parentItem().stackId)
+        # Put the dragged cards on the temp stack, to draw under mouse cursor.
+        self.boardView.updateTempStack(self.id, self.parentItem().id)
         
         # Show the dragCardStackView (tempStack)
         self.parentItem().show()
         
-        # TODO: Old paint method, remove when sure it won't be needed
-        '''
-        # Create a pixmap to paint the moving card on
-        pixmap = QPixmap(self.cardWidth, self.cardHeight)
-        pixmap.fill(Qt.transparent)
-        
-        # Create a painter for the pixmap
-        painter = QPainter(pixmap)
-        
-        # Translate coord system (snygg flytt indikation typ)
-        #painter.translate(5,5)
-        
-        # Call the paint function with the created painter
-        self.paint(painter, 0)
-        painter.end()
-        
-        # Set Pixmap and HotSpot to mouse location
-        drag.setPixmap(pixmap)
-        drag.setHotSpot(event.pos().toPoint())
-        '''
-        
         #Execute drag etc
         drag.exec_()
         self.setCursor(Qt.OpenHandCursor)
+        
         
     def dragEnterEvent(self, event):
         '''
@@ -125,12 +142,14 @@ class cardView(QGraphicsItem):
         '''
         self.parentItem().dragEnterEvent(event)
     
+    
     def dropEvent(self, event):
         '''
         Run when an accepted event is dropped on the card.
         Forward event to the parent of the card, the stack it's currently on.
         '''
         self.parentItem().dropEvent(event)
+    
     
     def paint(self, painter, option, widget=None): 
         '''
@@ -158,14 +177,21 @@ class cardView(QGraphicsItem):
             painter.setPen(Qt.red)
             
         # Paint upper left text and image
-        painter.drawText(self.boundingValueLeft, Qt.AlignTop | Qt.AlignHCenter, self.toStr(self.value))
+        painter.drawText(self.boundingValueLeft, Qt.AlignTop | Qt.AlignHCenter, self.toValueString(self.value))
         painter.drawImage(self.boundingImageLeft, self.image)
         
         #Paint lower right text and image
         painter.rotate(180)
-        painter.drawText(self.boundingValueRight, Qt.AlignTop | Qt.AlignHCenter, self.toStr(self.value))
+        painter.drawText(self.boundingValueRight, Qt.AlignTop | Qt.AlignHCenter, self.toValueString(self.value))
         painter.drawImage(self.boundingImageRight, self.image)
         
+        
+    def boundingRect(self):
+        '''
+        Returns a bounding rectangle covering the entire card.
+        '''
+        return QRectF(0, 0, self.cardWidth, self.cardHeight)    
+    
         
     def loadImage(self, color):
         '''
@@ -175,9 +201,10 @@ class cardView(QGraphicsItem):
         self.image = QImage("images/" + str(self.color) + "_small.png")
         self.image = self.image.scaledToHeight(10)
         if self.image.isNull():
-            print("Error loading image")
+            print("CARDVIEW  : loadImage: Error loading image")
             
-    def toStr(self, value):
+            
+    def toValueString(self, value):
         '''
         Returns correct string corresponding to a card value
         '''
@@ -187,53 +214,4 @@ class cardView(QGraphicsItem):
                 12: "Q",
                 13: "K",
                 }.get(value, str(value))
-                
-    def tcSlot(self, target):
-        '''
-        Slot receiving signal when target of QDrag is changed.
-        If target is None, drop has not happened and move to tempStack should be undone.
-        '''
-        # If drop has failed
-        if target == None:
-            # Undo move to temp stack
-            self.parentItem().hide()
-            print("tcSlot:", self.parentItem().stackId)
-            self.boardView.cancelTempStack()
-
-    
-    def __init__(self, gameStateController, boardView, color, value, cardId):
-        '''
-        Constructor:
-        Creates a Card in the GraphicsView.
-        Also loads the appropriate image for the card.
-        '''
-        super(cardView, self).__init__()
-        
-        # Create communicator, move somewhere else???
-        self.com = communicator.communicator()
-        # Connect slot (signalInterpreter) to signal (com.signal)
-        self.com.signal.connect(gameStateController.signalInterpreter)
-        # Connect slot (moveCard) to signal (com.moveCardSignal).
-        # Call as self.com.moveCardSignal.emit(fromStack, toStack, cardID)
-        self.com.moveCardSignal.connect(gameStateController.moveCard)
-        
-        # Store color, value and card id
-        self.color = color
-        self.value = value
-        self.id = cardId
-        
-        # Save game state controller instance
-        self.gsc = gameStateController
-        self.boardView = boardView
-        
-        # Load image
-        self.loadImage(self.color)  
-
-        # Set flags (flag | flag | flag...) and cursor type       
-        self.setFlag(self.ItemIsMovable)
-        self.setCursor(Qt.OpenHandCursor)
-        
-        # TODO: Currently not working to drop on cards.
-        # If enabled, tries to drop on self since tempStack is at mouse location with self as card
-        #self.setAcceptDrops(True)
-        
+             

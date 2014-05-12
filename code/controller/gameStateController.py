@@ -38,6 +38,7 @@ class gameStateController(object):
         
         # Create undoStack
         self.undoStack = QUndoStack()
+        
         # Send signal if possibility to undo/redo changes
         self.undoStack.canUndoChanged.connect(self.solWin.updateMenuUndo)
         self.undoStack.canRedoChanged.connect(self.solWin.updateMenuRedo)
@@ -48,20 +49,15 @@ class gameStateController(object):
         # Create the model, pass controller as parameter
         self.model = boardModel.boardModel(self)
         
-    def signalInterpreter(self, color, value, point):
-        '''
-        Receive a signal from the view and take appropriate action.
-        '''
-        print("Signal received in controller from card:")
-        print("Color: ", color,  " Value: ",  value, " X-coord: ", point.x(), " Y-coord:", point.y())
         
     def undo(self):
         '''
         Slot receiving a signal from the Edit menu's undo function.
         Calls the undo function of the undoStack
         '''
-        print("Controller: Undo()")
+        print("CONTROLLER: Undo: Performing undo operation.")
         self.undoStack.undo()
+        
         
     def redo(self):
         '''
@@ -69,95 +65,29 @@ class gameStateController(object):
         Calls the redo function of the undoStack
         TODO: Find out how this works
         '''
-        print("Controller: Redo()")
+        print("CONTROLLER: Redo: Performing redo operation.")
         self.undoStack.redo()
+        
         
     def updateControllerStacks(self, stacks):
         '''
         Slot receiving stack update from model
         '''
         # Forward stacks to view
+        print("CONTROLLER: UpdateControllerStacks: Forward stacks from MODEL to BOARDVIEW.")
         self.com.updateSignal.emit(stacks)
+        
         
     def moveCard(self, fromStack, toStack, cardID):
         '''
         Slot receiving signals from view. Creates a moveCardCommand(QUndoCommand)
         and pushes it on the undoStack.
         '''
-        # Temporary print until implemented
-        print("Controller: moveCardCommand(fromStack:" + str(fromStack) + ", toStack:" + str(toStack) + ", cardID:" + str(cardID) + ")")
+
+        print("CONTROLLER: moveCardCommand: Ask MODEL to MoveCard(", fromStack, ",", toStack, ",", cardID, ")")
         
         # Create moveCardCommand
         aMoveCardCommand = moveCardCommand.moveCardCommand(self.model, fromStack, toStack, cardID)
         
         # Push command to undoStack, undoStack automatically performs command redo()
         self.undoStack.push(aMoveCardCommand)
-        
-        
-    def testUndo(self):
-        '''
-        Test undo and redo
-        '''
-        
-        print("Co : No");
-        for i in range(0,52):
-            aCard = self.model.getCard(i)
-            print(str(i) + ". " + str(aCard.getColor()) + " : " + str(aCard.getValue()))
-
-        print("--BEGIN MOVE--")
-        self.moveCard(boardStacks.boardStacks.Deck, boardStacks.boardStacks.Drawable, 39)
-        print("--END MOVE--")
-         
-        self.printOut()
-         
-        print("--BEGIN MOVE--")
-        self.moveCard(boardStacks.boardStacks.Deck, boardStacks.boardStacks.Drawable, 26)
-        print("--END MOVE--")
-         
-        self.printOut()
-         
-        print("--BEGIN MOVE--")
-        #board.moveCard(boardModel.boardStacks.Drawable, boardModel.boardStacks.Deck, 26)
-        self.undo()
-        print("--END MOVE--")
-         
-         
-        self.printOut()
-         
-        print("--BEGIN MOVE--")
-        self.redo()
-        print("--END MOVE--")
-         
-        self.printOut()
-         
-        print("--BEGIN MOVE--")
-        self.undo()
-        print("--END MOVE--")
-         
-        self.printOut()
-        
-        
-    def printOut(self):
-        '''
-        Debug function that prints the drawable stack.
-        '''
-        print("--BEGIN PRINTOUT--")
-        aList = self.model.getStack(boardStacks.boardStacks.Drawable)
-        for i in range(0, len(aList)):
-            aCard = self.model.getCard(aList[i])
-            print(str(aCard.getColor()) + " : " + str(aCard.getValue()))
-        print("--END PRINTOUT--")
-
-
-    def getCard(self, cardId):
-        '''
-        Returns the cardModel representation of the card with id cardId.
-        '''
-        return self.model.getCard(cardId)
-
-
-    def getStack(self, stackId):
-        '''
-        Returns a list of all card id:s in stack stackId, from bottom to top.
-        '''
-        return self.model.getStack(stackId)

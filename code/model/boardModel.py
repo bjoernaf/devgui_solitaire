@@ -41,94 +41,29 @@ class boardModel(object):
         self.createSortedDeck()
         self.com.updateStackSignal.emit(self.getStackDict())
         
-    
-    def findRootCardInStack(self, stack):
-        '''
-        Finds the bottom-most card belonging to stack and returns it.
-        '''
-        for i in range(0, len(self.cardOrderDict)):
-            if(self.cardOrderDict[i][0] == stack):
-                print("MODEL: findRootCardInStack: Card " + str(i) + " is at the root of stack " + str(stack) + ".")
-                return i
-            
-        print("MODEL: findRootCardInStack: Can not find root of stack " + str(stack) + ", stack is empty.")
-        return None
-    
-    
-    def findTopCardInStack(self, stack):
-        '''
-        Returns the top-most card belonging to stack.
-        '''
-        oldCard = self.findRootCardInStack(stack)
         
-        if(oldCard == None):
-            print("MODEL: findTopCardInStack: Stack " + str(stack) + " is empty and has no top card.")
-            return None
-        else:
-            while(self.cardOrderDict[oldCard][1] != None):
-                oldCard = self.cardOrderDict[oldCard][1]
-            
-            print("MODEL: findTopCardInStack: Top card in stack " + str(stack) + " is card " + str(oldCard) + ".")
-            return oldCard
-    
-    
-    def findStackOfCard(self, card):
-        '''
-        Returns the stack card belongs to.
-        '''
-        tempCard = card
-
-        while(self.cardOrderDict[tempCard][0] >= 0):
-            tempCard = self.cardOrderDict[tempCard][0]
-        
-        return self.cardOrderDict[tempCard][0]
-        
-    def getCard(self, card):
-        '''
-        Returns the cardModel representing card.
-        '''
-        
-        return self.cardList[card]
-    
-    
-    def getStack(self, stack):
-        '''
-        Returns a list of cards, from bottom to top that make up a stack.
-        '''
-        
-        oldCard = self.findRootCardInStack(stack)
-        
-        if(oldCard != None):
-        
-            stackList = [oldCard]
-            while(self.cardOrderDict[oldCard][1] != None):
-                oldCard = self.cardOrderDict[oldCard][1]
-                stackList.append(oldCard)
-            return stackList
-        
-        else:
-            
-            return []
-    
-    
     def moveCard(self, fromStack, toStack, card):
         '''
+        Slot for receiving MoveCard events from Controller.
         Moves card to stack toStack, and updates all references to keep representation sane.
         '''
         
-        print("MODEL: MoveCard: Entering moveCard with arguments (" + str(fromStack) + ", " + str(toStack) + ", " + str(card) + ").");
+        print("MODEL     : MoveCard: Entering moveCard with arguments (", fromStack, ", ", toStack, ", ", card, ")");
+        
+        # Make sure the tempStack is not used in model.
+        if(fromStack == boardStacks.tempStack or toStack == boardStacks.tempStack):
+        	print("MODEL     : MoveCard: Sanity check: Attempted to use tempStack in MODEL -- ABORTING.")
+        	return False
         
         # Make sure that the card is not moved to the same stack.
         if(fromStack == toStack):
-        	print("MODEL: MoveCard: Sanity check: Source and Destination stacks are the same -- ABORTING.")
+        	print("MODEL     : MoveCard: Sanity check: Source and Destination stacks are the same -- ABORTING.")
         	return False
         
         # Make sure fromStack is sane.
         if(self.findStackOfCard(card) != fromStack):
-            print("MODEL: MoveCard: Sanity check: Card", card, "is NOT in Stack", fromStack, " -- ABORTING.")
+            print("MODEL     : MoveCard: Sanity check: Card", card, "is NOT in Stack", fromStack, " -- ABORTING.")
             return False
-        else:
-            print("MODEL: MoveCard: Sanity check: Card", card, "is in Stack", fromStack, " -- continue.")
         
         # These are the cards that will be affected by the move, in addition to card.
         oldPrev = self.cardOrderDict[card][0]
@@ -137,20 +72,19 @@ class boardModel(object):
         # Ensure that we keep the previous and next relationships sane.
         if(newPrev == None):
             self.cardOrderDict[card] = (toStack, self.cardOrderDict[card][1])
-            print("MODEL: MoveCard: Move card " + str(card) + " to empty stack " + str(toStack) + ".");
+            print("MODEL     : MoveCard: Move card", card, "to empty stack", toStack);
         else:
             self.cardOrderDict[card] = (newPrev, self.cardOrderDict[card][1])
             self.cardOrderDict[newPrev] = (self.cardOrderDict[newPrev][0], card)
-            print("MODEL: MoveCard: Move card " + str(card) + " to non-empty stack " + str(toStack) + ". Put on " + str(newPrev) + ".");
+            print("MODEL     : MoveCard: Move card", card, "to non-empty stack", toStack, ". Previous top:", newPrev);
         
         try:
             self.cardOrderDict[oldPrev] = (self.cardOrderDict[oldPrev][0], None)
         except:
-            print("MODEL: MoveCard: Stack " + str(oldPrev) + " is now empty.");
-        
-        print("MODEL: MoveCard: Finished.");
+            print("MODEL     : MoveCard: Stack", oldPrev, "is now empty.");
         
         # Create dictionary and send in signal to controller
+        print("MODEL     : MoveCard: Sending stacks to CONTROLLER.");
         self.com.updateStackSignal.emit(self.getStackDict())
         
         return True
@@ -164,7 +98,66 @@ class boardModel(object):
         for i in range(1, len(self.cardList) - 1):
             self.cardOrderDict[i] = (i-1,i+1)
         self.cardOrderDict[len(self.cardList) - 1] = (len(self.cardList) - 2, None)
+
         
+    def findStackOfCard(self, card):
+        '''
+        Returns the stack card belongs to.
+        '''
+        tempCard = card
+        
+        while(self.cardOrderDict[tempCard][0] >= 0):
+            tempCard = self.cardOrderDict[tempCard][0]
+        
+        return self.cardOrderDict[tempCard][0]
+
+    
+    def findRootCardInStack(self, stack):
+        '''
+        Finds the bottom-most card belonging to stack and returns it.
+        '''
+        
+        # Loop through data structure to find stack.
+        for i in range(0, len(self.cardOrderDict)):
+            if(self.cardOrderDict[i][0] == stack):
+                return i
+            
+        return None
+    
+    
+    def findTopCardInStack(self, stack):
+        '''
+        Returns the top-most card belonging to stack.
+        '''
+        oldCard = self.findRootCardInStack(stack)
+        
+        if(oldCard == None):
+            return None
+        else:
+        	# Iterate through stack until top card found.
+            while(self.cardOrderDict[oldCard][1] != None):
+                oldCard = self.cardOrderDict[oldCard][1]
+            
+            return oldCard
+    
+    
+    def getStack(self, stack):
+        '''
+        Returns a list of cards, from bottom to top that make up a stack.
+        '''
+        
+        oldCard = self.findRootCardInStack(stack)
+        
+        if(oldCard != None):
+            stackList = [oldCard]
+            while(self.cardOrderDict[oldCard][1] != None):
+                oldCard = self.cardOrderDict[oldCard][1]
+                stackList.append(oldCard)
+            return stackList
+        else:
+            return []
+    
+    
     def getStackDict(self):
         '''
         Creates a dictionary with (stackID, list[cardID]) and returns it
@@ -172,7 +165,8 @@ class boardModel(object):
         stackDict = dict()
         
         for stack in vars(boardStacks):
-            if not callable(stack) and not stack.startswith("__"):
+            if not callable(stack) and not stack.startswith("__") and not getattr(boardStacks, stack) == -30:
                 stackDict[getattr(boardStacks, stack)] = self.getStack(getattr(boardStacks, stack))
             
         return stackDict
+    
