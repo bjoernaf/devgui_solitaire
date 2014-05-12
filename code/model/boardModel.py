@@ -8,6 +8,9 @@ from .cardModel import cardModel
 from .communicator import communicator
 from .boardStacks import boardStacks
 
+# Allows us to randomize deck.
+import random
+
 
 class boardModel(object):
     '''
@@ -38,7 +41,7 @@ class boardModel(object):
                 self.cardList.append(cardModel(color, number))
         
         # Create deck of cards and notify view
-        self.createSortedDeck()
+        self.createRandomizedDeck() #createSortedDeck()
         self.com.updateStackSignal.emit(self.getStackDict())
         
         
@@ -92,14 +95,36 @@ class boardModel(object):
         
     def createSortedDeck(self):
         '''
-        Adds all cards in self.cardList to the Deck.
+        Adds all cards in self.cardList to the Deck in order.
         '''
         self.cardOrderDict[0] = (boardStacks.Deck, 1)
         for i in range(1, len(self.cardList) - 1):
             self.cardOrderDict[i] = (i-1,i+1)
         self.cardOrderDict[len(self.cardList) - 1] = (len(self.cardList) - 2, None)
 
-        
+
+    def createRandomizedDeck(self):
+    	'''
+    	Adds all cards in self.cardList to the Deck in random order.
+    	'''
+    	
+    	# Create list of all cards, from which we can remove added cards.
+    	deckOfCards = []
+    	for i in range(0, 52):
+    		deckOfCards.append(i)
+    	random.shuffle(deckOfCards)
+    	
+    	# Add first card
+    	self.cardOrderDict[deckOfCards[0]] = (boardStacks.Deck, deckOfCards[1])
+    	
+    	# Add all but last
+    	for i in range(1, len(deckOfCards)-1):
+    		self.cardOrderDict[deckOfCards[i]] = (deckOfCards[i-1], deckOfCards[i+1])
+    		
+    	# Add last card
+    	self.cardOrderDict[deckOfCards[len(deckOfCards)-1]] = (deckOfCards[len(deckOfCards)-2], None)
+    	
+    		
     def findStackOfCard(self, card):
         '''
         Returns the stack card belongs to.
