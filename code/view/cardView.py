@@ -67,10 +67,11 @@ class cardView(QGraphicsItem):
         self.boardView = boardView
         
         # Load image
-        self.loadImage(self.color)  
+        self.loadImage(self.color)
 
         # Set flags (flag | flag | flag...) and cursor type       
-        self.setFlag(self.ItemIsMovable)
+        self.setFlags(self.ItemIsMovable)
+        self.setAcceptHoverEvents(True)
         self.setCursor(Qt.OpenHandCursor)
         
         # TODO: Currently not working to drop on cards.
@@ -197,7 +198,6 @@ class cardView(QGraphicsItem):
         '''
         return QRectF(0, 0, self.cardWidth, self.cardHeight)    
     
-        
     def loadImage(self, color):
         '''
         Loads an image from file with color.png as filename.
@@ -208,6 +208,11 @@ class cardView(QGraphicsItem):
         if self.image.isNull():
             print("CARDVIEW  : loadImage: Error loading image")
             
+    def rotate(self):
+        '''
+        Rotate something
+        '''
+        print("Rotating...")
             
     def toValueString(self, value):
         '''
@@ -220,3 +225,16 @@ class cardView(QGraphicsItem):
                 13: "K",
                 }.get(value, str(value))
              
+    def hoverEnterEvent(self, event):
+        '''
+        Catch when mouse enters area over a card.
+        '''
+        #print("CARD ID: " + str(self.id) + " has hoverEnterEvent.")
+        #self.gsc.solWin.bView.animation.addRotating(self)
+        
+    def hoverLeaveEvent(self, event):
+        '''
+        Catch when mouse leaves area over card.
+        '''
+        #print("CARD ID: " + str(self.id) + " has hoverLeaveEvent.")
+        #self.gsc.solWin.bView.animation.removeRotating(self)
