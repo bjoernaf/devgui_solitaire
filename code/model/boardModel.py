@@ -131,9 +131,9 @@ class boardModel(object):
         self.cardOrderDict[deckOfCards[5]] = (deckOfCards[4], None)
 
         self.cardOrderDict[deckOfCards[6]] = (boardStacks.Bottom4, deckOfCards[7])
-        self.cardOrderDict[deckOfCards[7]] = (deckOfCards[5], deckOfCards[8])
-        self.cardOrderDict[deckOfCards[8]] = (deckOfCards[6], deckOfCards[9])
-        self.cardOrderDict[deckOfCards[9]] = (deckOfCards[7], None)
+        self.cardOrderDict[deckOfCards[7]] = (deckOfCards[6], deckOfCards[8])
+        self.cardOrderDict[deckOfCards[8]] = (deckOfCards[7], deckOfCards[9])
+        self.cardOrderDict[deckOfCards[9]] = (deckOfCards[8], None)
 
         self.cardOrderDict[deckOfCards[10]] = (boardStacks.Bottom5, deckOfCards[11])
         self.cardOrderDict[deckOfCards[11]] = (deckOfCards[10], deckOfCards[12])
