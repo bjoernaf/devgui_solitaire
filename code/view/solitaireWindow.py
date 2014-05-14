@@ -159,6 +159,7 @@ class solitaireWindow(QMainWindow):
             settings = QSettings()
             settings.setValue("MainWindow/Size", QVariant(self.size()))
             settings.setValue("MainWindow/Position", QVariant(self.pos()))
+            settings.setValue("ControlPanel/Position", QVariant(self.controlPanel.pos()))
         else:
             event.ignore()
          
