@@ -11,9 +11,10 @@ The boardView contains a QGraphicsScene that displays stacks (created in stackVi
 # Can remove lots of imports later, might use some of them soon
 from PyQt5.QtCore import (Qt)
 from PyQt5.QtGui import (QFont)
-from PyQt5.QtWidgets import (QGraphicsTextItem, QGraphicsScene, QGraphicsView)
+from PyQt5.QtWidgets import (QGraphicsTextItem, QGraphicsView)
 from view import cardView, stackView, boardScene
 from model import boardStacks
+from animation import animationEngine
 
 class boardView(QGraphicsView):
     '''
@@ -37,6 +38,9 @@ class boardView(QGraphicsView):
             for number in range(1,14):
                 self.cardList.append(cardView.cardView(gameStateController, self, color, number, index, True))
                 index += 1
+                
+        # TODO: Create animation engine (Remove comment when working)
+        # self.animation = animationEngine.animationEngine()
 
         # Create a scene based on the parent's size
         self.scene = boardScene.boardScene(0, 0, windowWidth, windowHeight, self)
