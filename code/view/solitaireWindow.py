@@ -19,6 +19,7 @@ from PyQt5.QtGui import QIcon
 
 from view import boardView
 from view import transSlider
+from view import controlPanel
 
 class solitaireWindow(QMainWindow):
     '''
@@ -37,6 +38,9 @@ class solitaireWindow(QMainWindow):
         
         # GameStateController needed for menu to Undo/Redo
         self.gameStateController = gameStateController
+        
+        # Create control panel
+        self.controlPanel = controlPanel.controlPanel(gameStateController)
 
         # Set up settings to store properties (width, height etc)
         settings = QSettings()
@@ -63,6 +67,15 @@ class solitaireWindow(QMainWindow):
         self.toolbar.addWidget(self.slide)
         self.addToolBar(Qt.TopToolBarArea, self.toolbar)
 
+
+    def openControlPanel(self):
+        '''
+        Opens the control panel dialog.
+        '''
+        self.controlPanel.show()
+        self.controlPanel.raise_()
+        self.controlPanel.activateWindow()
+        
     
     def createUI(self):
         '''
@@ -121,9 +134,13 @@ class solitaireWindow(QMainWindow):
         self.redoAction.setEnabled(False)
         self.redoAction.triggered.connect(self.gameStateController.redo)
         
+        self.controlPanelAction = QAction('Preferences', self)
+        self.controlPanelAction.setEnabled(True)
+        self.controlPanelAction.triggered.connect(self.openControlPanel)
+        
         editMenu.addAction(self.undoAction)
         editMenu.addAction(self.redoAction)
-        editMenu.addAction('Preferences')
+        editMenu.addAction(self.controlPanelAction)
         
         # Populate HelpMenu
         helpMenu.addAction('About')
@@ -134,6 +151,11 @@ class solitaireWindow(QMainWindow):
         Overrides closeEvent to provide confirm dialogue and save settings
         '''
         if self.okToContinue():
+
+			# Close the control panel
+            self.controlPanel.close()
+            
+            # Store settings
             settings = QSettings()
             settings.setValue("MainWindow/Size", QVariant(self.size()))
             settings.setValue("MainWindow/Position", QVariant(self.pos()))
