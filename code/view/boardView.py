@@ -35,7 +35,7 @@ class boardView(QGraphicsView):
         index = 0
         for color in range(1, 5):
             for number in range(1,14):
-                self.cardList.append(cardView.cardView(gameStateController, self, color, number, index))
+                self.cardList.append(cardView.cardView(gameStateController, self, color, number, index, True))
                 index += 1
 
         # Create a scene based on the parent's size
@@ -83,6 +83,7 @@ class boardView(QGraphicsView):
                 self.bottom6StackView.updateStackList(stacks[key])
             elif(key == boardStacks.boardStacks.Bottom7):
                 self.bottom7StackView.updateStackList(stacks[key])
+                
             else:
                 print("BOARDVIEW : UpdateStacks: INVALID STACK:", key)
                 

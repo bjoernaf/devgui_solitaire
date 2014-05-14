@@ -41,7 +41,7 @@ class cardView(QGraphicsItem):
     boundingImageRight = QRectF(-cardWidth + 5.3, -cardHeight + 16, 10, 10)
 
 
-    def __init__(self, gameStateController, boardView, color, value, cardId):
+    def __init__(self, gameStateController, boardView, color, value, cardId, faceup):
         '''
         Constructor:
         Creates a Card in the GraphicsView.
@@ -60,6 +60,7 @@ class cardView(QGraphicsItem):
         self.color = color
         self.value = value
         self.id = cardId
+        self.faceup = faceup
         
         # Save game state controller instance
         self.gsc = gameStateController
@@ -163,28 +164,32 @@ class cardView(QGraphicsItem):
         
         # Set pen and color to paint card with
         painter.setPen(Qt.black)
-        painter.setBrush(Qt.white)
+        if(self.faceup == True):
+            painter.setBrush(Qt.white)
+        else:
+            painter.setBrush(Qt.red)
         
         # Paint a rounded, anti-aliased rectangle representing the card
         painter.setRenderHint(QPainter.Antialiasing)
         painter.drawRoundedRect(0, 0, self.cardWidth, self.cardHeight, self.cardXRad, self.cardYRad, Qt.AbsoluteSize)
+
+        if(self.faceup == True):        
+            # Card value: Set font style and color
+            font = QFont("Helvetica")
+            font.setBold(True)
+            painter.setFont(font)
+            if self.color in range(2,4):
+                painter.setPen(Qt.red)
+                
+            # Paint upper left text and image
+            painter.drawText(self.boundingValueLeft, Qt.AlignTop | Qt.AlignHCenter, self.toValueString(self.value))
+            painter.drawImage(self.boundingImageLeft, self.image)
         
-        # Card value: Set font style and color
-        font = QFont("Helvetica")
-        font.setBold(True)
-        painter.setFont(font)
-        if self.color in range(2,4):
-            painter.setPen(Qt.red)
+            #Paint lower right text and image
+            painter.rotate(180)
+            painter.drawText(self.boundingValueRight, Qt.AlignTop | Qt.AlignHCenter, self.toValueString(self.value))
+            painter.drawImage(self.boundingImageRight, self.image)
             
-        # Paint upper left text and image
-        painter.drawText(self.boundingValueLeft, Qt.AlignTop | Qt.AlignHCenter, self.toValueString(self.value))
-        painter.drawImage(self.boundingImageLeft, self.image)
-        
-        #Paint lower right text and image
-        painter.rotate(180)
-        painter.drawText(self.boundingValueRight, Qt.AlignTop | Qt.AlignHCenter, self.toValueString(self.value))
-        painter.drawImage(self.boundingImageRight, self.image)
-        
         
     def boundingRect(self):
         '''
