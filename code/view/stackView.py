@@ -76,10 +76,10 @@ class stackView(QGraphicsItem):
         return self.id
         
     def getStack(self):
-    	'''
+        '''
     	Returns the card list of the stack.
     	'''
-    	return self.stackCardList
+        return self.stackCardList
 
     def paint(self, painter, option, widget=None):
         '''
@@ -133,13 +133,13 @@ class stackView(QGraphicsItem):
         
         # Update stack to add moved cards, unless same stack.
         if(fromStack == self.id):
-        	self.boardView.cancelTempStack()
+            self.boardView.cancelTempStack()
         else:
-	        self.boardView.clearTempStack()
-	        self.com.moveCardSignal.emit(fromStack, self.id, cardId)
+            self.boardView.clearTempStack()
+            self.com.moveCardSignal.emit(fromStack, self.id, cardId)
         
         # Hide the drag stack again
-        self.boardView.tempStackView.hide()
+        self.boardView.tempStackVisible(False)
         
         
     def setParents(self):

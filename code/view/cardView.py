@@ -87,7 +87,7 @@ class cardView(QGraphicsItem):
         # If drop has failed
         if target == None:
             # Undo move to temp stack
-            self.parentItem().hide()
+            self.boardView.tempStackVisible(False)
             print("CARDVIEW  : IllegalDropSlot: Illegal drop, cancel drag.")
             self.boardView.cancelTempStack()
 
@@ -130,7 +130,7 @@ class cardView(QGraphicsItem):
         self.boardView.updateTempStack(self.id, self.parentItem().id)
         
         # Show the dragCardStackView (tempStack)
-        self.parentItem().show()
+        self.boardView.tempStackVisible(True)
         
         #Execute drag etc
         drag.exec_()

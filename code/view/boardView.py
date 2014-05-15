@@ -194,6 +194,7 @@ class boardView(QGraphicsView):
         Updates the contents of the temp stack.
         '''
         
+        
         if(stackid == boardStacks.boardStacks.Deck):
             newStacks = self.splitStackOnCard(cardid, self.deckStackView.getStack())
             self.deckStackView.updateStackList(newStacks[0])
@@ -250,7 +251,8 @@ class boardView(QGraphicsView):
             print("BOARDVIEW : UpdateTempStack: INVALID STACK!!", stackid)
             return
         
-        self.tempStackView.updateStackList([cardid])
+        # TODO: Purpouse of line below? Does not work unless commented
+        #self.tempStackView.updateStackList([cardid])
         self.tempStackRoot = cardid
         self.tempStackFromStack = stackid
         
@@ -301,6 +303,19 @@ class boardView(QGraphicsView):
         '''
         self.tempStackView.updateStackList([])
         self.tempStackRoot = -1
+        
+    def tempStackVisible(self, isVisible):
+        '''
+        Shows the tempStack if isVisible = True
+        Hides the tempStack if isVisible = False
+        '''
+        if isVisible == True:
+            self.tempStackView.show()
+        elif isVisible == False:
+            self.tempStackView.hide()
+        else:
+            print("Error")
+            
 
 
     def splitStackOnCard(self, cardid, stack):
