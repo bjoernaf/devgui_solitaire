@@ -5,6 +5,7 @@ Created on 12 maj 2014
 '''
 
 from PyQt5.QtCore import QTimer
+from controller import communicator
 
 class animationEngine(object):
     '''
@@ -21,6 +22,8 @@ class animationEngine(object):
         self.timer = QTimer()
         # Connect timer signal to slot
         self.timer.timeout.connect(self.animate)
+        
+        self.com = communicator.communicator()
         
         # Lists of items to animate
         self.rotating = list()
@@ -52,4 +55,16 @@ class animationEngine(object):
         '''
         if obj in self.rotating:
             self.rotating.remove(obj)
+            
+    def addFlipping(self, obj):
+        '''
+        Add obj to list rotating
+        '''
+        self.flipping.append(obj)
         
+    def removeFlipping(self, obj):
+        '''
+        If obj is in list rotating, remove it.
+        '''
+        if obj in self.flipping:
+            self.flipping.remove(obj)
