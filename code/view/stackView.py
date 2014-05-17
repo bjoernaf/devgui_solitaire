@@ -99,8 +99,9 @@ class stackView(QGraphicsItem):
     def boundingRect(self):
         '''
         Override defining the bounding rectangle for a stack
+        to account for thicker painted borders
         '''
-        return QRectF(self.rectx, self.recty,
+        return QRectF(-self.rectx, -self.recty,
                       self.rectWidth, self.rectHeight) 
 
         

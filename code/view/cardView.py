@@ -7,7 +7,7 @@ cardView is an QGraphicsItem representing a card.
 
 from PyQt5.QtCore import Qt, QRectF, QMimeData
 from PyQt5.QtGui import QDrag, QFont, QPainter, QImage
-from PyQt5.QtWidgets import QGraphicsItem
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsDropShadowEffect
 from model import boardStacks
 from view import communicator
 
@@ -69,6 +69,13 @@ class cardView(QGraphicsItem):
         # TODO: Currently not working to drop on cards.
         # If enabled, tries to drop on self since tempStack is at mouse location with self as card
         #self.setAcceptDrops(True)
+        
+        # Set up effect to use when animating pulsate and connect it to the cardView
+        self.pulsateEffect = QGraphicsDropShadowEffect()
+        self.pulsateEffect.setColor(Qt.white)
+        self.pulsateEffect.setOffset(0,0)
+        self.pulsateIncrease = True # True increasing, False decreasing
+        self.setGraphicsEffect(self.pulsateEffect)
         
 
     def illegalDropSlot(self, target):
@@ -229,11 +236,51 @@ class cardView(QGraphicsItem):
         Catch when mouse enters area over a card.
         '''
         #print("CARD ID: " + str(self.id) + " has hoverEnterEvent.")
-        #self.gsc.solWin.bView.animation.addRotating(self)
+        self.boardView.animation.addPulsating(self)
         
     def hoverLeaveEvent(self, event):
         '''
         Catch when mouse leaves area over card.
         '''
         #print("CARD ID: " + str(self.id) + " has hoverLeaveEvent.")
-        #self.gsc.solWin.bView.animation.removeRotating(self)
+        self.boardView.animation.removePulsating(self)
+        self.resetAnimation()
+        
+    def pulsate(self):
+        '''
+        Animate self to pulsate
+        '''
+        # Store the current blurRadius
+        currentBlur = self.pulsateEffect.blurRadius()
+        
+        # If currentBlur is not at edge values, increase or decrease it
+        if currentBlur > 0 and currentBlur < 59:
+            if self.pulsateIncrease == True:
+                self.pulsateEffect.setBlurRadius(currentBlur+1)
+            else:
+                self.pulsateEffect.setBlurRadius(currentBlur-1)
+        # If currentBlur has reached 0, change to increasing Blur
+        elif currentBlur == 0:
+            self.pulsateIncrease = True
+            self.pulsateEffect.setBlurRadius(currentBlur+1)
+        # If currentblur has reached 59, change to decreasing Blur
+        elif currentBlur == 59:
+            self.pulsateIncrease = False
+            self.pulsateEffect.setBlurRadius(currentBlur-1)
+        else:
+            print("CARDVIEW: PULSATE: Error, wrong blurRadius!")
+        
+        # Enable blur effect if disabled
+        if self.pulsateEffect.isEnabled() == False:
+            self.pulsateEffect.setEnabled(True)
+            
+        #self.boardView.repaintStacks()
+        
+    def resetAnimation(self):
+        '''
+        Resets all animations to original state
+        '''
+        # Disable pulsating animation and reset it
+        self.pulsateEffect.setEnabled(False)
+        self.pulsateEffect.setBlurRadius(0)
+

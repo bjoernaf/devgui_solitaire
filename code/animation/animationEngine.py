@@ -9,12 +9,17 @@ from controller import communicator
 
 class animationEngine(object):
     '''
-    stuff
+    An engine controlling animations to be performed.
+    The engine can handle several types of animations through
+    different lists that are iterated over each time a timer
+    timeouts. The respective animation function for each object
+    is called upton to perform one step of the animation.
     '''
 
     def __init__(self):
         '''
-        Constructor, sets up a timer to sync animations.
+        Constructor, sets up a timer to sync animations and
+        create lists to contain objects that require animation.
         '''
         super(animationEngine, self).__init__()
         
@@ -28,6 +33,7 @@ class animationEngine(object):
         # Lists of items to animate
         self.rotating = list()
         self.flipping = list()
+        self.pulsating = list()
         
         # Start timer with 60+ timeouts per second
         self.timer.start(15)
@@ -42,6 +48,9 @@ class animationEngine(object):
         # For all objects in list flipping, call flip
         for obj in self.flipping:
             obj.flip()
+        # For all objects in list pulsating, call pulsate
+        for obj in self.pulsating:
+            obj.pulsate()
             
     def addRotating(self, obj):
         '''
@@ -68,3 +77,16 @@ class animationEngine(object):
         '''
         if obj in self.flipping:
             self.flipping.remove(obj)
+    
+    def addPulsating(self, obj):
+        '''
+        Add obj to list of obj that pulsate when animated
+        '''
+        self.pulsating.append(obj)
+        
+    def removePulsating(self, obj):
+        '''
+        If obj is in list pulsating, remove it
+        '''
+        if obj in self.pulsating:
+            self.pulsating.remove(obj)
