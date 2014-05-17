@@ -8,9 +8,11 @@ class cardModel(object):
     '''
     classdocs
     '''
-    color = None
-    value = None
-    faceup = False
+    # Martin: The lines below don't seem to do anything useful,
+    # so I comment them out.
+#    color = None
+#    value = None
+#    faceup = False
     
     def __init__(self, color, value, faceup = False):
         '''

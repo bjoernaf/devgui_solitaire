@@ -4,7 +4,7 @@ Created on 10 maj 2014
 @author: Sven
 '''
 
-from PyQt5.QtWidgets import QGraphicsScene, QGraphicsSceneDragDropEvent
+from PyQt5.QtWidgets import QGraphicsScene
 
 class boardScene(QGraphicsScene):
     '''
@@ -31,7 +31,7 @@ class boardScene(QGraphicsScene):
             if event.mimeData().hasText() and "," in event.mimeData().text():
                 # Update position of the dragStack
                 self.boardView.tempStackView.updatePos(event.scenePos())
-       			
+        
         # Call super        
         QGraphicsScene.dragMoveEvent(self, event)
         

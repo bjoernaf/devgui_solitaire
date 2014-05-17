@@ -1,18 +1,18 @@
 '''
 Created on 7 apr 2014
 
-@author: Sven, Bjorn
+@author: Sven, Bjorn, Martin
 
 boardView is a QGraphicsView representing a solitaire board.
-The boardView contains a QGraphicsScene that displays stacks (created in stackView.py) of cards (created in cardView.py).
-
+The boardView contains a QGraphicsScene that displays stacks
+(created in stackView.py) of cards (created in cardView.py).
 '''
 
-# Can remove lots of imports later, might use some of them soon
-from PyQt5.QtCore import (Qt)
-from PyQt5.QtGui import (QFont)
-from PyQt5.QtWidgets import (QGraphicsTextItem, QGraphicsView)
-from view import cardView, stackView, boardScene
+from PyQt5.QtCore import Qt
+#from PyQt5.QtGui import QFont
+#from PyQt5.QtWidgets import QGraphicsTextItem, QGraphicsView
+from PyQt5.QtWidgets import QGraphicsView
+from view import cardView, stackView, boardScene, communicator
 from model import boardStacks
 from animation import animationEngine
 
@@ -25,7 +25,8 @@ class boardView(QGraphicsView):
     def __init__(self, windowWidth, windowHeight, gameStateController):
         '''
         Constructor:
-        Creates a graphicsScene, calls drawContent and sets the scene as active scene in boardView
+        Creates a graphicsScene, calls drawContent and sets the scene
+        as active scene in boardView
         '''
         super(boardView,self).__init__()
         
@@ -36,11 +37,15 @@ class boardView(QGraphicsView):
         index = 0
         for color in range(1, 5):
             for number in range(1,14):
-                self.cardList.append(cardView.cardView(gameStateController, self, color, number, index, True))
+                self.cardList.append(cardView.cardView(gameStateController,
+                                                       self, color, number,
+                                                       index, True))
                 index += 1
-                
-        # TODO: Create animation engine (Remove comment when working)
-        # self.animation = animationEngine.animationEngine()
+        
+        self.animation = animationEngine.animationEngine()
+        
+        self.com = communicator.communicator()
+        self.com.moveCardSignal.connect(gameStateController.moveCard)
 
         # Create a scene based on the parent's size
         self.scene = boardScene.boardScene(0, 0, windowWidth, windowHeight, self)
@@ -51,8 +56,8 @@ class boardView(QGraphicsView):
         
     def updateStacks(self, stacks):
         '''
-        Slot for signal in controller. Receives new stack content if changes have occured.
-        Notifies each stack of it's new content.
+        Slot for signal in controller. Receives new stack content if changes have
+        occurred. Notifies each stack of its new content.
         '''
         print("BOARDVIEW : updateStacks: New stacks from MODEL:", stacks)
         
@@ -94,19 +99,17 @@ class boardView(QGraphicsView):
                 
     def drawContent(self, gameStateController):
         '''
-        set up the graphics scene and add items to it (stacks eventually, for now cards)
+        set up the graphics scene and add items to it
         '''
         
-        # This is just a nice font, use any font you like, or none
-        font=QFont('Decorative')
-        font.setPointSize(25)
-
         #Draw white text in the center of the window
-        centerText=QGraphicsTextItem('Solitaire')
-        centerText.setFont(font)
-        centerText.setDefaultTextColor(Qt.white)
-        centerText.setPos(310, 170)
-        self.scene.addItem(centerText)
+#        font=QFont('Decorative')
+#        font.setPointSize(25)
+#        centerText=QGraphicsTextItem('Solitaire')
+#        centerText.setFont(font)
+#        centerText.setDefaultTextColor(Qt.white)
+#        centerText.setPos(310, 170)
+#        self.scene.addItem(centerText)
         
         #Set background color to dark green
         self.scene.setBackgroundBrush(Qt.darkGreen)
@@ -114,79 +117,101 @@ class boardView(QGraphicsView):
         # Create stacks as
         # stackView.stackView(parent, gameStateController, boardStacks.boardStacks.STACKID, x-offset, y-offset, [faceUp])
         self.deckStackView = stackView.stackView(self, gameStateController,
-                                                 boardStacks.boardStacks.Deck, 0, 0, False)
+                                                 boardStacks.boardStacks.Deck,
+                                                 0, 0, False)
         self.deckStackView.setPos(10, 10)
         self.scene.addItem(self.deckStackView)
         
         self.drawableStackView = stackView.stackView(self, gameStateController,
-                                                     boardStacks.boardStacks.Drawable, 8, 0)
+                                                     boardStacks.boardStacks.Drawable,
+                                                     20, 0)
         self.drawableStackView.setPos(120, 10)
         self.scene.addItem(self.drawableStackView)
 
         self.topLLStackView = stackView.stackView(self, gameStateController,
-                                                  boardStacks.boardStacks.TopLL, 0, 0)
+                                                  boardStacks.boardStacks.TopLL,
+                                                  0, 0)
         self.topLLStackView.setPos(340, 10)
         self.scene.addItem(self.topLLStackView)        
 
         self.topMLStackView = stackView.stackView(self, gameStateController,
-                                                  boardStacks.boardStacks.TopML, 0, 0)
+                                                  boardStacks.boardStacks.TopML,
+                                                  0, 0)
         self.topMLStackView.setPos(450, 10)
         self.scene.addItem(self.topMLStackView)
         
         self.topMRStackView = stackView.stackView(self, gameStateController,
-                                                  boardStacks.boardStacks.TopMR, 0, 0)
+                                                  boardStacks.boardStacks.TopMR,
+                                                  0, 0)
         self.topMRStackView.setPos(560, 10)
         self.scene.addItem(self.topMRStackView)
         
         self.topRRStackView = stackView.stackView(self, gameStateController,
-                                                  boardStacks.boardStacks.TopRR, 0, 0)
+                                                  boardStacks.boardStacks.TopRR,
+                                                  0, 0)
         self.topRRStackView.setPos(670, 10)
         self.scene.addItem(self.topRRStackView)
 
         self.bottom1StackView = stackView.stackView(self, gameStateController,
-                                                     boardStacks.boardStacks.Bottom1)
+                                                    boardStacks.boardStacks.Bottom1)
         self.bottom1StackView.setPos(10, 240)
         self.scene.addItem(self.bottom1StackView)        
 
         self.bottom2StackView = stackView.stackView(self, gameStateController,
-                                                     boardStacks.boardStacks.Bottom2)
+                                                    boardStacks.boardStacks.Bottom2)
         self.bottom2StackView.setPos(120, 240)
         self.scene.addItem(self.bottom2StackView)
         
         self.bottom3StackView = stackView.stackView(self, gameStateController,
-                                                     boardStacks.boardStacks.Bottom3)
+                                                    boardStacks.boardStacks.Bottom3)
         self.bottom3StackView.setPos(230, 240)
         self.scene.addItem(self.bottom3StackView)
         
         self.bottom4StackView = stackView.stackView(self, gameStateController,
-                                                     boardStacks.boardStacks.Bottom4)
+                                                    boardStacks.boardStacks.Bottom4)
         self.bottom4StackView.setPos(340, 240)
         self.scene.addItem(self.bottom4StackView)
 
         self.bottom5StackView = stackView.stackView(self, gameStateController,
-                                                     boardStacks.boardStacks.Bottom5)
+                                                    boardStacks.boardStacks.Bottom5)
         self.bottom5StackView.setPos(450, 240)
         self.scene.addItem(self.bottom5StackView)
         
         self.bottom6StackView = stackView.stackView(self, gameStateController,
-                                                     boardStacks.boardStacks.Bottom6)
+                                                    boardStacks.boardStacks.Bottom6)
         self.bottom6StackView.setPos(560, 240)
         self.scene.addItem(self.bottom6StackView)
         
         self.bottom7StackView = stackView.stackView(self, gameStateController,
-                                                     boardStacks.boardStacks.Bottom7)
+                                                    boardStacks.boardStacks.Bottom7)
         self.bottom7StackView.setPos(670, 240)
         self.scene.addItem(self.bottom7StackView)
         
-        
         # The tempStack with no location and temporarily hidden
-        self.tempStackView = stackView.stackView(self, gameStateController, boardStacks.boardStacks.tempStack)
+        self.tempStackView = stackView.stackView(self, gameStateController,
+                                                 boardStacks.boardStacks.tempStack)
         self.scene.addItem(self.tempStackView)
         self.tempStackView.hide()
-    
-    
+        
         # Initialize the tempstack
         self.clearTempStack()
+
+    
+    def flipCards(self):
+        oldDeckStack = self.deckStackView.getStack()
+        flipNumber = 3
+        splitPoint = len(oldDeckStack) - flipNumber
+        
+        # Temporarily added
+        splitCardId = oldDeckStack[splitPoint]
+        # self.clearFlipStack() # This method has never existed ...
+        self.com.moveCardSignal.emit(boardStacks.boardStacks.Deck,
+                                     boardStacks.boardStacks.Drawable,
+                                     splitCardId)
+        # End temporarily added
+        
+        # newStacks = (oldDeckStack[0:splitPoint], oldDeckStack[splitPoint:])
+        # self.deckStackView.updateStackList(newStacks[0])
 
 
     def updateTempStack(self, cardid, stackid):
@@ -315,8 +340,7 @@ class boardView(QGraphicsView):
             self.tempStackView.hide()
         else:
             print("Error")
-            
-
+        
 
     def splitStackOnCard(self, cardid, stack):
         '''

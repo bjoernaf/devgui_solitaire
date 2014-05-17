@@ -1,25 +1,14 @@
 '''
 Created on 7 apr 2014
 
-@author: Sven, Bjorn
-cardView is an QGraphicsRectItem representing a card. 
+@author: Sven, Bjorn, Martin
+cardView is an QGraphicsItem representing a card. 
 '''
-from model import boardStacks
 
-from PyQt5.QtCore import (
-    Qt,
-    QRectF,
-    QMimeData,
-    QSize
-)
-from PyQt5.QtGui import (
-    QDrag,
-    QPixmap,
-    QFont, 
-    QPainter,
-    QImage
-)
+from PyQt5.QtCore import Qt, QRectF, QMimeData
+from PyQt5.QtGui import QDrag, QFont, QPainter, QImage
 from PyQt5.QtWidgets import QGraphicsItem
+from model import boardStacks
 from view import communicator
 
 class cardView(QGraphicsItem):
@@ -69,10 +58,13 @@ class cardView(QGraphicsItem):
         # Load image
         self.loadImage(self.color)
 
-        # Set flags (flag | flag | flag...) and cursor type       
-        self.setFlags(self.ItemIsMovable)
         self.setAcceptHoverEvents(True)
-        self.setCursor(Qt.OpenHandCursor)
+        # Martin: Since movability and cursor should depend on the current
+        # stack of the card, the settings below has been moved to
+        # stackView.setParents(). 
+        # Set flags (flag | flag | flag...) and cursor type
+#        self.setFlags(self.ItemIsMovable)
+#        self.setCursor(Qt.OpenHandCursor)
         
         # TODO: Currently not working to drop on cards.
         # If enabled, tries to drop on self since tempStack is at mouse location with self as card
@@ -97,10 +89,18 @@ class cardView(QGraphicsItem):
         Override mousePressEvent
         When the mouse is pressed, change the cursor to a closed hand.
         '''
-        self.setCursor(Qt.ClosedHandCursor)
+        if self.parentItem().getid() != boardStacks.boardStacks.Deck:
+            self.setCursor(Qt.ClosedHandCursor)
         QGraphicsItem.mousePressEvent(self, event)
-        
-        
+    
+
+    def mouseDoubleClickEvent(self, event):
+        if self.parentItem().getid() == boardStacks.boardStacks.Deck:
+            self.boardView.flipCards()
+        else:
+            QGraphicsItem.mouseDoubleClickEvent(self, event)
+
+            
     def mouseReleaseEvent(self, event):
         '''
         Override mouseReleaseEvent
@@ -113,8 +113,7 @@ class cardView(QGraphicsItem):
     def mouseMoveEvent(self, event):
         '''
         This is called when an object is moved with the mouse pressed down.
-        A drag event and a pixmap is created. The pixmap is attached to a painter
-        that paints the card while it is being dragged.
+        A drag event is created.
         '''
         
         # Create a drag event with attached mime data containing the card id and fromstack

@@ -4,12 +4,11 @@ Created on 7 apr 2014
 @author: Sven, Bjorn, Martin
 '''
 
-from model import boardStacks
-
 from PyQt5.QtCore import Qt, QRectF, QPointF
 from PyQt5.QtGui import QPen
-from PyQt5.QtWidgets import (QGraphicsItem)
+from PyQt5.QtWidgets import QGraphicsItem
 from view import communicator, cardView
+from model import boardStacks
 
 class stackView(QGraphicsItem):
     '''
@@ -28,7 +27,8 @@ class stackView(QGraphicsItem):
     rectHeight = height + penWidth
 
 
-    def __init__(self, boardView, gameStateController, id, x_offset = 0, y_offset = 5, faceUp = True):
+    def __init__(self, boardView, gameStateController, id,
+                 x_offset = 0, y_offset = 30, faceUp = True):
         '''
         Constructor
         '''
@@ -55,8 +55,8 @@ class stackView(QGraphicsItem):
         # Call as self.com.moveCardSignal.emit(fromStack, toStack, cardID)
         self.com.moveCardSignal.connect(gameStateController.moveCard)
         
-        # Accept drops on the stacks unless stack is tempStack
-        if self.id != boardStacks.boardStacks.tempStack:
+        # Accept drops on the stacks unless stack is the deck or the tempStack
+        if self.id != boardStacks.boardStacks.tempStack and self.id != boardStacks.boardStacks.Deck:
             self.setAcceptDrops(True)
         
         
@@ -145,8 +145,9 @@ class stackView(QGraphicsItem):
     def setParents(self):
         '''
         Sets the stack as parent for all cards.
-        Sets the position of the card to display a stack properly.
+        Sets the position of the cards to display a stack properly.
         Makes sure the cards are displayed in the correct order.
+        Sets movability and cursor of the cards depending on the stack type.
         '''
         offset_x = 5
         offset_y = 5
@@ -155,6 +156,14 @@ class stackView(QGraphicsItem):
             self.boardView.cardList[card].setPos(offset_x, offset_y)
             self.boardView.cardList[card].setParentItem(self)
             self.boardView.cardList[card].setZValue(index)
+            if self.id == boardStacks.boardStacks.Deck:
+                self.boardView.cardList[card].setFlag(QGraphicsItem.ItemIsMovable,
+                                                      False)
+                self.boardView.cardList[card].setCursor(Qt.ArrowCursor)
+            else:
+                self.boardView.cardList[card].setFlag(QGraphicsItem.ItemIsMovable,
+                                                      True)
+                self.boardView.cardList[card].setCursor(Qt.OpenHandCursor)
             offset_x += self.offset_x
             offset_y += self.offset_y
             index += 1

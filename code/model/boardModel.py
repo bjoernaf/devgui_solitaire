@@ -63,13 +63,13 @@ class boardModel(object):
         
         # Make sure the tempStack is not used in model.
         if(fromStack == boardStacks.tempStack or toStack == boardStacks.tempStack):
-        	print("MODEL     : MoveCard: Sanity check: Attempted to use tempStack in MODEL -- ABORTING.")
-        	return False
+            print("MODEL     : MoveCard: Sanity check: Attempted to use tempStack in MODEL -- ABORTING.")
+            return False
         
         # Make sure that the card is not moved to the same stack.
         if(fromStack == toStack):
-        	print("MODEL     : MoveCard: Sanity check: Source and Destination stacks are the same -- ABORTING.")
-        	return False
+            print("MODEL     : MoveCard: Sanity check: Source and Destination stacks are the same -- ABORTING.")
+            return False
         
         # Make sure fromStack is sane.
         if(self.findStackOfCard(card) != fromStack):
@@ -168,27 +168,27 @@ class boardModel(object):
 
 
     def createRandomizedDeck(self):
-    	'''
+        '''
     	Adds all cards in self.cardList to the Deck in random order.
     	'''
-    	
-    	# Create list of all cards, from which we can remove added cards.
-    	deckOfCards = []
-    	for i in range(0, 52):
-    		deckOfCards.append(i)
-    	random.shuffle(deckOfCards)
-    	
-    	# Add first card
-    	self.cardOrderDict[deckOfCards[0]] = (boardStacks.Deck, deckOfCards[1])
-    	
-    	# Add all but last
-    	for i in range(1, len(deckOfCards)-1):
-    		self.cardOrderDict[deckOfCards[i]] = (deckOfCards[i-1], deckOfCards[i+1])
-    		
-    	# Add last card
-    	self.cardOrderDict[deckOfCards[len(deckOfCards)-1]] = (deckOfCards[len(deckOfCards)-2], None)
-    	
-    		
+        
+        # Create list of all cards, from which we can remove added cards.
+        deckOfCards = []
+        for i in range(0, 52):
+            deckOfCards.append(i)
+            random.shuffle(deckOfCards)
+        
+        # Add first card
+        self.cardOrderDict[deckOfCards[0]] = (boardStacks.Deck, deckOfCards[1])
+        
+        # Add all but last
+        for i in range(1, len(deckOfCards)-1):
+            self.cardOrderDict[deckOfCards[i]] = (deckOfCards[i-1], deckOfCards[i+1])
+        
+        # Add last card
+        self.cardOrderDict[deckOfCards[len(deckOfCards)-1]] = (deckOfCards[len(deckOfCards)-2], None)
+        
+        
     def findStackOfCard(self, card):
         '''
         Returns the stack card belongs to.
@@ -223,7 +223,7 @@ class boardModel(object):
         if(oldCard == None):
             return None
         else:
-        	# Iterate through stack until top card found.
+            # Iterate through stack until top card found.
             while(self.cardOrderDict[oldCard][1] != None):
                 oldCard = self.cardOrderDict[oldCard][1]
             
