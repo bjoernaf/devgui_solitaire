@@ -150,24 +150,38 @@ class stackView(QGraphicsItem):
         Makes sure the cards are displayed in the correct order.
         Sets movability and cursor of the cards depending on the stack type.
         '''
+        # Base offset for first card in a stack
         offset_x = 5
         offset_y = 5
         index = 0
+        
+        # Iterate over all cards on the stack. Set position, parents and flags.
         for card in self.stackCardList:
             self.boardView.cardList[card].setPos(offset_x, offset_y)
             self.boardView.cardList[card].setParentItem(self)
             self.boardView.cardList[card].setZValue(index)
+            
+            # If the stack is the Deck, cards are not movable and use an arrow cursor.
             if self.id == boardStacks.boardStacks.Deck:
                 self.boardView.cardList[card].setFlag(QGraphicsItem.ItemIsMovable,
                                                       False)
                 self.boardView.cardList[card].setCursor(Qt.ArrowCursor)
+                
+            # For all other stacks, cards are movable and use an openHandCursor.
             else:
                 self.boardView.cardList[card].setFlag(QGraphicsItem.ItemIsMovable,
                                                       True)
                 self.boardView.cardList[card].setCursor(Qt.OpenHandCursor)
+                
+            # Inherit drop capabilities from the stack
+            self.boardView.cardList[card].setAcceptDrops(self.acceptDrops())
+            
+            # Update offset for next card
             offset_x += self.offset_x
             offset_y += self.offset_y
             index += 1
+            
+        # Repaint stack
         self.update()
         
         

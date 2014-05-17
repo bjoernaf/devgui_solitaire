@@ -233,22 +233,24 @@ class cardView(QGraphicsItem):
              
     def hoverEnterEvent(self, event):
         '''
-        Catch when mouse enters area over a card.
+        Catches when the mouse enters the hover area above the cardView.
         '''
-        #print("CARD ID: " + str(self.id) + " has hoverEnterEvent.")
+        # Add the card to the pulsating animation engine list
         self.boardView.animation.addPulsating(self)
         
     def hoverLeaveEvent(self, event):
         '''
-        Catch when mouse leaves area over card.
+        Catches when the mouse leaves the hover area above the cardView.
         '''
-        #print("CARD ID: " + str(self.id) + " has hoverLeaveEvent.")
+        # Remove the card from the pulsating animation engine list
         self.boardView.animation.removePulsating(self)
         self.resetAnimation()
         
     def pulsate(self):
         '''
-        Animate self to pulsate
+        Animate the card to pulsate. The animation is implemented
+        using a white QGraphicsDropShadowEffect where increased
+        blurRadius blurs the edges of the effect.
         '''
         # Store the current blurRadius
         currentBlur = self.pulsateEffect.blurRadius()
@@ -273,12 +275,11 @@ class cardView(QGraphicsItem):
         # Enable blur effect if disabled
         if self.pulsateEffect.isEnabled() == False:
             self.pulsateEffect.setEnabled(True)
-            
-        #self.boardView.repaintStacks()
         
     def resetAnimation(self):
         '''
-        Resets all animations to original state
+        Resets all animations to original state.
+        Add more animations if necessary.
         '''
         # Disable pulsating animation and reset it
         self.pulsateEffect.setEnabled(False)
