@@ -107,8 +107,10 @@ class boardModel(object):
         Slot for receiving MoveCard events from Controller.
         Moves card to stack toStack, and updates all references to keep representation sane.
         '''
+        '''
         if(self.checkMove(fromStack, toStack, card) == False):
             return False
+        '''
         
         print("MODEL     : MoveCard: Entering moveCard with arguments (", fromStack, ", ", toStack, ", ", card, ")");
         

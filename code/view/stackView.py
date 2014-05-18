@@ -113,13 +113,27 @@ class stackView(QGraphicsItem):
         Set event to accepted, drop will then generate dropEvent
         '''
         #If DragEvent originates from within Solitaire
-        if event.source() != None:
+        if event.source() != None:            
+            
             # Check that it contains a valid card id as text
             if event.mimeData().hasText() and "," in event.mimeData().text():
-                event.accept()
+                
+                # Extract metadata from the card being moved
+                rawMetaData = event.mimeData().text().split(",")
+                cardId = int(rawMetaData[0])
+                fromStack = int(rawMetaData[1])
+                
+                # Ask model whether the move is valid or not, accept only if it is
+                if self.gameStateController.checkMove(fromStack, self.id, cardId) == True:
+                    event.accept()
+                else:
+                    # TODO: Ignore move if it is invalid, perhaps say that it's invalid in tooltip?
+                    event.ignore()
             else:
+                # Ignore move if invalid object is being dragged
                 event.ignore()
         else:
+            # Ignore move if object dragged originates from outside of Solitaire
             event.ignore()
             
             
