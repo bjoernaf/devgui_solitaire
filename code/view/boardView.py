@@ -55,7 +55,7 @@ class boardView(QGraphicsView):
         self.setScene(self.scene)
     
     def updateAllCards(self, cardFaceUp):
-        for i in range(0, 53):
+        for i in range(0, 52):
             self.cardList[i].faceup = cardFaceUp[i]
             print("bajs")
             print(cardFaceUp)
