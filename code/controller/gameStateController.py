@@ -14,6 +14,7 @@ from controller import moveCardCommand
 from controller import communicator
 from view import boardView
 from model import boardStacks
+from animation import animationEngine
 
 class gameStateController(object):
     '''
@@ -53,6 +54,8 @@ class gameStateController(object):
         
         # Create the model, pass controller as parameter
         self.model = boardModel.boardModel(self)
+        
+        self.animationEngine = animationEngine.animationEngine(self)
         
         
     def undo(self):

@@ -5,6 +5,7 @@ Created on 12 maj 2014
 '''
 
 from PyQt5.QtCore import QTimer
+from animation import flippingCardsAnimation
 from controller import communicator
 
 class animationEngine(object):
@@ -16,25 +17,24 @@ class animationEngine(object):
     is called upton to perform one step of the animation.
     '''
 
-    def __init__(self):
+    def __init__(self, gameStateController):
         '''
         Constructor, sets up a timer to sync animations and
         create lists to contain objects that require animation.
         '''
         super(animationEngine, self).__init__()
         
-        # Animation timer
-        self.timer = QTimer()
-        # Connect timer signal to slot
-        self.timer.timeout.connect(self.animate)
-        
-        self.com = communicator.communicator()
+        self.gameStateController = gameStateController
         
         # Lists of items to animate
         self.rotating = list()
         self.flipping = list()
         self.pulsating = list()
-        
+
+        # Animation timer
+        self.timer = QTimer()
+        # Connect timer signal to slot
+        self.timer.timeout.connect(self.animate)
         # Start timer with 60+ timeouts per second
         self.timer.start(15)
         
@@ -65,15 +65,22 @@ class animationEngine(object):
         if obj in self.rotating:
             self.rotating.remove(obj)
             
-    def addFlipping(self, obj):
+    def addFlippingCards(self, cardList, startStack, endStack, endPosition, scaleStep):
         '''
-        Add obj to list rotating
+        Create a flipping cards animation and add it to the list flipping.
         '''
-        self.flipping.append(obj)
+        animation = flippingCardsAnimation.flippingCardsAnimation(cardList,
+                                                                  startStack,
+                                                                  endStack,
+                                                                  endPosition,
+                                                                  scaleStep,
+                                                                  self.gameStateController,
+                                                                  self)
+        self.flipping.append(animation)
         
     def removeFlipping(self, obj):
         '''
-        If obj is in list rotating, remove it.
+        If obj is in list flipping, remove it.
         '''
         if obj in self.flipping:
             self.flipping.remove(obj)
