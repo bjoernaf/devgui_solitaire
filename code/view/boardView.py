@@ -55,12 +55,16 @@ class boardView(QGraphicsView):
         self.setScene(self.scene)
     
     def updateAllCards(self, cardFaceUp):
+        '''
+        Slot for signal which updates the facing of the cards
+        '''
         for i in range(0, 52):
             self.cardList[i].faceup = cardFaceUp[i]
-            print("bajs")
-            print(cardFaceUp)
     
     def updateCard(self, cardId):
+        '''
+        Slot for signal which updates the facing of one card
+        '''
         self.cardList[cardId].faceup = not self.cardList[cardId].faceup
         
     def updateStacks(self, stacks):
