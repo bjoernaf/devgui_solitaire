@@ -39,7 +39,7 @@ class boardView(QGraphicsView):
             for number in range(1,14):
                 self.cardList.append(cardView.cardView(gameStateController,
                                                        self, color, number,
-                                                       index, True))
+                                                       index, False))
                 index += 1
         
         self.animation = animationEngine.animationEngine()
@@ -54,8 +54,13 @@ class boardView(QGraphicsView):
         self.drawContent(gameStateController)
         self.setScene(self.scene)
     
+    def updateAllCards(self, cardFaceUp):
+        for i in range(0, 53):
+            self.cardList[i].faceup = cardFaceUp[i]
+            print("bajs")
+            print(cardFaceUp)
+    
     def updateCard(self, cardId):
-        print("hej")
         self.cardList[cardId].faceup = not self.cardList[cardId].faceup
         
     def updateStacks(self, stacks):

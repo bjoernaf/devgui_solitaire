@@ -39,17 +39,20 @@ class boardModel(object):
         # Connect signals to slot
         self.com.updateStackSignal.connect(gameStateController.updateControllerStacks)
         self.com.updateCardSignal.connect(gameStateController.updateControllerCard)
+        self.com.updateAllCardsSignal.connect(gameStateController.updateControllerAllCards)
         
         # Create cards in cardList and facing status
         for color in range(1, 5):
             for number in range(1,14):
                 self.cardList.append(cardModel(color, number))
-                self.cardFaceUp.append(True)
-        
+                self.cardFaceUp.append(False)
+                       
         # Create deck of cards and notify view
         #self.createRandomizedDeck() #createSortedDeck()
         self.createSolitaireGame()
         self.com.updateStackSignal.emit(self.getStackDict())
+        
+        self.com.updateAllCardsSignal.emit(self.cardFaceUp)
         
     def turnCard(self, cardId):
         print("card turn request")
@@ -131,25 +134,29 @@ class boardModel(object):
         random.shuffle(deckOfCards) 
         
         self.cardOrderDict[deckOfCards[0]] = (boardStacks.Bottom1, None)
-        self.cardList[deckOfCards[0]].faceup = True
+        self.cardFaceUp[deckOfCards[0]] = True
         
         self.cardOrderDict[deckOfCards[1]] = (boardStacks.Bottom2, deckOfCards[2])
         self.cardOrderDict[deckOfCards[2]] = (deckOfCards[1], None)
+        self.cardFaceUp[deckOfCards[2]] = True
 
         self.cardOrderDict[deckOfCards[3]] = (boardStacks.Bottom3, deckOfCards[4])
         self.cardOrderDict[deckOfCards[4]] = (deckOfCards[3], deckOfCards[5])
         self.cardOrderDict[deckOfCards[5]] = (deckOfCards[4], None)
+        self.cardFaceUp[deckOfCards[5]] = True
 
         self.cardOrderDict[deckOfCards[6]] = (boardStacks.Bottom4, deckOfCards[7])
         self.cardOrderDict[deckOfCards[7]] = (deckOfCards[6], deckOfCards[8])
         self.cardOrderDict[deckOfCards[8]] = (deckOfCards[7], deckOfCards[9])
         self.cardOrderDict[deckOfCards[9]] = (deckOfCards[8], None)
+        self.cardFaceUp[deckOfCards[9]] = True
 
         self.cardOrderDict[deckOfCards[10]] = (boardStacks.Bottom5, deckOfCards[11])
         self.cardOrderDict[deckOfCards[11]] = (deckOfCards[10], deckOfCards[12])
         self.cardOrderDict[deckOfCards[12]] = (deckOfCards[11], deckOfCards[13])
         self.cardOrderDict[deckOfCards[13]] = (deckOfCards[12], deckOfCards[14])
         self.cardOrderDict[deckOfCards[14]] = (deckOfCards[13], None)
+        self.cardFaceUp[deckOfCards[14]] = True
 
         self.cardOrderDict[deckOfCards[15]] = (boardStacks.Bottom6, deckOfCards[16])
         self.cardOrderDict[deckOfCards[16]] = (deckOfCards[15], deckOfCards[17])
@@ -157,6 +164,7 @@ class boardModel(object):
         self.cardOrderDict[deckOfCards[18]] = (deckOfCards[17], deckOfCards[19])
         self.cardOrderDict[deckOfCards[19]] = (deckOfCards[18], deckOfCards[20])
         self.cardOrderDict[deckOfCards[20]] = (deckOfCards[19], None)
+        self.cardFaceUp[deckOfCards[20]] = True
 
         self.cardOrderDict[deckOfCards[21]] = (boardStacks.Bottom7, deckOfCards[22])
         self.cardOrderDict[deckOfCards[22]] = (deckOfCards[21], deckOfCards[23])
@@ -165,16 +173,20 @@ class boardModel(object):
         self.cardOrderDict[deckOfCards[25]] = (deckOfCards[24], deckOfCards[26])
         self.cardOrderDict[deckOfCards[26]] = (deckOfCards[25], deckOfCards[27])
         self.cardOrderDict[deckOfCards[27]] = (deckOfCards[26], None)
+        self.cardFaceUp[deckOfCards[27]] = True
 
         # Add first card
         self.cardOrderDict[deckOfCards[28]] = (boardStacks.Deck, deckOfCards[29])
+        self.cardFaceUp[deckOfCards[28]] = True
 
         # Add all but last
         for i in range(29, len(deckOfCards)-1):
             self.cardOrderDict[deckOfCards[i]] = (deckOfCards[i-1], deckOfCards[i+1])
+            self.cardFaceUp[deckOfCards[i]] = True
             
         # Add last card
         self.cardOrderDict[deckOfCards[len(deckOfCards)-1]] = (deckOfCards[len(deckOfCards)-2], None)
+        self.cardFaceUp[deckOfCards[len(deckOfCards)-1]] = True
 
 
     def createRandomizedDeck(self):

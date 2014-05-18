@@ -13,8 +13,9 @@ class communicator(QObject):
     # just a test signal to move a card
     updateSignal = pyqtSignal(dict, name='updateSignal')
 
-    # just a test signal to move a card
     updateCardSignal = pyqtSignal(int, name='updateCardSignal')
+    
+    updateAllCardsSignal = pyqtSignal(list, name='updateAllCardsSignal')
 
     def __init__(self):
         '''
