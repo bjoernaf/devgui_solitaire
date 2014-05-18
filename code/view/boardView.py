@@ -14,6 +14,7 @@ from PyQt5.QtCore import Qt, QPointF
 from PyQt5.QtWidgets import QGraphicsView
 from view import cardView, stackView, boardScene, communicator
 from model import boardStacks
+from animation import animationEngine
 
 class boardView(QGraphicsView):
     '''
@@ -45,6 +46,9 @@ class boardView(QGraphicsView):
         
         self.com = communicator.communicator()
         self.com.moveCardSignal.connect(gameStateController.moveCard)
+        
+        # Create animationEngine
+        self.animationEngine = animationEngine.animationEngine(gameStateController)
 
         # Create a scene based on the parent's size
         self.scene = boardScene.boardScene(0, 0, windowWidth, windowHeight, self)
@@ -238,10 +242,9 @@ class boardView(QGraphicsView):
         # Pass the cards to flip, the start stack, the end stack,
         # and the end position to the animation engine
         scaleStep = -0.01
-        self.gameStateController.animationEngine.addFlippingCards(flipCards,
-                                                                  boardStacks.boardStacks.Deck,
-                                                                  boardStacks.boardStacks.Drawable,
-                                                                  endPos, scaleStep)
+        self.animationEngine.addFlippingCards(flipCards, boardStacks.boardStacks.Deck,
+                                              boardStacks.boardStacks.Drawable,
+                                              endPos, scaleStep)
                 
 
     def updateTempStack(self, cardid, stackid):

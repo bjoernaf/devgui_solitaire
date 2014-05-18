@@ -238,14 +238,14 @@ class cardView(QGraphicsItem):
         Catches when the mouse enters the hover area above the cardView.
         '''
         # Add the card to the pulsating animation engine list
-        self.boardView.animation.addPulsating(self)
+        self.boardView.animationEngine.addPulsating(self)
         
     def hoverLeaveEvent(self, event):
         '''
         Catches when the mouse leaves the hover area above the cardView.
         '''
         # Remove the card from the pulsating animation engine list
-        self.boardView.animation.removePulsating(self)
+        self.boardView.animationEngine.removePulsating(self)
         self.resetAnimation()
         
     def pulsate(self):
