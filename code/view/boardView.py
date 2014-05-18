@@ -8,13 +8,12 @@ The boardView contains a QGraphicsScene that displays stacks
 (created in stackView.py) of cards (created in cardView.py).
 '''
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QPointF
 #from PyQt5.QtGui import QFont
 #from PyQt5.QtWidgets import QGraphicsTextItem, QGraphicsView
 from PyQt5.QtWidgets import QGraphicsView
 from view import cardView, stackView, boardScene, communicator
 from model import boardStacks
-from animation import animationEngine
 
 class boardView(QGraphicsView):
     '''
@@ -42,7 +41,7 @@ class boardView(QGraphicsView):
                                                        index, False))
                 index += 1
         
-        self.animation = animationEngine.animationEngine()
+        self.gameStateController = gameStateController
         
         self.com = communicator.communicator()
         self.com.moveCardSignal.connect(gameStateController.moveCard)
@@ -205,27 +204,45 @@ class boardView(QGraphicsView):
                                                  boardStacks.boardStacks.tempStack)
         self.scene.addItem(self.tempStackView)
         self.tempStackView.hide()
-        
         # Initialize the tempstack
         self.clearTempStack()
 
     
     def flipCards(self):
-        oldDeckStack = self.deckStackView.getStack()
+        # Detach the cards to flip from the deck
         flipNumber = 3
-        splitPoint = len(oldDeckStack) - flipNumber
+        oldDeckStack = self.deckStackView.getStack()
+        oldDeckStackLength = len(oldDeckStack)
+        splitIndex = oldDeckStackLength - flipNumber
+        newDeckStack = oldDeckStack[:splitIndex]
+        self.deckStackView.updateStackList(newDeckStack)
         
-        # Temporarily added
-        splitCardId = oldDeckStack[splitPoint]
-        # self.clearFlipStack() # This method has never existed ...
-        self.com.moveCardSignal.emit(boardStacks.boardStacks.Deck,
-                                     boardStacks.boardStacks.Drawable,
-                                     splitCardId)
-        # End temporarily added
+        # Create a list of the cards to flip
+        flipCards = list()
+        for i in range(splitIndex, oldDeckStackLength):
+            flipCardId = oldDeckStack[i]
+            flipCard = self.cardList[flipCardId]
+            flipCardPos = flipCard.scenePos() # Necessary?
+            flipCard.setParentItem(None)
+            flipCard.setPos(flipCardPos) # Necessary?
+            flipCards.append(flipCard)
+        flipCards.reverse()
         
-        # newStacks = (oldDeckStack[0:splitPoint], oldDeckStack[splitPoint:])
-        # self.deckStackView.updateStackList(newStacks[0])
-
+        # Find the end position of the flip
+        drawableStackPosition = self.drawableStackView.scenePos()
+        drawableStackSize = len(self.drawableStackView.getStack())
+        endPos = QPointF(drawableStackPosition.x() + 5 + 20 * drawableStackSize,
+                         drawableStackPosition.y() + 5) # Do this less hard-codedly
+        print("endPos: " + str(endPos))
+        
+        # Pass the cards to flip, the start stack, the end stack,
+        # and the end position to the animation engine
+        scaleStep = -0.01
+        self.gameStateController.animationEngine.addFlippingCards(flipCards,
+                                                                  boardStacks.boardStacks.Deck,
+                                                                  boardStacks.boardStacks.Drawable,
+                                                                  endPos, scaleStep)
+                
 
     def updateTempStack(self, cardid, stackid):
         '''
@@ -341,6 +358,7 @@ class boardView(QGraphicsView):
         '''
         self.tempStackView.updateStackList([])
         self.tempStackRoot = -1
+        
         
     def tempStackVisible(self, isVisible):
         '''

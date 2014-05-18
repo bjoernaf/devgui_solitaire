@@ -219,8 +219,9 @@ class cardView(QGraphicsItem):
         '''
         Rotate something
         '''
-        print("Rotating...")
-            
+        print("Rotating...")    
+    
+    
     def toValueString(self, value):
         '''
         Returns correct string corresponding to a card value

@@ -74,12 +74,14 @@ class stackView(QGraphicsItem):
         Returns id
         '''
         return self.id
+    
         
     def getStack(self):
         '''
     	Returns the card list of the stack.
     	'''
         return self.stackCardList
+    
 
     def paint(self, painter, option, widget=None):
         '''
@@ -133,7 +135,7 @@ class stackView(QGraphicsItem):
         print("STACKVIEW : dropEvent: Dropped card (", cardId, ",", fromStack, ")")
         
         # Update stack to add moved cards, unless same stack.
-        if(fromStack == self.id):
+        if(fromStack == self.id): # or self.id == boardStacks.boardStacks.Deck):
             self.boardView.cancelTempStack()
         else:
             self.boardView.clearTempStack()
