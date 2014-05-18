@@ -67,10 +67,6 @@ class cardView(QGraphicsItem):
 #        self.setFlags(self.ItemIsMovable)
 #        self.setCursor(Qt.OpenHandCursor)
         
-        # TODO: Currently not working to drop on cards.
-        # If enabled, tries to drop on self since tempStack is at mouse location with self as card
-        #self.setAcceptDrops(True)
-        
         # Set up effect to use when animating pulsate and connect it to the cardView
         self.pulsateEffect = QGraphicsDropShadowEffect()
         self.pulsateEffect.setColor(Qt.white)
@@ -261,13 +257,13 @@ class cardView(QGraphicsItem):
         currentBlur = self.pulsateEffect.blurRadius()
         
         # If currentBlur is not at edge values, increase or decrease it
-        if currentBlur > 0 and currentBlur < 59:
+        if currentBlur > 1 and currentBlur < 59:
             if self.pulsateIncrease == True:
                 self.pulsateEffect.setBlurRadius(currentBlur+1)
             else:
                 self.pulsateEffect.setBlurRadius(currentBlur-1)
         # If currentBlur has reached 0, change to increasing Blur
-        elif currentBlur == 0:
+        elif currentBlur <= 1:
             self.pulsateIncrease = True
             self.pulsateEffect.setBlurRadius(currentBlur+1)
         # If currentblur has reached 59, change to decreasing Blur

@@ -38,22 +38,24 @@ class transSlider(QSlider):
     
     def mouseMoveEvent(self, event):
         '''
-        Override of mouseMoveEvent to set opacity on each move
+        Override of mouseMoveEvent to set opacity on each move.
+        Call repaintCards() on boardView to repaint all cards.
         '''
         super(transSlider, self).mouseMoveEvent(event)
         self.gsc.opacity = self.sliderPosition()
-        self.gsc.solWin.bView.scene.update()
+        self.gsc.solWin.bView.repaintCards()
     
     def mouseReleaseEvent(self, event):
         '''
         Override of mouseReleaseEvent that moves the slider to the
         position pressed on the scale, and sets the opacity in
         gameStateController accordingly.
+        Call repaintCards() on boardView to repaint all cards.
         '''
         posClicked = self.minimum() + ((self.maximum()-self.minimum()) * event.x()) / self.width()
         if (self.sliderPosition() != posClicked):
             self.setValue(posClicked)
             self.gsc.opacity = self.sliderPosition()
-            self.gsc.solWin.bView.scene.update()
+            self.gsc.solWin.bView.repaintCards()
         QSlider.mouseReleaseEvent(self, event)
         # http://stackoverflow.com/questions/11132597/qslider-mouse-direct-jump

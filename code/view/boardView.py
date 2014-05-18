@@ -370,3 +370,10 @@ class boardView(QGraphicsView):
         '''
         self.scene.setSceneRect(0, 0, event.size().width(), event.size().height())
         QGraphicsView.resizeEvent(self, event)
+        
+    def repaintCards(self):
+        '''
+        Trigger a repaint (update()) of all cards in boardView.
+        '''
+        for card in self.cardList:
+            card.update()
