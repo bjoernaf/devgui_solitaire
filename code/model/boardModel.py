@@ -53,24 +53,62 @@ class boardModel(object):
         self.com.updateStackSignal.emit(self.getStackDict())
         
         self.com.updateAllCardsSignal.emit(self.cardFaceUp)
+    
+    #TODO: separate to Rule class
+    def checkMove(self, fromStack, toStack, card):
+        #_, top = self.cardOrderDict[fromStack[0]]
+        # These are the cards that will be affected by the move, in addition to card.
+        #oldPrev = self.cardOrderDict[card][0]
+        topCard = self.findTopCardInStack(toStack)
+        print("topcard checkmove")
+        print(topCard)
         
-    def turnCard(self, cardId):
-        print("card turn request")
-        print(cardId)        
-        self.cardFaceUp[cardId] = not self.cardFaceUp[cardId]
-        # Create dictionary and send in signal to controller
-        print("MODEL     : turnCard: Sending update signal to boardView.");
-        self.com.updateCardSignal.emit(cardId)
+        #Can't place a stack on a back-turned card.
+        if(self.cardFaceUp[topCard] == False):
+            return False
+        
+        #TODO: kings and only kings can be placed on empty stack!
+        
+        color1 = self.cardList[topCard].color
+        color2 = self.cardList[card].color
+        indexdif = card - topCard
+        #print("indexdif")
+        #print(indexdif)
+        #print("color1")
+        #print(color1)
+        if(color1 == 1):
+            if(indexdif != 12 and indexdif != 25):
+                return False
+        elif(color1 == 2):
+            if(indexdif != -14 and indexdif != 25):
+                return False
+        elif(color1 == 3):
+            if(indexdif != -27 and indexdif != 12):
+                return False
+        elif(color1 == 4):
+            if(indexdif != -14 and indexdif != -27):
+                return False       
+               
+        return True
+    
+    #TODO: This logic should perhaps be part of a Rule class.
+    def turnCard(self, cardId):  
+        _, top = self.cardOrderDict[cardId]
+        #If the card is turned and on top of the pile, then turn it over.
+        if(self.cardFaceUp[cardId] == False and top == None): 
+            self.cardFaceUp[cardId] = True     
+            print("MODEL     : turnCard: Sending update signal to boardView.")
+            self.com.updateCardSignal.emit(cardId)
+        else:
+            print("MODEL    : turnCard: Turning of card disallowed.") 
         
     def moveCard(self, fromStack, toStack, card):
         '''
         Slot for receiving MoveCard events from Controller.
         Moves card to stack toStack, and updates all references to keep representation sane.
         '''
-
-        #self.count += 1        
-        #if(self.count % 2 == 0):
-        #    return False
+        if(self.checkMove(fromStack, toStack, card) == False):
+            return False
         
         print("MODEL     : MoveCard: Entering moveCard with arguments (", fromStack, ", ", toStack, ", ", card, ")");
         
