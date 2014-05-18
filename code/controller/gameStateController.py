@@ -46,6 +46,9 @@ class gameStateController(object):
         # Connect updateSignal to slot in view
         self.com.updateSignal.connect(self.solWin.bView.updateStacks)
         
+        #Connect updateCardSignal to slot in view
+        self.com.updateCardSignal.connect(self.solWin.bView.updateCard)
+        
         # Create the model, pass controller as parameter
         self.model = boardModel.boardModel(self)
         
@@ -76,6 +79,14 @@ class gameStateController(object):
         # Forward stacks to view
         print("CONTROLLER: UpdateControllerStacks: Forward stacks from MODEL to BOARDVIEW.")
         self.com.updateSignal.emit(stacks)
+
+    def updateControllerCard(self, cardId):
+        '''
+        Slot receiving card update from model
+        '''
+        # Forward stacks to view
+        print("CONTROLLER: updateControllerCard: Forward card from MODEL to BOARDVIEW.")
+        self.com.updateCardSignal.emit(cardId)
         
         
     def moveCard(self, fromStack, toStack, cardID):
@@ -91,3 +102,9 @@ class gameStateController(object):
         
         # Push command to undoStack, undoStack automatically performs command redo()
         self.undoStack.push(aMoveCardCommand)
+        
+    def turnCard(self, cardID):
+        '''
+        Slot receiving signal from view requesting the turning of a card.
+        '''
+        self.model.turnCard(cardID)

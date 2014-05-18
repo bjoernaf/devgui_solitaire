@@ -44,6 +44,7 @@ class cardView(QGraphicsItem):
         # Connect slot (moveCard) to signal (com.moveCardSignal).
         # Call as self.com.moveCardSignal.emit(fromStack, toStack, cardID)
         self.com.moveCardSignal.connect(gameStateController.moveCard)
+        self.com.turnCardSignal.connect(gameStateController.turnCard)
         
         # Store color, value and card id
         self.color = color
@@ -77,6 +78,7 @@ class cardView(QGraphicsItem):
         self.pulsateIncrease = True # True increasing, False decreasing
         self.setGraphicsEffect(self.pulsateEffect)
         
+        #print("card created")
 
     def illegalDropSlot(self, target):
         '''
@@ -99,6 +101,9 @@ class cardView(QGraphicsItem):
         if self.parentItem().getid() != boardStacks.boardStacks.Deck:
             self.setCursor(Qt.ClosedHandCursor)
         QGraphicsItem.mousePressEvent(self, event)
+        
+        #self.faceup = not self.faceup
+        self.com.turnCardSignal.emit(self.id)
     
 
     def mouseDoubleClickEvent(self, event):

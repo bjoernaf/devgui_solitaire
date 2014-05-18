@@ -25,6 +25,7 @@ class boardModel(object):
     #Representation: cardOrderDict[currentCard] = (previousCard, nextCard)
     cardOrderDict = dict()
     
+    cardFaceUp = list()
     
     count = 0
     
@@ -35,19 +36,28 @@ class boardModel(object):
         '''
         # Set up communicator
         self.com = communicator()
-        # Connect signal to slot
+        # Connect signals to slot
         self.com.updateStackSignal.connect(gameStateController.updateControllerStacks)
+        self.com.updateCardSignal.connect(gameStateController.updateControllerCard)
         
-        # Create cards in cardList
+        # Create cards in cardList and facing status
         for color in range(1, 5):
             for number in range(1,14):
-                self.cardList.append(cardModel(color, number, True))
+                self.cardList.append(cardModel(color, number))
+                self.cardFaceUp.append(True)
         
         # Create deck of cards and notify view
         #self.createRandomizedDeck() #createSortedDeck()
         self.createSolitaireGame()
         self.com.updateStackSignal.emit(self.getStackDict())
         
+    def turnCard(self, cardId):
+        print("card turn request")
+        print(cardId)        
+        self.cardFaceUp[cardId] = not self.cardFaceUp[cardId]
+        # Create dictionary and send in signal to controller
+        print("MODEL     : turnCard: Sending update signal to boardView.");
+        self.com.updateCardSignal.emit(cardId)
         
     def moveCard(self, fromStack, toStack, card):
         '''

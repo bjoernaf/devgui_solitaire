@@ -14,13 +14,12 @@ class cardModel(object):
 #    value = None
 #    faceup = False
     
-    def __init__(self, color, value, faceup = False):
+    def __init__(self, color, value):
         '''
         Constructor
         '''
         self.color = color
         self.value = value
-        self.faceup = faceup
             
     def getColor(self):
         '''
@@ -33,9 +32,3 @@ class cardModel(object):
         Returns card value
         '''
         return self.value
-        
-    def faceIsUp(self):
-        '''
-        Returns faceup value
-        '''
-        return self.faceup

@@ -17,6 +17,8 @@ class communicator(QObject):
     # call as moveCardSignal(fromStack, toStack, cardID)
     moveCardSignal = pyqtSignal(int, int, int, name='moveCard')
     
+    turnCardSignal = pyqtSignal(int, name='turnCard')
+    
     # undo signal
     undoSignal = pyqtSignal(name = 'undo')
     

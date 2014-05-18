@@ -53,6 +53,10 @@ class boardView(QGraphicsView):
         # Call drawContent to draw stacks etc, then set scene as active in the view (boardView)
         self.drawContent(gameStateController)
         self.setScene(self.scene)
+    
+    def updateCard(self, cardId):
+        print("hej")
+        self.cardList[cardId].faceup = not self.cardList[cardId].faceup
         
     def updateStacks(self, stacks):
         '''

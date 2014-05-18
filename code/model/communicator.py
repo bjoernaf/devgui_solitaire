@@ -12,7 +12,7 @@ class communicator(QObject):
     '''
     # Update stack signal from model to view
     updateStackSignal = pyqtSignal(dict, name='updateSignal')
-
+    updateCardSignal = pyqtSignal(int, name='updateCardSignal')
 
     def __init__(self):
         '''
