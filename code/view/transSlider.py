@@ -1,7 +1,7 @@
 '''
 Created on 9 maj 2014
 
-@author: Max, Sven
+@author: Max, Sven, Bjorn
 '''
 from PyQt5.QtWidgets import QSlider
 from PyQt5.QtCore import Qt

@@ -1,7 +1,7 @@
 '''
 Created on 24 apr 2014
 
-@author: Sven
+@author: Sven, Bjorn
 '''
 
 from PyQt5.QtCore import (QObject, pyqtSignal, QPointF)
