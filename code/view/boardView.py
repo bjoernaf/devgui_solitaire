@@ -9,7 +9,7 @@ The boardView contains a QGraphicsScene that displays stacks
 '''
 
 from PyQt5.QtCore import Qt, QPointF
-#from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QImage
 #from PyQt5.QtWidgets import QGraphicsTextItem, QGraphicsView
 from PyQt5.QtWidgets import QGraphicsView
 from view import cardView, stackView, boardScene, communicator
@@ -46,6 +46,9 @@ class boardView(QGraphicsView):
         
         self.com = communicator.communicator()
         self.com.moveCardSignal.connect(gameStateController.moveCard)
+        
+        # Load image for back of cards, red as default
+        self.setBackImage("backRed")
         
         # Create animationEngine
         self.animationEngine = animationEngine.animationEngine(gameStateController)
@@ -415,3 +418,12 @@ class boardView(QGraphicsView):
     	Returns the opacity of cards.
     	'''
     	return self.cardOpacity
+ 
+    def setBackImage(self, image):
+        '''
+        Sets the back image according to images/image.png
+        Also acts as receiving slot from control panel
+        '''
+        self.backImage = QImage("images/" + image + ".png")
+        self.backImage = self.backImage.scaled(80, 120, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+        self.repaintCards()

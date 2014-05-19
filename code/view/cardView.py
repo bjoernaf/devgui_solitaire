@@ -174,18 +174,16 @@ class cardView(QGraphicsItem):
         # Set opacity to paint entire card with
         painter.setOpacity(self.boardView.cardOpacity/100.0)
         
-        # Set pen and color to paint card with
-        painter.setPen(Qt.black)
-        if(self.faceup == True):
-            painter.setBrush(Qt.white)
-        else:
-            painter.setBrush(Qt.red)
-        
-        # Paint a rounded, anti-aliased rectangle representing the card
+        # Set painter rendering mode
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.drawRoundedRect(0, 0, self.cardWidth, self.cardHeight, self.cardXRad, self.cardYRad, Qt.AbsoluteSize)
-
-        if(self.faceup == True):        
+        
+        # If the card is facing up, draw card and details
+        if(self.faceup == True):
+            # Paint a rounded, anti-aliased rectangle representing the card
+            painter.setPen(Qt.black)
+            painter.setBrush(Qt.white)
+            painter.drawRoundedRect(self.boundingRect(), self.cardXRad, self.cardYRad, Qt.AbsoluteSize)
+    
             # Card value: Set font style and color
             font = QFont("Helvetica")
             font.setBold(True)
@@ -201,6 +199,12 @@ class cardView(QGraphicsItem):
             painter.rotate(180)
             painter.drawText(self.boundingValueRight, Qt.AlignTop | Qt.AlignHCenter, self.toValueString(self.value))
             painter.drawImage(self.imagePosRight, self.image)
+            
+        # If the card is facing down, draw the back image
+        else:
+            painter.drawImage(self.boundingRect(), self.boardView.backImage)
+        
+
             
         
     def boundingRect(self):
