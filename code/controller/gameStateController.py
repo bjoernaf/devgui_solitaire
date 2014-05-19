@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QUndoStack
 
 from model import boardModel, boardStacks
 from view import solitaireWindow, boardView
-from controller import communicator, moveCardCommand, turnCardCommand
+from controller import communicator, moveCardCommand, turnCardCommand, reenterCardCommand
 
 class gameStateController(object):
     '''
@@ -106,8 +106,8 @@ class gameStateController(object):
         '''
         Slot for moving Drawable cards from Drawable to Deck again.
         '''
-        print("GSC: reenterCard: **** FIXME: Non-undoable event! ****")
-        self.model.reenterCards()
+        aReenterCardCommand = reenterCardCommand.reenterCardCommand(self.model)
+        self.undoStack.push(aReenterCardCommand)
        
         
     def turnCard(self, cardId):
