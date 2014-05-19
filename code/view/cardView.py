@@ -99,8 +99,9 @@ class cardView(QGraphicsItem):
         if self.parentItem().getid() != boardStacks.boardStacks.Deck:
             self.setCursor(Qt.ClosedHandCursor)
         
-        #self.faceup = not self.faceup
-        self.com.turnCardSignal.emit(self.id)
+        # If the card is turned upside down, request to turn it
+        if self.faceup == False:
+            self.com.turnCardSignal.emit(self.id)
         QGraphicsItem.mousePressEvent(self, event)
     
 

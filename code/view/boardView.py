@@ -10,8 +10,7 @@ The boardView contains a QGraphicsScene that displays stacks
 
 from PyQt5.QtCore import Qt, QPointF
 from PyQt5.QtGui import QImage
-#from PyQt5.QtWidgets import QGraphicsTextItem, QGraphicsView
-from PyQt5.QtWidgets import QGraphicsView
+from PyQt5.QtWidgets import QGraphicsView, QGraphicsItem
 from view import cardView, stackView, boardScene, communicator
 from model import boardStacks
 from animation import animationEngine
@@ -67,14 +66,35 @@ class boardView(QGraphicsView):
         '''
         Slot for signal which updates the facing of the cards
         '''
-        for i in range(0, 52):
-            self.cardList[i].faceup = cardFaceUp[i]
+        for cardId in range(0, 52):
+            self.cardList[cardId].faceup = cardFaceUp[cardId]
+            # Update movable status depending on faceUp value
+            # NOTE: Only if the card belongs to a stack
+            if self.cardList[cardId].parentItem() != None:
+                # If not in Deck, set correct itemIsMovable
+                if self.cardList[cardId].parentItem().id != boardStacks.boardStacks.Deck:
+                    self.cardList[cardId].setFlag(QGraphicsItem.ItemIsMovable, cardFaceUp[cardId])
+                # Else, set itemIsMovable to false
+                else:
+                    self.cardList[cardId].setFlag(QGraphicsItem.ItemIsMovable, False)
     
     def updateCard(self, cardId):
         '''
         Slot for signal which updates the facing of one card
         '''
         self.cardList[cardId].faceup = not self.cardList[cardId].faceup
+        self.cardList[cardId].setFlag(QGraphicsItem.ItemIsMovable, self.cardList[cardId].faceup)
+        
+        '''
+        if self.cardList[cardId].parentItem() != None:
+                # If not in Deck, set correct itemIsMovable
+                if self.cardList[cardId].parentItem().id != boardStacks.boardStacks.Deck:
+                    self.cardList[cardId].setFlag(QGraphicsItem.ItemIsMovable, self.cardList[cardId].faceup)
+                # Else, set itemIsMovable to false
+                else:
+                    self.cardList[cardId].setFlag(QGraphicsItem.ItemIsMovable, False)
+        '''
+           
         
     def updateStacks(self, stacks):
         '''
@@ -243,11 +263,11 @@ class boardView(QGraphicsView):
         drawableStackSize = len(self.drawableStackView.getStack())
         endPos = QPointF(drawableStackPosition.x() + 5 + 20 * drawableStackSize,
                          drawableStackPosition.y() + 5) # Do this less hard-codedly
-        print("endPos: " + str(endPos))
+        #print("endPos: " + str(endPos))
         
         # Pass the cards to flip, the start stack, the end stack,
         # and the end position to the animation engine
-        scaleStep = -0.01
+        scaleStep = -0.05
         self.animationEngine.addFlippingCards(flipCards, boardStacks.boardStacks.Deck,
                                               boardStacks.boardStacks.Drawable,
                                               endPos, scaleStep)

@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QUndoStack
 
 from model import boardModel, boardStacks
 from view import solitaireWindow, boardView
-from controller import communicator, moveCardCommand
+from controller import communicator, moveCardCommand, turnCardCommand
 
 class gameStateController(object):
     '''
@@ -110,11 +110,15 @@ class gameStateController(object):
         self.model.reenterCards()
        
         
-    def turnCard(self, cardID):
+    def turnCard(self, cardId):
         '''
         Slot receiving signal from view requesting the turning of a card.
         '''
-        self.model.turnCard(cardID)
+        # Create turnCardCommand for card cardId
+        aTurnCardCommand = turnCardCommand.turnCardCommand(self.model, cardId)
+        
+        # Push command on undoStack, automatically calls redo() function of command
+        self.undoStack.push(aTurnCardCommand)
         
     def checkMove(self, fromStack, toStack, cardId):
         '''

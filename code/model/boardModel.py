@@ -127,7 +127,11 @@ class boardModel(object):
         return True
     
     #TODO: This logic should perhaps be part of a Rule class.
-    def turnCard(self, cardId):  
+    def turnCard(self, cardId): 
+        '''
+        Turns a card in the model if allowed.
+        Signals the controller that the turn is completed.
+        ''' 
         _, top = self.cardOrderDict[cardId]
         #If the card is turned and on top of the pile, then turn it over.
         if(self.cardFaceUp[cardId] == False and top == None): 
@@ -135,7 +139,21 @@ class boardModel(object):
             print("MODEL     : turnCard: Sending update signal to boardView.")
             self.com.updateCardSignal.emit(cardId)
         else:
-            print("MODEL    : turnCard: Turning of card disallowed.") 
+            print("MODEL    : turnCard: Turning of card disallowed.")
+    
+    def turnCardUndo(self, cardId):
+        '''
+        Turns a card in the model back if allowed. (RE-turn, result of undo)
+        Signals the controller that the turn is completed.
+        ''' 
+        _, top = self.cardOrderDict[cardId]
+        #If the card is turned and on top of the pile, then turn it over.
+        if(self.cardFaceUp[cardId] == True and top == None): 
+            self.cardFaceUp[cardId] = False     
+            print("MODEL     : turnCardUndo: Sending update signal to boardView.")
+            self.com.updateCardSignal.emit(cardId)
+        else:
+            print("MODEL    : turnCardUndo: Turning of card disallowed.")
         
     def moveCard(self, fromStack, toStack, card):
         '''
