@@ -168,7 +168,7 @@ class cardView(QGraphicsItem):
         and lower right corner.
         '''
         # Set opacity to paint entire card with
-        painter.setOpacity(self.gsc.opacity/100.0)
+        painter.setOpacity(self.boardView.cardOpacity/100.0)
         
         # Set pen and color to paint card with
         painter.setPen(Qt.black)

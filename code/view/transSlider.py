@@ -5,6 +5,7 @@ Created on 9 maj 2014
 '''
 from PyQt5.QtWidgets import QSlider
 from PyQt5.QtCore import Qt
+from view import communicator
         
 
 class transSlider(QSlider):
@@ -12,50 +13,52 @@ class transSlider(QSlider):
     Slider to set the transparency of cards.
     TODO: Change to move cards only later?
     '''
-    def __init__(self, gsc):
+    
+    classCom = communicator.communicator()
+    
+    def __init__(self, boardView):
         '''
         Constructor, creates the slider and sets it's value to opacity stored in gsc
         '''
         super(transSlider, self).__init__(Qt.Horizontal)
-        self.gsc = gsc
+        self.boardView = boardView
         self.setMaximumWidth(200)
         
         # Set minimum and maximum value of the slider, then get value from gsc
         self.setMinimum(0)
         self.setMaximum(100)
-        self.setSliderPosition(self.gsc.opacity)
+        self.setSliderPosition(self.boardView.getOpacity())
         
-        # Set up and send signal to update tooltip
-        self.valueChanged.connect(self.updateToolTip)
+        # Set up and send valueChanged signal to synchronize all instances.
+        self.valueChanged.connect(transSlider.spreadValue)
         self.valueChanged.emit(self.value())
         
-    def updateToolTip(self, value):
+        # Set up this instance to listen to synch signal.
+        transSlider.classCom.opacitySignal.connect(self.updateSliderView)
+        
+        
+    def updateSliderView(self, value):
         '''
-        Updates the tooltip to display the current value
+        Updates the tooltip and position to display the current value in this instance.
         '''
-        self.toolTipString = "Card Opacity: " + str(self.value()) + "%"
+        
+        # Set tooltip
+        self.toolTipString = "Card Opacity: " + str(value) + "%"
         self.setToolTip(self.toolTipString)
-    
-    def mouseMoveEvent(self, event):
+        
+        # Set the opacity of cards
+        # TODO: Make boardView static and set it once in spreadValue instead?
+        self.boardView.setOpacity(value)
+        
+        # Set slider position (since the value might have moved in other instance)
+        self.setSliderPosition(value)
+        
+        
+    @classmethod
+    def spreadValue(cls, value):
         '''
-        Override of mouseMoveEvent to set opacity on each move.
-        Call repaintCards() on boardView to repaint all cards.
+    	Emits the local value changed signal in every instance of transSlider
         '''
-        super(transSlider, self).mouseMoveEvent(event)
-        self.gsc.opacity = self.sliderPosition()
-        self.gsc.solWin.bView.repaintCards()
-    
-    def mouseReleaseEvent(self, event):
-        '''
-        Override of mouseReleaseEvent that moves the slider to the
-        position pressed on the scale, and sets the opacity in
-        gameStateController accordingly.
-        Call repaintCards() on boardView to repaint all cards.
-        '''
-        posClicked = self.minimum() + ((self.maximum()-self.minimum()) * event.x()) / self.width()
-        if (self.sliderPosition() != posClicked):
-            self.setValue(posClicked)
-            self.gsc.opacity = self.sliderPosition()
-            self.gsc.solWin.bView.repaintCards()
-        QSlider.mouseReleaseEvent(self, event)
-        # http://stackoverflow.com/questions/11132597/qslider-mouse-direct-jump
+        
+        # Update the view of all instances of transSlider to display same value.
+        cls.classCom.opacitySignal.emit(value)

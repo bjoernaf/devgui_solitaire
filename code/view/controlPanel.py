@@ -28,14 +28,14 @@ class controlPanel(QDialog):
     winTitle = "Control panel"
 
 
-    def __init__(self, gameStateControl):
+    def __init__(self, boardView):
         '''
         Init function
         '''
         
         super(controlPanel,self).__init__()
 
-        self.gsc = gameStateControl
+        self.boardView = boardView
 
         self.setWindowTitle(self.winTitle)
         
@@ -48,7 +48,7 @@ class controlPanel(QDialog):
         self.label = QLabel('Card transparency:')
         
         # Create a transparency slider for the cards
-        self.slide = transSlider.transSlider(self.gsc)
+        self.slide = transSlider.transSlider(self.boardView)
         self.slide.setFixedWidth(200)
         
         self.layout.addWidget(self.label)

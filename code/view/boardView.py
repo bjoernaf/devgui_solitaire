@@ -53,6 +53,9 @@ class boardView(QGraphicsView):
         # Create a scene based on the parent's size
         self.scene = boardScene.boardScene(0, 0, windowWidth, windowHeight, self)
         
+        # Ensure initialization of opacity.
+        self.setOpacity(100)
+        
         # Call drawContent to draw stacks etc, then set scene as active in the view (boardView)
         self.drawContent(gameStateController)
         self.setScene(self.scene)
@@ -398,3 +401,17 @@ class boardView(QGraphicsView):
         '''
         for card in self.cardList:
             card.update()
+
+    def setOpacity(self, opacity):
+        '''
+        Set the opacity of cards.
+        '''
+        
+        self.cardOpacity = opacity
+        self.repaintCards()
+        
+    def getOpacity(self):
+    	'''
+    	Returns the opacity of cards.
+    	'''
+    	return self.cardOpacity

@@ -27,7 +27,10 @@ class communicator(QObject):
     
     # signal to start new game
     newGameSignal = pyqtSignal(name = 'newGame')
-
+    
+    # transSlider signal
+    opacitySignal = pyqtSignal(int, name = 'opacitySignal')
+    
     def __init__(self):
         '''
         Constructor

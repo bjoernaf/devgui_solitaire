@@ -40,8 +40,6 @@ class solitaireWindow(QMainWindow):
         # Create communicator and connect signals
         self.com = communicator.communicator()
         self.com.newGameSignal.connect(self.gameStateController.startNewGame)
-        # Create control panel
-        self.controlPanel = controlPanel.controlPanel(gameStateController)
 
         # Set up settings to store properties (width, height etc)
         settings = QSettings()
@@ -58,8 +56,11 @@ class solitaireWindow(QMainWindow):
         self.createUI()
         self.createMenu()
         
+        # Create control panel
+        self.controlPanel = controlPanel.controlPanel(self.bView)
+        
         # Create a transparency slider for the cards
-        self.slide = transSlider.transSlider(self.gameStateController)
+        self.slide = transSlider.transSlider(self.bView)
         # Create a toolbar and add appropriate actions and widgets to it
         self.toolbar = QToolBar()
         self.toolbar.addAction(self.undoAction)
