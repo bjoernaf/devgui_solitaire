@@ -100,6 +100,15 @@ class gameStateController(object):
         
         # Push command to undoStack, undoStack automatically performs command redo()
         self.undoStack.push(aMoveCardCommand)
+       
+        
+    def reenterCard(self):
+        '''
+        Slot for moving Drawable cards from Drawable to Deck again.
+        '''
+        print("GSC: reenterCard: **** FIXME: Non-undoable event! ****")
+        self.model.reenterCards()
+       
         
     def turnCard(self, cardID):
         '''

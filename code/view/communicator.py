@@ -19,6 +19,8 @@ class communicator(QObject):
     
     turnCardSignal = pyqtSignal(int, name='turnCard')
     
+    reenterCardSignal = pyqtSignal(name='reenterCard')
+    
     # undo signal
     undoSignal = pyqtSignal(name = 'undo')
     

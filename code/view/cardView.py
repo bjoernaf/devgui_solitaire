@@ -46,6 +46,7 @@ class cardView(QGraphicsItem):
         # Call as self.com.moveCardSignal.emit(fromStack, toStack, cardID)
         self.com.moveCardSignal.connect(gameStateController.moveCard)
         self.com.turnCardSignal.connect(gameStateController.turnCard)
+        self.com.reenterCardSignal.connect(gameStateController.reenterCard)
         
         # Store color, value and card id
         self.color = color
@@ -108,6 +109,7 @@ class cardView(QGraphicsItem):
         Override mouseDoubleClickEvent
         '''
         if self.parentItem().getid() == boardStacks.boardStacks.Deck:
+            self.com.reenterCardSignal.emit()
             self.boardView.flipCards()
         else:
             QGraphicsItem.mouseDoubleClickEvent(self, event)

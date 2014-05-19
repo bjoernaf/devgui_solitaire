@@ -181,6 +181,33 @@ class boardModel(object):
         return True
         
         
+    def reenterCards(self):
+        '''
+        Moves all Drawable cards to the bottom of the Deck.
+        '''
+        bottomDrawCard = self.findRootCardInStack(boardStacks.Drawable)
+        topDrawCard = self.findTopCardInStack(boardStacks.Drawable)
+        bottomDeckCard = self.findRootCardInStack(boardStacks.Deck)
+        
+        if(bottomDrawCard == None):
+            # There is nothing to move.
+            return False
+        
+        if(bottomDeckCard == None):
+            # The Deck stack is empty, so we just move the cards here.
+            self.moveCard(boardStacks.Drawable, boardStacks.Deck, bottomDrawCard)
+        else:
+            # We insert the cards between the Deck and bottom of Deck.
+            self.cardOrderDict[bottomDeckCard] = (topDrawCard, self.cardOrderDict[bottomDeckCard][1])
+            self.cardOrderDict[topDrawCard] = (self.cardOrderDict[topDrawCard][0], bottomDeckCard)
+            self.cardOrderDict[bottomDrawCard] = (boardStacks.Deck, self.cardOrderDict[bottomDrawCard][1])
+        
+        # Create dictionary and send in signal to controller
+        print("MODEL     : MoveCard: Sending stacks to CONTROLLER.");
+        self.com.updateStackSignal.emit(self.getStackDict())
+        
+        return True
+        
     def createSortedDeck(self):
         '''
         Adds all cards in self.cardList to the Deck in order.
