@@ -74,8 +74,13 @@ class boardModel(object):
                     return False            
             else:
                 #the cards must be the same color
-                if(self.cardList[card].color != self.cardList[topCard]):
+                if(self.cardList[card].color != self.cardList[topCard].color):
                     return False
+                
+                print("VALUES")
+                print(self.cardList[card].value)
+                print(self.cardList[topCard].value)
+                print(self.cardList[card].value - self.cardList[topCard].value)
                 #the order must be increasing
                 if(self.cardList[card].value - self.cardList[topCard].value != 1):
                     return False
