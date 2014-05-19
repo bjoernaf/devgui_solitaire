@@ -184,9 +184,14 @@ class stackView(QGraphicsItem):
                 self.boardView.cardList[card].setCursor(Qt.ArrowCursor)
                 
             # For all other stacks, cards are movable and use an openHandCursor.
+            # Cards are movable only if faceup == True
             else:
-                self.boardView.cardList[card].setFlag(QGraphicsItem.ItemIsMovable,
-                                                      True)
+                if self.boardView.cardList[card].faceup == True:
+                    self.boardView.cardList[card].setFlag(QGraphicsItem.ItemIsMovable,
+                                                          True)
+                else:
+                    self.boardView.cardList[card].setFlag(QGraphicsItem.ItemIsMovable,
+                                                          False)
                 self.boardView.cardList[card].setCursor(Qt.OpenHandCursor)
                 
             # Inherit drop capabilities from the stack

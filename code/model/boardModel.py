@@ -50,9 +50,8 @@ class boardModel(object):
         # Create deck of cards and notify view
         #self.createRandomizedDeck() #createSortedDeck()
         self.createSolitaireGame()
-        self.com.updateStackSignal.emit(self.getStackDict())
-        
         self.com.updateAllCardsSignal.emit(self.cardFaceUp)
+        self.com.updateStackSignal.emit(self.getStackDict())
     
     #TODO: separate to Rule class
     def checkMove(self, fromStack, toStack, card):

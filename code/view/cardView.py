@@ -5,7 +5,7 @@ Created on 7 apr 2014
 cardView is an QGraphicsItem representing a card. 
 '''
 
-from PyQt5.QtCore import Qt, QRectF, QMimeData
+from PyQt5.QtCore import Qt, QRectF, QMimeData, QPointF, QSize
 from PyQt5.QtGui import QDrag, QFont, QPainter, QImage
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsDropShadowEffect
 from model import boardStacks
@@ -26,8 +26,9 @@ class cardView(QGraphicsItem):
     # Bounding rectangles to paint card number and images in
     boundingValueLeft = QRectF(4, 3, 12, 15)
     boundingValueRight = QRectF(-cardWidth + 4, -cardHeight + 3, 12, 15)
-    boundingImageLeft = QRectF(5.3, 16, 10, 10)
-    boundingImageRight = QRectF(-cardWidth + 5.3, -cardHeight + 16, 10, 10)
+    imagePosLeft = QPointF(4, 16)
+    imagePosRight = QPointF(-cardWidth + 4, -cardHeight + 16)
+    imageSize = QSize(12,12)
 
 
     def __init__(self, gameStateController, boardView, color, value, cardId, faceup):
@@ -96,13 +97,16 @@ class cardView(QGraphicsItem):
         '''
         if self.parentItem().getid() != boardStacks.boardStacks.Deck:
             self.setCursor(Qt.ClosedHandCursor)
-        QGraphicsItem.mousePressEvent(self, event)
         
         #self.faceup = not self.faceup
         self.com.turnCardSignal.emit(self.id)
+        QGraphicsItem.mousePressEvent(self, event)
     
 
     def mouseDoubleClickEvent(self, event):
+        '''
+        Override mouseDoubleClickEvent
+        '''
         if self.parentItem().getid() == boardStacks.boardStacks.Deck:
             self.boardView.flipCards()
         else:
@@ -188,15 +192,15 @@ class cardView(QGraphicsItem):
             painter.setFont(font)
             if self.color in range(2,4):
                 painter.setPen(Qt.red)
-                
+            
             # Paint upper left text and image
             painter.drawText(self.boundingValueLeft, Qt.AlignTop | Qt.AlignHCenter, self.toValueString(self.value))
-            painter.drawImage(self.boundingImageLeft, self.image)
+            painter.drawImage(self.imagePosLeft, self.image)
         
             #Paint lower right text and image
             painter.rotate(180)
             painter.drawText(self.boundingValueRight, Qt.AlignTop | Qt.AlignHCenter, self.toValueString(self.value))
-            painter.drawImage(self.boundingImageRight, self.image)
+            painter.drawImage(self.imagePosRight, self.image)
             
         
     def boundingRect(self):
@@ -208,10 +212,11 @@ class cardView(QGraphicsItem):
     def loadImage(self, color):
         '''
         Loads an image from file with color.png as filename.
+        Scales it to the desired image size.
         Stores image in self.image
         '''
-        self.image = QImage("images/" + str(self.color) + "_small.png")
-        self.image = self.image.scaledToHeight(10)
+        self.image = QImage("images/" + str(self.color) + "_simpleSmall.png")
+        self.image = self.image.scaled(self.imageSize, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
         if self.image.isNull():
             print("CARDVIEW  : loadImage: Error loading image")
             

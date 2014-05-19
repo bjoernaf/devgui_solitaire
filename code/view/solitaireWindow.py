@@ -120,15 +120,15 @@ class solitaireWindow(QMainWindow):
         helpMenu = self.menuBar.addMenu('&Help')
         
         # Populate FileMenu
-        self.exitAction = QAction('Exit', self)        
-        self.exitAction.setShortcut('Ctrl+Q')
-        self.exitAction.triggered.connect(self.close)
-        fileMenu.addAction(self.exitAction)
-        
         self.newGameAction = QAction('New Game', self)
         self.newGameAction.setShortcut('Ctrl+N')
         self.newGameAction.triggered.connect(self.newGame)
         fileMenu.addAction(self.newGameAction)
+        
+        self.exitAction = QAction('Exit', self)        
+        self.exitAction.setShortcut('Ctrl+Q')
+        self.exitAction.triggered.connect(self.close)
+        fileMenu.addAction(self.exitAction)
         
         # Populate EditMenu with actions
         self.undoAction = QAction(QIcon('images/undo.png'), 'Undo', self)        
