@@ -56,42 +56,66 @@ class boardModel(object):
     
     #TODO: separate to Rule class
     def checkMove(self, fromStack, toStack, card):
-        #_, top = self.cardOrderDict[fromStack[0]]
-        # These are the cards that will be affected by the move, in addition to card.
-        #oldPrev = self.cardOrderDict[card][0]
-        topCard = self.findTopCardInStack(toStack)
+
+        #drawable or deck stack
+        if(toStack == -1 or toStack == -2):
+            return False
         
-        #Can't place a stack on a back-turned card.
-        if(topCard == None):
-            if(card != 12 and card != 25 and card != 38 and card != 51):
-                return False            
-        else:
-            if(self.cardFaceUp[topCard] == False):
+        #top stacks?
+        if(toStack >= -14 and toStack <= -11): 
+            #You may not move more than one card each time to the top stacks
+            if(self.cardOrderDict[card][1] != None):
                 return False
             
-            color1 = self.cardList[topCard].color
-            color2 = self.cardList[card].color
-            indexdif = card - topCard
-
-            print("topcard")
-            print(topCard)
-            print("movecard")
-            print(card)
+            topCard = self.findTopCardInStack(toStack)
             
-            #Is the card a king?   
-            #only allow placing of cards of different color and value 1
-            if(color1 == 1):
-                if(indexdif != 12 and indexdif != 25):
+            if(topCard == None):
+                #only aces are accepted as first card
+                if(self.cardList[card].value != 1):
+                    return False            
+            else:
+                #the cards must be the same color
+                if(self.cardList[card].color != self.cardList[topCard]):
                     return False
-            elif(color1 == 2):
-                if(indexdif != -14 and indexdif != 25):
+                #the order must be increasing
+                if(self.cardList[card].value - self.cardList[topCard].value != 1):
                     return False
-            elif(color1 == 3):
-                if(indexdif != -27 and indexdif != 12):
+            
+        #bottom stacks
+        else:               
+            topCard = self.findTopCardInStack(toStack)
+            
+            #Can't place a stack on a back-turned card.
+            if(topCard == None):
+                if(card != 12 and card != 25 and card != 38 and card != 51):
+                    return False            
+            else:
+                if(self.cardFaceUp[topCard] == False):
                     return False
-            elif(color1 == 4):
-                if(indexdif != -14 and indexdif != -27):
-                    return False       
+                
+                color1 = self.cardList[topCard].color
+                color2 = self.cardList[card].color
+                indexdif = card - topCard
+    
+                print("topcard")
+                print(topCard)
+                print("movecard")
+                print(card)
+                
+                #Is the card a king?   
+                #only allow placing of cards of different color and value 1
+                if(color1 == 1):
+                    if(indexdif != 12 and indexdif != 25):
+                        return False
+                elif(color1 == 2):
+                    if(indexdif != -14 and indexdif != 25):
+                        return False
+                elif(color1 == 3):
+                    if(indexdif != -27 and indexdif != 12):
+                        return False
+                elif(color1 == 4):
+                    if(indexdif != -14 and indexdif != -27):
+                        return False       
            
         return True
     
