@@ -215,4 +215,11 @@ class stackView(QGraphicsItem):
         y = pos.y() - self.height/2
         truePos = QPointF(x, y)
         self.setPos(truePos)
+        
+    def topCardId(self):
+        '''
+        Returns the card id of the top card
+        '''
+        if self.stackCardList != []:
+            return self.stackCardList[-1]
                 

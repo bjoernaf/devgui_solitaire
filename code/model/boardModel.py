@@ -18,17 +18,6 @@ class boardModel(object):
     to move cards between stacks.
     '''
     
-    #cardList contains a list of all cards present in the game, and is used to reference cards by id numbers.
-    cardList = list()
-    
-    #cardOrderDict keeps a linked list-like representation of the neighbors of each card.
-    #Representation: cardOrderDict[currentCard] = (previousCard, nextCard)
-    cardOrderDict = dict()
-    
-    cardFaceUp = list()
-    
-    count = 0
-    
     
     def __init__(self, gameStateController):
         '''
@@ -40,6 +29,18 @@ class boardModel(object):
         self.com.updateStackSignal.connect(gameStateController.updateControllerStacks)
         self.com.updateCardSignal.connect(gameStateController.updateControllerCard)
         self.com.updateAllCardsSignal.connect(gameStateController.updateControllerAllCards)
+        
+        #cardList contains a list of all cards present in the game, and is used to reference cards by id numbers.
+        self.cardList = list()
+        
+        #cardOrderDict keeps a linked list-like representation of the neighbors of each card.
+        #Representation: cardOrderDict[currentCard] = (previousCard, nextCard)
+        self.cardOrderDict = dict()
+        
+        # cardFaceUp keeps a list of how the cards are facing (up/down)
+        self.cardFaceUp = list()
+        
+        self.count = 0
         
         # Create cards in cardList and facing status
         for color in range(1, 5):
@@ -104,10 +105,10 @@ class boardModel(object):
                 color2 = self.cardList[card].color
                 indexdif = card - topCard
     
-                print("topcard")
-                print(topCard)
-                print("movecard")
-                print(card)
+                #print("topcard")
+                #print(topCard)
+                #print("movecard")
+                #print(card)
                 
                 #Is the card a king?   
                 #only allow placing of cards of different color and value 1

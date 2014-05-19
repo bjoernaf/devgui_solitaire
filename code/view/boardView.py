@@ -66,8 +66,11 @@ class boardView(QGraphicsView):
         '''
         Slot for signal which updates the facing of the cards
         '''
+        # Loop over all cards
         for cardId in range(0, 52):
+            # set new faceup value for cardId and repaint it
             self.cardList[cardId].faceup = cardFaceUp[cardId]
+            self.cardList[cardId].update()
             # Update movable status depending on faceUp value
             # NOTE: Only if the card belongs to a stack
             if self.cardList[cardId].parentItem() != None:

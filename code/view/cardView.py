@@ -48,7 +48,7 @@ class cardView(QGraphicsItem):
         self.com.turnCardSignal.connect(gameStateController.turnCard)
         self.com.reenterCardSignal.connect(gameStateController.reenterCard)
         
-        # Store color, value and card id
+        # Store color, value, cardId and faceup status
         self.color = color
         self.value = value
         self.id = cardId
@@ -61,13 +61,8 @@ class cardView(QGraphicsItem):
         # Load image
         self.loadImage(self.color)
 
+        # Set item to accept hoverEvents
         self.setAcceptHoverEvents(True)
-        # Martin: Since movability and cursor should depend on the current
-        # stack of the card, the settings below has been moved to
-        # stackView.setParents(). 
-        # Set flags (flag | flag | flag...) and cursor type
-#        self.setFlags(self.ItemIsMovable)
-#        self.setCursor(Qt.OpenHandCursor)
         
         # Set up effect to use when animating pulsate and connect it to the cardView
         self.pulsateEffect = QGraphicsDropShadowEffect()
@@ -75,8 +70,6 @@ class cardView(QGraphicsItem):
         self.pulsateEffect.setOffset(0,0)
         self.pulsateIncrease = True # True increasing, False decreasing
         self.setGraphicsEffect(self.pulsateEffect)
-        
-        #print("card created")
 
     def illegalDropSlot(self, target):
         '''
@@ -98,9 +91,10 @@ class cardView(QGraphicsItem):
         '''
         if self.parentItem().getid() != boardStacks.boardStacks.Deck:
             self.setCursor(Qt.ClosedHandCursor)
-        
-        # If the card is turned upside down, request to turn it
-        if self.faceup == False:
+            
+        # If the card is turned upside down, and is the top of the stack,
+        # request to turn it over
+        if self.faceup == False and self.id == self.parentItem().topCardId():
             self.com.turnCardSignal.emit(self.id)
         QGraphicsItem.mousePressEvent(self, event)
     
@@ -251,6 +245,15 @@ class cardView(QGraphicsItem):
         '''
         # Add the card to the pulsating animation engine list
         self.boardView.animationEngine.addPulsating(self)
+        
+    def hoverMoveEvent(self, event):
+        '''
+        When moving mouse over card,
+        change cursor to OpenHandCursor
+        '''
+        if (self.cursor() != Qt.OpenHandCursor and 
+            self.parentItem().getid() != boardStacks.boardStacks.Deck):
+            self.setCursor(Qt.OpenHandCursor)
         
     def hoverLeaveEvent(self, event):
         '''
