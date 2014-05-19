@@ -46,6 +46,7 @@ class flippingCardsAnimation(object):
         self.zValueList.reverse()
         
         self.com = communicator.communicator()
+        self.com.turnCardSignal.connect(self.gameStateController.turnCard)
         self.com.moveCardSignal.connect(self.gameStateController.moveCard)
 
         
@@ -59,7 +60,7 @@ class flippingCardsAnimation(object):
         scaleFactor = transform.m11() + self.scaleStep
         print("scaleFactor " + str(scaleFactor))
         if scaleFactor <= 0.0:
-            # TO DO: turn the card face up
+            self.com.turnCardSignal.emit(flipCard.id)
             flipCard.setRotation(0)
             flipCard.setZValue(self.zValueList[self.cardListIndex])
             scaleFactor = 0.0

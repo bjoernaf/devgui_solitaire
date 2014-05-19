@@ -4,16 +4,11 @@ Created on 7 apr 2014
 @author: Sven, Bjorn
 '''
 
-from view import solitaireWindow
-from model import boardModel
-
-from PyQt5.QtCore import QPointF
 from PyQt5.QtWidgets import QUndoStack
 
-from controller import moveCardCommand
-from controller import communicator
-from view import boardView
-from model import boardStacks
+from model import boardModel, boardStacks
+from view import solitaireWindow, boardView
+from controller import communicator, moveCardCommand
 
 class gameStateController(object):
     '''

@@ -20,7 +20,7 @@ class boardView(QGraphicsView):
     '''
     classdocs
     '''
-        
+    
         
     def __init__(self, windowWidth, windowHeight, gameStateController):
         '''
