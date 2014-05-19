@@ -167,6 +167,7 @@ class solitaireWindow(QMainWindow):
             settings.setValue("MainWindow/Size", QVariant(self.size()))
             settings.setValue("MainWindow/Position", QVariant(self.pos()))
             settings.setValue("ControlPanel/Position", QVariant(self.controlPanel.pos()))
+            settings.setValue("TransparencySlider/Position", QVariant(self.bView.getOpacity()))
         else:
             event.ignore()
          

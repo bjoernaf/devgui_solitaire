@@ -4,7 +4,7 @@ Created on 9 maj 2014
 @author: Max, Sven, Bjorn
 '''
 from PyQt5.QtWidgets import QSlider
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QSettings
 from view import communicator
         
 
@@ -24,10 +24,14 @@ class transSlider(QSlider):
         self.boardView = boardView
         self.setMaximumWidth(200)
         
-        # Set minimum and maximum value of the slider, then get value from gsc
+        # Set minimum and maximum value of the slider
         self.setMinimum(0)
         self.setMaximum(100)
-        self.setSliderPosition(self.boardView.getOpacity())
+        
+        # Initialize settings and retreive saved opacity value (maximum as backup)
+        settings = QSettings()
+        startOpacity = settings.value("TransparencySlider/Position", self.maximum())
+        self.setSliderPosition(startOpacity)
         
         # Set up and send valueChanged signal to synchronize all instances.
         self.valueChanged.connect(transSlider.spreadValue)
@@ -35,6 +39,7 @@ class transSlider(QSlider):
         
         # Set up this instance to listen to synch signal.
         transSlider.classCom.opacitySignal.connect(self.updateSliderView)
+        transSlider.classCom.opacitySignal.emit(self.value())
         
         
     def updateSliderView(self, value):

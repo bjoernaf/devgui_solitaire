@@ -46,9 +46,6 @@ class boardView(QGraphicsView):
         self.com = communicator.communicator()
         self.com.moveCardSignal.connect(gameStateController.moveCard)
         
-        # Load image for back of cards, red as default
-        self.setBackImage("backRed")
-        
         # Create animationEngine
         self.animationEngine = animationEngine.animationEngine(gameStateController)
 
@@ -448,5 +445,8 @@ class boardView(QGraphicsView):
         Also acts as receiving slot from control panel
         '''
         self.backImage = QImage("images/" + image + ".png")
-        self.backImage = self.backImage.scaled(80, 120, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+        if self.backImage != None:
+            self.backImage = self.backImage.scaled(80, 120, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+        else:
+            print("BOARDVIEW : ERROR loading back image.")
         self.repaintCards()
