@@ -115,4 +115,15 @@ class gameStateController(object):
         TODO: Implement as signal, possibly not doable?
         '''
         return self.model.checkMove(fromStack, toStack, cardId)
+    
+    def startNewGame(self):
+        '''
+        Slot receiving a signal to start a new game.
+        Clear the undoStack and create a new model.
+        '''
+        # Clear the undoStack
+        self.undoStack.clear()
+        
+        # Create a new model
+        self.model = boardModel.boardModel(self)
         

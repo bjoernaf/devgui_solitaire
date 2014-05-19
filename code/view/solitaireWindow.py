@@ -17,9 +17,7 @@ from PyQt5.QtCore import (QSettings, QSize, QVariant, QPoint, Qt)
 from PyQt5.QtWidgets import (QMainWindow, QAction, QMessageBox, QToolBar)
 from PyQt5.QtGui import QIcon
 
-from view import boardView
-from view import transSlider
-from view import controlPanel
+from view import boardView, transSlider, controlPanel, communicator
 
 class solitaireWindow(QMainWindow):
     '''
@@ -39,6 +37,9 @@ class solitaireWindow(QMainWindow):
         # GameStateController needed for menu to Undo/Redo
         self.gameStateController = gameStateController
         
+        # Create communicator and connect signals
+        self.com = communicator.communicator()
+        self.com.newGameSignal.connect(self.gameStateController.startNewGame)
         # Create control panel
         self.controlPanel = controlPanel.controlPanel(gameStateController)
 
@@ -123,6 +124,11 @@ class solitaireWindow(QMainWindow):
         self.exitAction.triggered.connect(self.close)
         fileMenu.addAction(self.exitAction)
         
+        self.newGameAction = QAction('New Game', self)
+        self.newGameAction.setShortcut('Ctrl+N')
+        self.newGameAction.triggered.connect(self.newGame)
+        fileMenu.addAction(self.newGameAction)
+        
         # Populate EditMenu with actions
         self.undoAction = QAction(QIcon('images/undo.png'), 'Undo', self)        
         self.undoAction.setShortcut('Ctrl+Z')
@@ -183,3 +189,16 @@ class solitaireWindow(QMainWindow):
             return True
         else:
             return False
+        
+    def newGame(self):
+        '''
+        Creates a QMessageBox that prompts user if they wish to start a
+        new game and abandon their current session. If reply is yes,
+        current game is destroyed and a new game is set up.
+        '''
+        reply = QMessageBox.question(self, "Start new game?",
+                                     "Do you want to abandon your current session and start a new game?",
+                                     QMessageBox.Yes | QMessageBox.No)
+        
+        if reply == QMessageBox.Yes:
+            self.com.newGameSignal.emit()

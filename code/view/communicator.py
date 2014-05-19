@@ -24,6 +24,9 @@ class communicator(QObject):
     
     # redo signal
     redoSignal = pyqtSignal(name = 'redo')
+    
+    # signal to start new game
+    newGameSignal = pyqtSignal(name = 'newGame')
 
     def __init__(self):
         '''
