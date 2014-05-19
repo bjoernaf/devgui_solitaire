@@ -96,13 +96,16 @@ class cardView(QGraphicsItem):
         '''
         if self.parentItem().getid() != boardStacks.boardStacks.Deck:
             self.setCursor(Qt.ClosedHandCursor)
-        QGraphicsItem.mousePressEvent(self, event)
         
         #self.faceup = not self.faceup
         self.com.turnCardSignal.emit(self.id)
+        QGraphicsItem.mousePressEvent(self, event)
     
 
     def mouseDoubleClickEvent(self, event):
+        '''
+        Override mouseDoubleClickEvent
+        '''
         if self.parentItem().getid() == boardStacks.boardStacks.Deck:
             self.boardView.flipCards()
         else:
