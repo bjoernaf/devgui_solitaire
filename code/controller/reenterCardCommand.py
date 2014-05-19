@@ -27,13 +27,13 @@ class reenterCardCommand(QUndoCommand):
         Call to perform or redo a reenterCard Command
         '''
         self.numberOfCards = self.model.reenterCards()
-        print("TURNCARDCOM: redo: Put", self.numberOfCards, "cards back on deck.")
+        print("REECARDCOM: redo: Put", self.numberOfCards, "cards back on deck.")
                 
         
     def undo(self):
         '''
         Call to undo a moveCardCommand
         '''
-        print("TURNCARDCOM: undo: Returning", self.numberOfCards, "cards to drawable.")
+        print("REECARDCOM: undo: Returning", self.numberOfCards, "cards to drawable.")
         self.model.unReenterCards(self.numberOfCards)
         

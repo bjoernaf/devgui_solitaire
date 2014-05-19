@@ -247,8 +247,8 @@ class boardModel(object):
         Move the bottom amount cards to Drawable from Deck.
         '''
         
-        newDeckRoot = findNthCardInStack(boardStacks.Deck, amount)
-        newDrawableRoot = findRootCardInStack(boardStacks.Deck)
+        newDeckRoot = self.findNthCardInStack(boardStacks.Deck, amount)
+        newDrawableRoot = self.findRootCardInStack(boardStacks.Deck)
         
         self.moveCard(boardStacks.Deck, boardStacks.tempStack, newDeckRoot, True)
         self.moveCard(boardStacks.Deck, boardStacks.Drawable, newDrawableRoot)
@@ -408,9 +408,11 @@ class boardModel(object):
             # Iterate through stack until top card found.
             while(self.cardOrderDict[oldCard][1] != None):
                 oldCard = self.cardOrderDict[oldCard][1]
+                cardNumber += 1
                 if(cardNumber == Nth):
                     return oldCard
             
+            print("cardnumber:", cardNumber, "nth:", Nth)
             return None            
             
     def findNumberOfCardsBeforeCardInStack(self, stack, card):
