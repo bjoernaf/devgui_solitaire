@@ -60,35 +60,39 @@ class boardModel(object):
         # These are the cards that will be affected by the move, in addition to card.
         #oldPrev = self.cardOrderDict[card][0]
         topCard = self.findTopCardInStack(toStack)
-        print("topcard checkmove")
-        print(topCard)
         
         #Can't place a stack on a back-turned card.
-        if(self.cardFaceUp[topCard] == False):
-            return False
-        
-        #TODO: kings and only kings can be placed on empty stack!
-        
-        color1 = self.cardList[topCard].color
-        color2 = self.cardList[card].color
-        indexdif = card - topCard
-        #print("indexdif")
-        #print(indexdif)
-        #print("color1")
-        #print(color1)
-        if(color1 == 1):
-            if(indexdif != 12 and indexdif != 25):
+        if(topCard == None):
+            if(card != 12 and card != 25 and card != 38 and card != 51):
+                return False            
+        else:
+            if(self.cardFaceUp[topCard] == False):
                 return False
-        elif(color1 == 2):
-            if(indexdif != -14 and indexdif != 25):
-                return False
-        elif(color1 == 3):
-            if(indexdif != -27 and indexdif != 12):
-                return False
-        elif(color1 == 4):
-            if(indexdif != -14 and indexdif != -27):
-                return False       
-               
+            
+            color1 = self.cardList[topCard].color
+            color2 = self.cardList[card].color
+            indexdif = card - topCard
+
+            print("topcard")
+            print(topCard)
+            print("movecard")
+            print(card)
+            
+            #Is the card a king?   
+            #only allow placing of cards of different color and value 1
+            if(color1 == 1):
+                if(indexdif != 12 and indexdif != 25):
+                    return False
+            elif(color1 == 2):
+                if(indexdif != -14 and indexdif != 25):
+                    return False
+            elif(color1 == 3):
+                if(indexdif != -27 and indexdif != 12):
+                    return False
+            elif(color1 == 4):
+                if(indexdif != -14 and indexdif != -27):
+                    return False       
+           
         return True
     
     #TODO: This logic should perhaps be part of a Rule class.
