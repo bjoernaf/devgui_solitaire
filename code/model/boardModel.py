@@ -91,8 +91,11 @@ class boardModel(object):
             
             #Can't place a stack on a back-turned card.
             if(topCard == None):
-                if(card != 12 and card != 25 and card != 38 and card != 51):
-                    return False            
+                #if(card != 12 and card != 25 and card != 38 and card != 51):
+                #    return False            
+                # CHANGE BY BJORN: We should allow any card to be base of bottom
+                #                  stacks.
+                print("MODEL     : checkMove: Allowing any card as base in bottom.")
             else:
                 if(self.cardFaceUp[topCard] == False):
                     return False
