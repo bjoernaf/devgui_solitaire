@@ -48,11 +48,11 @@ class controlPanel(QDialog):
         # Create a transparency slider for the cards
         self.slide = transSlider.transSlider(self.boardView)
         self.slide.setFixedWidth(200)
-        self.transparencyLabel = QLabel('Card transparency:')
+        self.transparencyLabel = QLabel('Card opacity:')
         
         # Create a button group to select card look
         self.createCardButtonGroup()
-        self.themeLabel = QLabel('Deck Theme')
+        self.themeLabel = QLabel('Deck theme')
         
         # Add widgets and buttons to the control panel
         self.layout.addWidget(self.transparencyLabel)

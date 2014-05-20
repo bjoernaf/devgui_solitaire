@@ -91,11 +91,11 @@ class cardView(QGraphicsItem):
         '''
         if self.parentItem().getid() != boardStacks.boardStacks.Deck:
             self.setCursor(Qt.ClosedHandCursor)
-            
-        # If the card is turned upside down, and is the top of the stack,
-        # request to turn it over
-        if self.faceup == False and self.id == self.parentItem().topCardId():
-            self.com.turnCardSignal.emit(self.id)
+            # If the card is turned upside down, and is the top of the stack,
+            # request to turn it over
+            if self.faceup == False and self.id == self.parentItem().topCardId():
+                self.com.turnCardSignal.emit(self.id)
+                
         QGraphicsItem.mousePressEvent(self, event)
     
 
@@ -251,9 +251,10 @@ class cardView(QGraphicsItem):
         When moving mouse over card,
         change cursor to OpenHandCursor
         '''
-        if (self.cursor() != Qt.OpenHandCursor and 
-            self.parentItem().getid() != boardStacks.boardStacks.Deck):
-            self.setCursor(Qt.OpenHandCursor)
+        if self.cursor() != Qt.OpenHandCursor:
+            if (self.parentItem() != None and 
+                self.parentItem().getid() != boardStacks.boardStacks.Deck):
+                self.setCursor(Qt.OpenHandCursor)
         
     def hoverLeaveEvent(self, event):
         '''

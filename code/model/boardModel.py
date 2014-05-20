@@ -134,11 +134,14 @@ class boardModel(object):
         Signals the controller that the turn is completed.
         ''' 
         _, top = self.cardOrderDict[cardId]
-        #If the card is turned and on top of the pile, then turn it over.
-        if(self.cardFaceUp[cardId] == False and top == None): 
-            self.cardFaceUp[cardId] = True     
-            print("MODEL     : turnCard: Sending update signal to boardView.")
-            self.com.updateCardSignal.emit(cardId)
+        #If the card is turned upside down
+        if self.cardFaceUp[cardId] == False:
+            # If the card is the top card or the card is on the deck stack
+            if top == None or self.findStackOfCard(cardId) == boardStacks.Deck:
+                # Turn the card and emit the signal
+                self.cardFaceUp[cardId] = True     
+                print("MODEL     : turnCard: Sending update signal to boardView.")
+                self.com.updateCardSignal.emit(cardId)    
         else:
             print("MODEL    : turnCard: Turning of card disallowed.")
     
@@ -147,12 +150,16 @@ class boardModel(object):
         Turns a card in the model back if allowed. (RE-turn, result of undo)
         Signals the controller that the turn is completed.
         ''' 
+        print("ASKING TO UNDO TURN XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
         _, top = self.cardOrderDict[cardId]
-        #If the card is turned and on top of the pile, then turn it over.
-        if(self.cardFaceUp[cardId] == True and top == None): 
-            self.cardFaceUp[cardId] = False     
-            print("MODEL     : turnCardUndo: Sending update signal to boardView.")
-            self.com.updateCardSignal.emit(cardId)
+        #If the card is turned up
+        if self.cardFaceUp[cardId] == True:
+            # If the card is the top card or the card is on the drawable stack
+            if top == None or self.findStackOfCard(cardId) == boardStacks.Drawable:
+                # Turn the card and emit the signal
+                self.cardFaceUp[cardId] = False    
+                print("MODEL     : turnCard: Sending update signal to boardView.")
+                self.com.updateCardSignal.emit(cardId)    
         else:
             print("MODEL    : turnCardUndo: Turning of card disallowed.")
         
@@ -319,16 +326,16 @@ class boardModel(object):
 
         # Add first card
         self.cardOrderDict[deckOfCards[28]] = (boardStacks.Deck, deckOfCards[29])
-        self.cardFaceUp[deckOfCards[28]] = True
+        self.cardFaceUp[deckOfCards[28]] = False
 
         # Add all but last
         for i in range(29, len(deckOfCards)-1):
             self.cardOrderDict[deckOfCards[i]] = (deckOfCards[i-1], deckOfCards[i+1])
-            self.cardFaceUp[deckOfCards[i]] = True
+            self.cardFaceUp[deckOfCards[i]] = False
             
         # Add last card
         self.cardOrderDict[deckOfCards[len(deckOfCards)-1]] = (deckOfCards[len(deckOfCards)-2], None)
-        self.cardFaceUp[deckOfCards[len(deckOfCards)-1]] = True
+        self.cardFaceUp[deckOfCards[len(deckOfCards)-1]] = False
 
 
     def createRandomizedDeck(self):

@@ -28,9 +28,9 @@ class flippingCardsAnimation(object):
 
         self.scaleStep = scaleStep
         self.middlePos = QPointF(95 + (self.endPos.x() - 95) / 2, 15) # Do this in a less hard-coded way
-        print("Original middlePos: " + str(self.middlePos))
+        #print("Original middlePos: " + str(self.middlePos))
         self.moveStep = (self.middlePos.x() - 95) * -self.scaleStep # Do this in a less hard-coded way
-        print("Original moveStep: " + str(self.moveStep))
+        #print("Original moveStep: " + str(self.moveStep))
         
         self.cardListIndex = 0
         
@@ -58,8 +58,9 @@ class flippingCardsAnimation(object):
         flipCard = self.cardList[self.cardListIndex]
         transform = flipCard.transform()
         scaleFactor = transform.m11() + self.scaleStep
-        print("scaleFactor " + str(scaleFactor))
+        #print("scaleFactor " + str(scaleFactor))
         if scaleFactor <= 0.0:
+            print(flipCard.id)
             self.com.turnCardSignal.emit(flipCard.id)
             flipCard.setRotation(0)
             flipCard.setZValue(self.zValueList[self.cardListIndex])
@@ -72,7 +73,7 @@ class flippingCardsAnimation(object):
         else:
             newPos = QPointF(flipCard.scenePos().x() + self.moveStep,
                              flipCard.scenePos().y())
-            print("newPos: " + str(newPos))
+            #print("newPos: " + str(newPos))
             flipCard.setPos(newPos)
         transform.setMatrix(scaleFactor, transform.m12(), transform.m13(),
                             transform.m21(), transform.m22(), transform.m23(),
@@ -89,12 +90,12 @@ class flippingCardsAnimation(object):
                                              flipCard.id)
             else:
                 self.cardListIndex = self.cardListIndex + 1
-                print("New cardListIndex: " + str(self.cardListIndex))
+                #print("New cardListIndex: " + str(self.cardListIndex))
                 self.scaleStep = -self.scaleStep
                 # do below stuff in less hard-coded way
                 self.middlePos = QPointF(self.middlePos.x() + 10, 15)
-                print("New middlePos: " + str(self.middlePos))
+                #print("New middlePos: " + str(self.middlePos))
                 self.endPos = QPointF(self.endPos.x() + 20, 15)
-                print("New endPos: " + str(self.endPos))
+                #print("New endPos: " + str(self.endPos))
                 self.moveStep = (self.middlePos.x() - 95) * -self.scaleStep
-                print("New moveStep: " + str(self.moveStep))
+                #print("New moveStep: " + str(self.moveStep))

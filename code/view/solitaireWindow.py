@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsTextItem, QGraphicsScene, Q
 '''
 
 from PyQt5.QtCore import (QSettings, QSize, QVariant, QPoint, Qt)
-from PyQt5.QtWidgets import (QMainWindow, QAction, QMessageBox, QToolBar)
+from PyQt5.QtWidgets import (QMainWindow, QAction, QMessageBox, QToolBar, QLabel)
 from PyQt5.QtGui import QIcon
 
 from view import boardView, transSlider, controlPanel, communicator

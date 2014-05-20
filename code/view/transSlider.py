@@ -48,7 +48,7 @@ class transSlider(QSlider):
         '''
         
         # Set tooltip
-        self.toolTipString = "Card Opacity: " + str(value) + "%"
+        self.toolTipString = "Card opacity: " + str(value) + "%"
         self.setToolTip(self.toolTipString)
         
         # Set the opacity of cards
