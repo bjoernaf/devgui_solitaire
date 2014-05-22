@@ -52,7 +52,7 @@ class controlPanel(QDialog):
         
         # Create a button group to select card look
         self.createCardButtonGroup()
-        self.themeLabel = QLabel('Deck theme')
+        self.themeLabel = QLabel('Deck theme:')
         
         # Add widgets and buttons to the control panel
         self.layout.addWidget(self.transparencyLabel)
