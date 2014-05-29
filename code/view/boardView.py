@@ -35,7 +35,7 @@ class boardView(QGraphicsView):
         # Create cards in cardList
         index = 0
         for color in range(1, 5):
-            for number in range(1,14):
+            for number in range(1, 14):
                 self.cardList.append(cardView.cardView(gameStateController,
                                                        self, color, number,
                                                        index, False))
@@ -240,40 +240,47 @@ class boardView(QGraphicsView):
 
     
     def flipCards(self):
-        # Make the method more generic (possible to flip between other stacks)? 
-        # Detach the cards to flip from the deck
-        flipNumber = 3
+        '''
+        Flips new cards from Deck to Drawable
+        '''
+        
+        # Detach the cards to flip from the Deck
         oldDeckStack = self.deckStackView.getStack()
         oldDeckStackLength = len(oldDeckStack)
+        if oldDeckStackLength < 3:
+            flipNumber = oldDeckStackLength
+        else:
+            flipNumber = 3
         splitIndex = oldDeckStackLength - flipNumber
         newDeckStack = oldDeckStack[:splitIndex]
         self.deckStackView.updateStackList(newDeckStack)
+        
+        # Find the start and end position of the flip
+        startPos = self.cardList[oldDeckStack[0]].scenePos()
+        drawableStackPosition = self.drawableStackView.scenePos()
+        endPos = QPointF(drawableStackPosition.x() + self.drawableStackView.getDistanceX(),
+                         drawableStackPosition.y() + self.drawableStackView.getDistanceY())
         
         # Create a list of the cards to flip
         flipCards = list()
         for i in range(splitIndex, oldDeckStackLength):
             flipCardId = oldDeckStack[i]
             flipCard = self.cardList[flipCardId]
-            flipCardPos = flipCard.scenePos() # Necessary?
             flipCard.setParentItem(None)
-            flipCard.setPos(flipCardPos) # Necessary?
             flipCards.append(flipCard)
         flipCards.reverse()
         
-        # Find the end position of the flip
-        drawableStackPosition = self.drawableStackView.scenePos()
-        drawableStackSize = len(self.drawableStackView.getStack())
-        endPos = QPointF(drawableStackPosition.x() + 5 + 20 * drawableStackSize,
-                         drawableStackPosition.y() + 5) # Do this less hard-codedly
-        #print("endPos: " + str(endPos))
+        # Find the x offset between subsequent cards in the end stack
+        cardOffsetX = self.drawableStackView.getCardOffsetX()
+        
         
         # Pass the cards to flip, the start stack, the end stack,
-        # and the end position to the animation engine
+        # the end position, and the scale step to the animation engine
         scaleStep = -0.05
         self.animationEngine.addFlippingCards(flipCards, boardStacks.boardStacks.Deck,
                                               boardStacks.boardStacks.Drawable,
-                                              endPos, scaleStep)
-                
+                                              startPos, endPos, cardOffsetX, scaleStep)
+
 
     def updateTempStack(self, cardid, stackid):
         '''
@@ -419,13 +426,15 @@ class boardView(QGraphicsView):
         '''
         self.scene.setSceneRect(0, 0, event.size().width(), event.size().height())
         QGraphicsView.resizeEvent(self, event)
-        
+
+
     def repaintCards(self):
         '''
         Trigger a repaint (update()) of all cards in boardView.
         '''
         for card in self.cardList:
             card.update()
+
 
     def setOpacity(self, opacity):
         '''
@@ -434,13 +443,15 @@ class boardView(QGraphicsView):
         
         self.cardOpacity = opacity
         self.repaintCards()
-        
+
+
     def getOpacity(self):
-    	'''
+        '''
     	Returns the opacity of cards.
     	'''
-    	return self.cardOpacity
- 
+        return self.cardOpacity
+
+
     def setBackImage(self, image):
         '''
         Sets the back image according to images/image.png

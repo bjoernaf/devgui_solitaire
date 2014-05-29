@@ -10,40 +10,45 @@ from view import communicator
 
 class flippingCardsAnimation(object):
     '''
-    An animation that shows cards flipping from one stack to another.
+    An animation that shows cards flipping to the right (from one stack to another).
     '''
 
 
-    def __init__(self, cardList, startStack, endStack, endPos,
-                 scaleStep, gameStateController, animationEngine):
+    def __init__(self, cardList, startStack, endStack, startPos, endPos,
+                 cardOffsetX, scaleStep, gameStateController, animationEngine):
         '''
         Constructor
         '''
         self.cardList = cardList
         self.startStack = startStack
         self.endStack = endStack
+        self.startPos = startPos
         self.endPos = endPos
+        self.cardOffsetX = cardOffsetX
         self.gameStateController = gameStateController
         self.animationEngine = animationEngine
-
         self.scaleStep = scaleStep
-        self.middlePos = QPointF(95 + (self.endPos.x() - 95) / 2, 15) # Do this in a less hard-coded way
-        #print("Original middlePos: " + str(self.middlePos))
-        self.moveStep = (self.middlePos.x() - 95) * -self.scaleStep # Do this in a less hard-coded way
-        #print("Original moveStep: " + str(self.moveStep))
         
+        # Set which card to flip first
         self.cardListIndex = 0
-        
+
+        topCard = self.cardList[0] # All cards to be flipped are supposed to have the same size
+        self.cardWidth = topCard.getCardWidth()
+        self.cardHeight = topCard.getCardHeight()
+
         # Rotate the cards so that the flipping will be performed
         # in the right direction
+        newXCardPosition = self.startPos.x() + self.cardWidth
+        newYCardPosition = self.startPos.y() + self.cardHeight        
         for card in self.cardList:
             card.setRotation(180)
-            card.setPos(95, 135) # Do this in a less hard-coded way
-        
-        self.zValueList = list()
-        for card in self.cardList:
-            self.zValueList.append(card.zValue())
-        self.zValueList.reverse()
+            card.setPos(newXCardPosition, newYCardPosition)
+
+        # Set the position where half of the flipping should be performed and
+        # the distance to move the card in each step
+        self.middlePos = QPointF(newXCardPosition + (self.endPos.x() - newXCardPosition) / 2,
+                                 self.startPos.y())
+        self.moveStep = (self.middlePos.x() - newXCardPosition) * -self.scaleStep
         
         self.com = communicator.communicator()
         self.com.turnCardSignal.connect(self.gameStateController.turnCard)
@@ -57,34 +62,24 @@ class flippingCardsAnimation(object):
         from the animation engine if the end of the animation has been reached.
         '''
         flipCard = self.cardList[self.cardListIndex]
-#        print("METHOD flip")
-#        print("Card: " + str(flipCard.id))
-#        print("Position: " + str(flipCard.pos()))
-#        print("Move step: " + str(self.moveStep))
         transform = flipCard.transform()
         scaleFactor = transform.m11() + self.scaleStep
-#        print("Scale factor: " + str(scaleFactor))
+        
         if scaleFactor <= 0.0: # Flipping of current card is half-finished 
-#            print("Flipping half-finished.")
-#            print("Current position: " + str(flipCard.pos()))
-#            print("Middle position: " + str(self.middlePos))            
             self.com.turnCardSignal.emit(flipCard.id)
             flipCard.setRotation(0)
-            flipCard.setZValue(self.zValueList[self.cardListIndex]) # Good?
+            flipCard.setZValue(self.cardListIndex) # The end stack is supposed to be empty
             scaleFactor = 0.0
             flipCard.setPos(self.middlePos)
             self.scaleStep = -self.scaleStep
         elif scaleFactor >= 1.0: # Flipping of current card is finished
-#            print("Flipping finished.")
-#            print("Current position: " + str(flipCard.pos()))
-#            print("End position: " + str(self.endPos))
             scaleFactor = 1.0
             flipCard.setPos(self.endPos)
         else:
             newPos = QPointF(flipCard.scenePos().x() + self.moveStep,
                              flipCard.scenePos().y())
-            #print("newPos: " + str(newPos))
             flipCard.setPos(newPos)
+        
         transform.setMatrix(scaleFactor, transform.m12(), transform.m13(),
                             transform.m21(), transform.m22(), transform.m23(),
                             transform.m31(), transform.m32(), transform.m33())
@@ -101,12 +96,8 @@ class flippingCardsAnimation(object):
                 self.com.endFlipMacroSignal.emit()
             else:
                 self.cardListIndex = self.cardListIndex + 1
-                #print("New cardListIndex: " + str(self.cardListIndex))
                 self.scaleStep = -self.scaleStep
-                # do below stuff in less hard-coded way
-                self.middlePos = QPointF(self.middlePos.x() + 10, 15)
-                #print("New middlePos: " + str(self.middlePos))
-                self.endPos = QPointF(self.endPos.x() + 20, 15)
-                #print("New endPos: " + str(self.endPos))
-                self.moveStep = (self.middlePos.x() - 95) * -self.scaleStep
-                #print("New moveStep: " + str(self.moveStep))
+                self.middlePos = QPointF(self.middlePos.x() + self.cardOffsetX / 2,
+                                         self.startPos.y())
+                self.endPos = QPointF(self.endPos.x() + self.cardOffsetX, self.startPos.y())
+                self.moveStep = (self.middlePos.x() - (self.startPos.x() + self.cardWidth)) * -self.scaleStep

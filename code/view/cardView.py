@@ -71,7 +71,22 @@ class cardView(QGraphicsItem):
         self.pulsateEffect.setOffset(0,0)
         self.pulsateIncrease = True # True increasing, False decreasing
         self.setGraphicsEffect(self.pulsateEffect)
-
+    
+    
+    def getCardWidth(self):
+        '''
+        Returns the width of the card.
+        '''
+        return self.cardWidth
+    
+    
+    def getCardHeight(self):
+        '''
+        Returns the height of the card.
+        '''
+        return self.cardHeight
+    
+    
     def illegalDropSlot(self, target):
         '''
         Slot receiving signal when target of QDrag is changed.
@@ -105,7 +120,12 @@ class cardView(QGraphicsItem):
         Override mouseDoubleClickEvent
         '''
         if self.parentItem().getid() == boardStacks.boardStacks.Deck:
+            # Begin a command macro, so that the whole process of flipping cards
+            # from Deck to Drawable can be undone in one step
             self.com.beginFlipMacroSignal.emit()
+
+            # Move all current cards from Drawable to Deck and flip new cards
+            # from Deck to Drawable
             self.com.reenterCardSignal.emit()
             self.boardView.flipCards()
         else:

@@ -65,14 +65,17 @@ class animationEngine(object):
         if obj in self.rotating:
             self.rotating.remove(obj)
             
-    def addFlippingCards(self, cardList, startStack, endStack, endPosition, scaleStep):
+    def addFlippingCards(self, cardList, startStack, endStack, startPos, endPos,
+                         cardOffsetX, scaleStep):
         '''
         Create a flipping cards animation and add it to the list flipping.
         '''
         animation = flippingCardsAnimation.flippingCardsAnimation(cardList,
                                                                   startStack,
                                                                   endStack,
-                                                                  endPosition,
+                                                                  startPos,
+                                                                  endPos,
+                                                                  cardOffsetX,
                                                                   scaleStep,
                                                                   self.gameStateController,
                                                                   self)
