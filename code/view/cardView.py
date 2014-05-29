@@ -47,6 +47,7 @@ class cardView(QGraphicsItem):
         self.com.moveCardSignal.connect(gameStateController.moveCard)
         self.com.turnCardSignal.connect(gameStateController.turnCard)
         self.com.reenterCardSignal.connect(gameStateController.reenterCard)
+        self.com.beginFlipMacroSignal.connect(gameStateController.beginFlipMacro)
         
         # Store color, value, cardId and faceup status
         self.color = color
@@ -104,6 +105,7 @@ class cardView(QGraphicsItem):
         Override mouseDoubleClickEvent
         '''
         if self.parentItem().getid() == boardStacks.boardStacks.Deck:
+            self.com.beginFlipMacroSignal.emit()
             self.com.reenterCardSignal.emit()
             self.boardView.flipCards()
         else:

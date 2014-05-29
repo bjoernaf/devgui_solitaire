@@ -48,6 +48,7 @@ class flippingCardsAnimation(object):
         self.com = communicator.communicator()
         self.com.turnCardSignal.connect(self.gameStateController.turnCard)
         self.com.moveCardSignal.connect(self.gameStateController.moveCard)
+        self.com.endFlipMacroSignal.connect(self.gameStateController.endFlipMacro)
 
         
     def flip(self):
@@ -97,6 +98,7 @@ class flippingCardsAnimation(object):
                 self.animationEngine.removeFlipping(self)
                 self.com.moveCardSignal.emit(self.startStack, self.endStack,
                                              flipCard.id)
+                self.com.endFlipMacroSignal.emit()
             else:
                 self.cardListIndex = self.cardListIndex + 1
                 #print("New cardListIndex: " + str(self.cardListIndex))

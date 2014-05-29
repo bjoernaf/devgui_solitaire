@@ -152,14 +152,14 @@ class boardModel(object):
         Turns a card in the model back if allowed. (RE-turn, result of undo)
         Signals the controller that the turn is completed.
         ''' 
-        print("ASKING TO UNDO TURN XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        print("ASKING TO UNDO TURN OF CARD " + str(cardId))
         _, top = self.cardOrderDict[cardId]
         #If the card is turned up
         if self.cardFaceUp[cardId] == True:
             # If the card is the top card or the card is on the drawable stack
-            if top == None or self.findStackOfCard(cardId) == boardStacks.Drawable:
+            if top == None or self.findStackOfCard(cardId) == boardStacks.Deck:
                 # Turn the card and emit the signal
-                self.cardFaceUp[cardId] = False    
+                self.cardFaceUp[cardId] = False
                 print("MODEL     : turnCard: Sending update signal to boardView.")
                 self.com.updateCardSignal.emit(cardId)    
         else:
@@ -247,7 +247,6 @@ class boardModel(object):
             # The Deck stack is empty, so we just move the cards here.
             self.moveCard(boardStacks.Drawable, boardStacks.Deck, bottomDrawCard)
         else:
-        
             self.moveCard(boardStacks.Deck, boardStacks.tempStack, bottomDeckCard, True)
             self.moveCard(boardStacks.Drawable, boardStacks.Deck, bottomDrawCard)
             self.moveCard(boardStacks.tempStack, boardStacks.Deck, bottomDeckCard, True)

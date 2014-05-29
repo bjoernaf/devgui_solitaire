@@ -33,6 +33,10 @@ class communicator(QObject):
     # transSlider signal
     opacitySignal = pyqtSignal(int, name = 'opacitySignal')
     
+    beginFlipMacroSignal = pyqtSignal(name = 'beginFlipMacroSignal')
+    
+    endFlipMacroSignal = pyqtSignal(name = 'endFlipMacroSignal')
+    
     def __init__(self):
         '''
         Constructor

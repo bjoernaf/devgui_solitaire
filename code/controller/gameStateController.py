@@ -142,3 +142,11 @@ class gameStateController(object):
         
         # Create a new model
         self.model = boardModel.boardModel(self)
+    
+    
+    def beginFlipMacro(self):
+        self.undoStack.beginMacro("Flip cards")
+    
+    
+    def endFlipMacro(self):
+        self.undoStack.endMacro()

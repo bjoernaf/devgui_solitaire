@@ -82,6 +82,7 @@ class boardView(QGraphicsView):
         '''
         Slot for signal which updates the facing of one card
         '''
+        print("Received update signal for card " + str(cardId))
         self.cardList[cardId].faceup = not self.cardList[cardId].faceup
         self.cardList[cardId].setFlag(QGraphicsItem.ItemIsMovable, self.cardList[cardId].faceup)
         
