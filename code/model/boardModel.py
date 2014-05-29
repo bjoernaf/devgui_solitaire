@@ -195,8 +195,8 @@ class boardModel(object):
             print("MODEL     : MoveCard: Sanity check: Card", card, "is NOT in Stack", fromStack, " -- ABORTING.")
             return False
 
-        # Make sure that cards that are to be moved from Drawable to Deck (in an undo)
-        # are placed in the right order
+        # Make sure that cards that are to be moved from Drawable to Deck
+        # are placed in the right (reverse) order
         if (fromStack == boardStacks.Drawable and toStack == boardStacks.Deck):
             self.reverseStack(fromStack)
             card = self.findRootCardInStack(fromStack)
@@ -219,8 +219,8 @@ class boardModel(object):
         except:
             print("MODEL     : MoveCard: Stack", oldPrev, "is now empty.");
 
-        # Make sure that cards that have been flipped from Deck to Drawable show up
-        # in the right order
+        # Make sure that cards that have been move from Deck to Drawable show up
+        # in the right (reverse) order
         if (fromStack == boardStacks.Deck and toStack == boardStacks.Drawable):
             self.reverseStack(toStack)
         
@@ -242,6 +242,12 @@ class boardModel(object):
         if(bottomDrawCard == None):
             # There is nothing to move.
             return 0
+        
+        # Turn the cards face down before returning them to the Deck
+        drawableStackList = self.getStack(boardStacks.Drawable)
+        for cardId in drawableStackList:
+            self.cardFaceUp[cardId] = False
+            self.com.updateCardSignal.emit(cardId)
         
         if(bottomDeckCard == None):
             # The Deck stack is empty, so we just move the cards here.
@@ -273,6 +279,13 @@ class boardModel(object):
         
         self.moveCard(boardStacks.Deck, boardStacks.tempStack, newDeckRoot, True)
         self.moveCard(boardStacks.Deck, boardStacks.Drawable, newDrawableRoot)
+
+        # Turn the cards face up after returning them to Drawable
+        drawableStackList = self.getStack(boardStacks.Drawable)
+        for cardId in drawableStackList:
+            self.cardFaceUp[cardId] = True
+            self.com.updateCardSignal.emit(cardId)
+
         self.moveCard(boardStacks.tempStack, boardStacks.Deck, newDeckRoot, True)
         
         
