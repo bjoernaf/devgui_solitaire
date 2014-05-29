@@ -239,6 +239,7 @@ class boardView(QGraphicsView):
 
     
     def flipCards(self):
+        # Make the method more generic (possible to flip between other stacks)? 
         # Detach the cards to flip from the deck
         flipNumber = 3
         oldDeckStack = self.deckStackView.getStack()

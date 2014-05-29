@@ -126,6 +126,7 @@ class boardModel(object):
                         return False       
            
         return True
+
     
     #TODO: This logic should perhaps be part of a Rule class.
     def turnCard(self, cardId): 
@@ -139,11 +140,12 @@ class boardModel(object):
             # If the card is the top card or the card is on the deck stack
             if top == None or self.findStackOfCard(cardId) == boardStacks.Deck:
                 # Turn the card and emit the signal
-                self.cardFaceUp[cardId] = True     
+                self.cardFaceUp[cardId] = True
                 print("MODEL     : turnCard: Sending update signal to boardView.")
-                self.com.updateCardSignal.emit(cardId)    
+                self.com.updateCardSignal.emit(cardId)
         else:
             print("MODEL    : turnCard: Turning of card disallowed.")
+
     
     def turnCardUndo(self, cardId):
         '''
@@ -162,6 +164,7 @@ class boardModel(object):
                 self.com.updateCardSignal.emit(cardId)    
         else:
             print("MODEL    : turnCardUndo: Turning of card disallowed.")
+
         
     def moveCard(self, fromStack, toStack, card, allowUseOfTempStack = False):
         '''
@@ -191,7 +194,13 @@ class boardModel(object):
         if(self.findStackOfCard(card) != fromStack):
             print("MODEL     : MoveCard: Sanity check: Card", card, "is NOT in Stack", fromStack, " -- ABORTING.")
             return False
-        
+
+        # Make sure that cards that are to be moved from Drawable to Deck (in an undo)
+        # are placed in the right order
+        if (fromStack == boardStacks.Drawable and toStack == boardStacks.Deck):
+            self.reverseStack(fromStack)
+            card = self.findRootCardInStack(fromStack)
+
         # These are the cards that will be affected by the move, in addition to card.
         oldPrev = self.cardOrderDict[card][0]
         newPrev = self.findTopCardInStack(toStack)
@@ -209,6 +218,11 @@ class boardModel(object):
             self.cardOrderDict[oldPrev] = (self.cardOrderDict[oldPrev][0], None)
         except:
             print("MODEL     : MoveCard: Stack", oldPrev, "is now empty.");
+
+        # Make sure that cards that have been flipped from Deck to Drawable show up
+        # in the right order
+        if (fromStack == boardStacks.Deck and toStack == boardStacks.Drawable):
+            self.reverseStack(toStack)
         
         # Create dictionary and send in signal to controller
         print("MODEL     : MoveCard: Sending stacks to CONTROLLER.");
@@ -222,7 +236,7 @@ class boardModel(object):
         Moves all Drawable cards to the bottom of the Deck.
         '''
         bottomDrawCard = self.findRootCardInStack(boardStacks.Drawable)
-        topDrawCard = self.findTopCardInStack(boardStacks.Drawable)
+#        topDrawCard = self.findTopCardInStack(boardStacks.Drawable)
         bottomDeckCard = self.findRootCardInStack(boardStacks.Deck)
         
         if(bottomDrawCard == None):
@@ -423,6 +437,7 @@ class boardModel(object):
             print("cardnumber:", cardNumber, "nth:", Nth)
             return None            
             
+    
     def findNumberOfCardsBeforeCardInStack(self, stack, card):
         '''
         Returns the number of cards before card in stack.
@@ -458,6 +473,25 @@ class boardModel(object):
             return []
     
     
+    def reverseStack(self, stack):
+        '''
+        Reverses the order of the cards in a stack.
+        '''
+        stackList = self.getStack(stack)
+        stackSize = len(stackList)
+        card = stackList[stackSize - 1]
+        nextCard = stackList[stackSize - 2]
+        self.cardOrderDict[card] = (stack, nextCard)
+        
+        for i in range(stackSize - 2, -1, -1):
+            prevCard = card
+            card = nextCard
+            if i == 0:
+                nextCard = None
+            else:
+                nextCard = stackList[i - 1]
+            self.cardOrderDict[card] = (prevCard, nextCard)
+    
     def getStackDict(self):
         '''
         Creates a dictionary with (stackID, list[cardID]) and returns it
@@ -469,4 +503,3 @@ class boardModel(object):
                 stackDict[getattr(boardStacks, stack)] = self.getStack(getattr(boardStacks, stack))
             
         return stackDict
-    

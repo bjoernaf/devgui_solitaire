@@ -65,11 +65,13 @@ class gameStateController(object):
         '''
         print("CONTROLLER: Redo: Performing redo operation.")
         self.undoStack.redo()
+
   
     def updateControllerAllCards(self, cardFaceUp):
         print("CONTROLLER: updateControllerAllCards: Forward cardFacUp from MODEL to BOARDVIEW.")
-        self.com.updateAllCardsSignal.emit(cardFaceUp)    
-        
+        self.com.updateAllCardsSignal.emit(cardFaceUp)
+
+
     def updateControllerStacks(self, stacks):
         '''
         Slot receiving stack update from model
@@ -77,6 +79,7 @@ class gameStateController(object):
         # Forward stacks to view
         print("CONTROLLER: UpdateControllerStacks: Forward stacks from MODEL to BOARDVIEW.")
         self.com.updateSignal.emit(stacks)
+
 
     def updateControllerCard(self, cardId):
         '''
@@ -100,7 +103,7 @@ class gameStateController(object):
         
         # Push command to undoStack, undoStack automatically performs command redo()
         self.undoStack.push(aMoveCardCommand)
-       
+            
         
     def reenterCard(self):
         '''
@@ -119,6 +122,7 @@ class gameStateController(object):
         
         # Push command on undoStack, automatically calls redo() function of command
         self.undoStack.push(aTurnCardCommand)
+
         
     def checkMove(self, fromStack, toStack, cardId):
         '''
@@ -126,6 +130,7 @@ class gameStateController(object):
         TODO: Implement as signal, possibly not doable?
         '''
         return self.model.checkMove(fromStack, toStack, cardId)
+
     
     def startNewGame(self):
         '''
@@ -137,4 +142,3 @@ class gameStateController(object):
         
         # Create a new model
         self.model = boardModel.boardModel(self)
-        

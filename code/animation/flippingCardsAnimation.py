@@ -56,18 +56,27 @@ class flippingCardsAnimation(object):
         from the animation engine if the end of the animation has been reached.
         '''
         flipCard = self.cardList[self.cardListIndex]
+#        print("METHOD flip")
+#        print("Card: " + str(flipCard.id))
+#        print("Position: " + str(flipCard.pos()))
+#        print("Move step: " + str(self.moveStep))
         transform = flipCard.transform()
         scaleFactor = transform.m11() + self.scaleStep
-        #print("scaleFactor " + str(scaleFactor))
-        if scaleFactor <= 0.0:
-            print(flipCard.id)
+#        print("Scale factor: " + str(scaleFactor))
+        if scaleFactor <= 0.0: # Flipping of current card is half-finished 
+#            print("Flipping half-finished.")
+#            print("Current position: " + str(flipCard.pos()))
+#            print("Middle position: " + str(self.middlePos))            
             self.com.turnCardSignal.emit(flipCard.id)
             flipCard.setRotation(0)
-            flipCard.setZValue(self.zValueList[self.cardListIndex])
+            flipCard.setZValue(self.zValueList[self.cardListIndex]) # Good?
             scaleFactor = 0.0
             flipCard.setPos(self.middlePos)
             self.scaleStep = -self.scaleStep
-        elif scaleFactor >= 1.0:
+        elif scaleFactor >= 1.0: # Flipping of current card is finished
+#            print("Flipping finished.")
+#            print("Current position: " + str(flipCard.pos()))
+#            print("End position: " + str(self.endPos))
             scaleFactor = 1.0
             flipCard.setPos(self.endPos)
         else:
