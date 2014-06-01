@@ -214,11 +214,12 @@ class stackView(QGraphicsItem):
                 if self.boardView.cardList[card].faceup == True:
                     self.boardView.cardList[card].setFlag(QGraphicsItem.ItemIsMovable,
                                                           True)
+                    self.boardView.cardList[card].setCursor(Qt.OpenHandCursor)
                 else:
                     self.boardView.cardList[card].setFlag(QGraphicsItem.ItemIsMovable,
                                                           False)
-                self.boardView.cardList[card].setCursor(Qt.OpenHandCursor)
-                
+                    self.boardView.cardList[card].setCursor(Qt.ArrowCursor)
+            
             # Inherit drop capabilities from the stack
             self.boardView.cardList[card].setAcceptDrops(self.acceptDrops())
             

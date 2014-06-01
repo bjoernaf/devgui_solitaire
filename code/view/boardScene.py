@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QGraphicsScene
 
 class boardScene(QGraphicsScene):
     '''
-    A Scene to display in q QGraphicsView
+    A Scene to display in a QGraphicsView
     Only contains override of mouseMoveEvent to detect cursor position
     '''
     

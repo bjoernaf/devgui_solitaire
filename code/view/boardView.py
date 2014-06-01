@@ -138,6 +138,12 @@ class boardView(QGraphicsView):
                 
             else:
                 print("BOARDVIEW : UpdateStacks: INVALID STACK:", key)
+
+        # Enable interaction (actually only necessary if the update is the result of a flip,
+        # which disables interaction)
+        items = self.scene.items()
+        for item in items:
+            item.setEnabled(True)
                 
                 
     def drawContent(self, gameStateController):
@@ -244,6 +250,11 @@ class boardView(QGraphicsView):
         Flips new cards from Deck to Drawable
         '''
         
+        # Disables interaction during the flip
+        items = self.scene.items()
+        for item in items:
+            item.setEnabled(False)
+        
         # Detach the cards to flip from the Deck
         oldDeckStack = self.deckStackView.getStack()
         oldDeckStackLength = len(oldDeckStack)
@@ -272,7 +283,6 @@ class boardView(QGraphicsView):
         
         # Find the x offset between subsequent cards in the end stack
         cardOffsetX = self.drawableStackView.getCardOffsetX()
-        
         
         # Pass the cards to flip, the start stack, the end stack,
         # the end position, and the scale step to the animation engine

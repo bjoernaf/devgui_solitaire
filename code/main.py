@@ -1,6 +1,6 @@
 '''
 Created on 7 apr 2014
-gnbhg
+
 @author: Sven, Bjorn, Martin
 '''
 
@@ -20,7 +20,7 @@ def main():
     app.setApplicationName("Solitaire")
     
     # Create gameStateController (controller in MVC)
-    gsc = gameStateController.gameStateController()
+    gameStateController.gameStateController()
 
     sys.exit(app.exec_())
 

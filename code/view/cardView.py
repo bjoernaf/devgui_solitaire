@@ -103,15 +103,9 @@ class cardView(QGraphicsItem):
     def mousePressEvent(self, event):
         '''
         Override mousePressEvent
-        When the mouse is pressed, change the cursor to a closed hand.
         '''
-        if self.parentItem().getid() != boardStacks.boardStacks.Deck:
+        if self.faceup == True:
             self.setCursor(Qt.ClosedHandCursor)
-            # If the card is turned upside down, and is the top of the stack,
-            # request to turn it over
-            if self.faceup == False and self.id == self.parentItem().topCardId():
-                self.com.turnCardSignal.emit(self.id)
-                
         QGraphicsItem.mousePressEvent(self, event)
     
 
@@ -123,11 +117,14 @@ class cardView(QGraphicsItem):
             # Begin a command macro, so that the whole process of flipping cards
             # from Deck to Drawable can be undone in one step
             self.com.beginFlipMacroSignal.emit()
-
-            # Move all current cards from Drawable to Deck and flip new cards
-            # from Deck to Drawable
+            
+            # Move all current cards from Drawable to Deck
             self.com.reenterCardSignal.emit()
+            
+            # Flip new cards from Deck to Drawable
             self.boardView.flipCards()
+        elif self.id == self.parentItem().topCardId():
+            self.com.turnCardSignal.emit(self.id)        
         else:
             QGraphicsItem.mouseDoubleClickEvent(self, event)
 
@@ -146,7 +143,7 @@ class cardView(QGraphicsItem):
         This is called when an object is moved with the mouse pressed down.
         A drag event is created.
         '''
-        
+                
         # Create a drag event with attached mime data containing the card id and fromstack
         drag = QDrag(event.widget())
         mime = QMimeData()
@@ -222,10 +219,8 @@ class cardView(QGraphicsItem):
         # If the card is facing down, draw the back image
         else:
             painter.drawImage(self.boundingRect(), self.boardView.backImage)
-        
-
-            
-        
+    
+    
     def boundingRect(self):
         '''
         Returns a bounding rectangle covering the entire card.
@@ -268,15 +263,16 @@ class cardView(QGraphicsItem):
         # Add the card to the pulsating animation engine list
         self.boardView.animationEngine.addPulsating(self)
         
-    def hoverMoveEvent(self, event):
-        '''
-        When moving mouse over card,
-        change cursor to OpenHandCursor
-        '''
-        if self.cursor() != Qt.OpenHandCursor:
-            if (self.parentItem() != None and 
-                self.parentItem().getid() != boardStacks.boardStacks.Deck):
-                self.setCursor(Qt.OpenHandCursor)
+# Martin: This method doesn't seem necessary
+#    def hoverMoveEvent(self, event):
+#        '''
+#        When moving mouse over card,
+#        change cursor to OpenHandCursor
+#        '''
+#        if self.cursor() != Qt.OpenHandCursor:
+#            if (self.parentItem() != None and 
+#                self.parentItem().getid() != boardStacks.boardStacks.Deck):
+#                self.setCursor(Qt.OpenHandCursor)
         
     def hoverLeaveEvent(self, event):
         '''
