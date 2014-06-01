@@ -1,7 +1,7 @@
 '''
 Created on 7 apr 2014
 
-@author: Sven, Bjorn
+@author: Sven, Bjorn, Max
 '''
 
 from .cardModel import cardModel
@@ -17,7 +17,6 @@ class boardModel(object):
     The main part of the model, which keeps track of where the cards are located, and offers an interface
     to move cards between stacks.
     '''
-    
     
     def __init__(self, gameStateController):
         '''
@@ -54,8 +53,30 @@ class boardModel(object):
         self.com.updateAllCardsSignal.emit(self.cardFaceUp)
         self.com.updateStackSignal.emit(self.getStackDict())
     
-    #TODO: separate to Rule class
+    def checkWin(self):
+        '''
+        Checks if the board is in a winning state.
+        This is a sketch. It has not been tested.
+        '''
+        
+        #For each of the top stacks
+        for i in range(-14, -11):
+            topCard = self.findTopCardInStack(i)
+            if(topCard != None):
+                card = topCard
+                count = 0
+                while(self.cardOrderDict[card][1] == card+1):
+                    card = self.cardOrderDict[card][1]
+                    count += 1
+                if(count > 11):
+                    return True
+            return False 
+    
+    
     def checkMove(self, fromStack, toStack, card):
+        '''
+        The rule checking function. This could be abstracted into a rule class.
+        '''
 
         #drawable or deck stack
         if(toStack == -1 or toStack == -2):
@@ -105,11 +126,6 @@ class boardModel(object):
                 color2 = self.cardList[card].color
                 indexdif = card - topCard
     
-                #print("topcard")
-                #print(topCard)
-                #print("movecard")
-                #print(card)
-                
                 #Is the card a king?   
                 #only allow placing of cards of different color and value 1
                 if(color1 == 1):
@@ -227,6 +243,10 @@ class boardModel(object):
         # Create dictionary and send in signal to controller
         print("MODEL     : MoveCard: Sending stacks to CONTROLLER.");
         self.com.updateStackSignal.emit(self.getStackDict())
+        
+        if(self.checkWin()):
+            print("YOU WIN!")
+            #do something here
         
         return True
         
