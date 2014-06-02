@@ -28,9 +28,14 @@ class glassView(QGraphicsItem):
         # Save game state controller instance
         self.gsc = gameStateController
         self.boardView = boardView
-        
                 
 
+    def boundingRect(self):
+        '''
+        Returns a bounding rectangle for the tutorial glass pane.
+        '''
+        return QRectF(0, 0, self.width, self.height) 
+    
     def paint(self, painter, option, widget=None): 
         '''
         Override of the default paint function.
@@ -40,7 +45,7 @@ class glassView(QGraphicsItem):
         '''
         
         # Set opacity to paint entire card with
-        painter.setOpacity(100.0)
+        painter.setOpacity(0.3)
         
         # Set painter rendering mode
         painter.setRenderHint(QPainter.Antialiasing)
@@ -53,7 +58,7 @@ class glassView(QGraphicsItem):
         painter.setFont(font)
         
         # ****** TEMPORARY TESTING *******
-        painter.drawRoundedRect(QRectF(0, 0, self.width, self.height), 8, 8, Qt.AbsoluteSize)
+        painter.drawRoundedRect(self.boundingRect(), 8, 8, Qt.AbsoluteSize)
     
         
         # Print help text
@@ -63,6 +68,21 @@ class glassView(QGraphicsItem):
         
         painter.drawText(80, 550, "Place lower cards of opposite color on higher cards. Cannot skip cards.")
         
-        painter.drawText(8, 175, "Double click the deck to draw new cards.")  
+        painter.drawText(8, 175, "Double click the deck to draw new cards.")
+        
+        
+    def resizeEvent(self, event):
+        '''
+        Override of resizeEvent.
+        Called from boardView to match size of scene and glass pane
+        '''
+        # Get scene position
+        x = self.scenePos().x()
+        y = self.scenePos().y()
+        
+        # Set width and height to cover scene properly
+        # Scene width or height - 2 * relative scene position
+        self.width = event.size().width() - 2*x
+        self.height = event.size().height() - 2*y
 #       
 

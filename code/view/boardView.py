@@ -166,6 +166,7 @@ class boardView(QGraphicsView):
         # Add glass pane tutorial to boardview.
         self.glassView = glassView.glassView(gameStateController, self, self.width(), self.height())
         self.glassView.setPos(1, 1)
+        self.glassView.setZValue(100) # Just to show on top of rest, 100 not important.
         self.glassView.hide()
         self.tutorialVisible = False
         self.scene.addItem(self.glassView)
@@ -441,9 +442,11 @@ class boardView(QGraphicsView):
                 
     def resizeEvent(self, event):
         '''
-        Override of resizeEvent called from solWin to match size
+        Override of resizeEvent.
+        Called from solWin, forwards resizeEvent to scene and glassView.
         '''
-        self.scene.setSceneRect(0, 0, event.size().width(), event.size().height())
+        self.scene.resizeEvent(event)
+        self.glassView.resizeEvent(event)
         QGraphicsView.resizeEvent(self, event)
 
 
@@ -484,12 +487,22 @@ class boardView(QGraphicsView):
         self.repaintCards()
 
     def showTutorial(self):
+        '''
+        Shows tutorial window on top of everything else.
+        Sets visible flag to True.
+        '''
         self.glassView.show()
         self.tutorialVisible = True
         
     def hideTutorial(self):
+        '''
+        Hides tutorial window and sets visible flag to False.
+        '''
         self.glassView.hide()
         self.tutorialVisible = False
         
     def isTutorialVisible(self):
+        '''
+        Returns the value of tutorialVisible
+        '''
         return self.tutorialVisible

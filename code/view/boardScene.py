@@ -42,3 +42,10 @@ class boardScene(QGraphicsScene):
         '''
         self.boardView.tempStackView.updatePos(event.scenePos())
         QGraphicsScene.mouseMoveEvent(self, event)
+        
+    def resizeEvent(self, event):
+        '''
+        Override of resizeEvent.
+        Called from boardView to forward size changes.
+        '''
+        self.setSceneRect(0, 0, event.size().width(), event.size().height())

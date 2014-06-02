@@ -263,17 +263,6 @@ class cardView(QGraphicsItem):
         # Add the card to the pulsating animation engine list
         self.boardView.animationEngine.addPulsating(self)
         
-# Martin: This method doesn't seem necessary
-#    def hoverMoveEvent(self, event):
-#        '''
-#        When moving mouse over card,
-#        change cursor to OpenHandCursor
-#        '''
-#        if self.cursor() != Qt.OpenHandCursor:
-#            if (self.parentItem() != None and 
-#                self.parentItem().getid() != boardStacks.boardStacks.Deck):
-#                self.setCursor(Qt.OpenHandCursor)
-        
     def hoverLeaveEvent(self, event):
         '''
         Catches when the mouse leaves the hover area above the cardView.
