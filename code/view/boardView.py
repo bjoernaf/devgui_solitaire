@@ -288,6 +288,7 @@ class boardView(QGraphicsView):
             flipCardId = oldDeckStack[i]
             flipCard = self.cardList[flipCardId]
             flipCard.setParentItem(None)
+            flipCard.hoverLeaveEvent(0)
             flipCards.append(flipCard)
         flipCards.reverse()
         
