@@ -11,7 +11,7 @@ The boardView contains a QGraphicsScene that displays stacks
 from PyQt5.QtCore import Qt, QPointF
 from PyQt5.QtGui import QImage
 from PyQt5.QtWidgets import QGraphicsView, QGraphicsItem
-from view import cardView, stackView, boardScene, communicator
+from view import cardView, stackView, boardScene, communicator, glassView
 from model import boardStacks
 from animation import animationEngine
 
@@ -156,6 +156,13 @@ class boardView(QGraphicsView):
         #Set background color to dark green
         self.scene.setBackgroundBrush(Qt.darkGreen)
         
+        # Add glass pane tutorial to boardview.
+        self.glassView = glassView.glassView(gameStateController, self, self.width(), self.height())
+        self.glassView.setPos(1, 1)
+        self.glassView.hide()
+        self.tutorialVisible = False
+        self.scene.addItem(self.glassView)
+        
         # Create stacks as
         # stackView.stackView(parent, gameStateController, boardStacks.boardStacks.STACKID, x-offset, y-offset, [faceUp])
         self.deckStackView = stackView.stackView(self, gameStateController,
@@ -228,6 +235,8 @@ class boardView(QGraphicsView):
                                                     boardStacks.boardStacks.Bottom7)
         self.bottom7StackView.setPos(670, 240)
         self.scene.addItem(self.bottom7StackView)
+        
+     
         
         # The tempStack with no location and temporarily hidden
         self.tempStackView = stackView.stackView(self, gameStateController,
@@ -451,3 +460,14 @@ class boardView(QGraphicsView):
         else:
             print("BOARDVIEW : ERROR loading back image.")
         self.repaintCards()
+
+    def showTutorial(self):
+        self.glassView.show()
+        self.tutorialVisible = True
+        
+    def hideTutorial(self):
+        self.glassView.hide()
+        self.tutorialVisible = False
+        
+    def isTutorialVisible(self):
+        return self.tutorialVisible

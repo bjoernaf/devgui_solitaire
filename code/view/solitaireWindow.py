@@ -150,8 +150,23 @@ class solitaireWindow(QMainWindow):
         editMenu.addAction(self.controlPanelAction)
         
         # Populate HelpMenu
+        self.tutorialAction = QAction('Tutorial', self)
+        self.tutorialAction.setEnabled(True)
+        self.tutorialAction.triggered.connect(self.toggleTutorial)
+        
+        helpMenu.addAction(self.tutorialAction)
         helpMenu.addAction('About')
     
+    
+    def toggleTutorial(self):
+        '''
+        Changes the visibility of tutorial
+        '''
+        if(self.bView.isTutorialVisible()):
+            self.bView.hideTutorial()
+        else:
+            self.bView.showTutorial()
+        
     
     def closeEvent(self, event):
         '''
