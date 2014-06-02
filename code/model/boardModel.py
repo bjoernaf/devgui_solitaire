@@ -18,17 +18,18 @@ class boardModel(object):
     to move cards between stacks.
     '''
     
-    def __init__(self, gameStateController):
+    def __init__(self, gsController):
         '''
         Constructor
         '''
         # Set up communicator
         self.com = communicator()
+        
         # Connect signals to slot
-        self.com.updateStackSignal.connect(gameStateController.updateControllerStacks)
-        self.com.updateCardSignal.connect(gameStateController.updateControllerCard)
-        self.com.updateAllCardsSignal.connect(gameStateController.updateControllerAllCards)
-        self.com.gameWonSignal.connect(gameStateController.gameWonSlot)
+        self.com.updateStackSignal.connect(gsController.updateControllerStacks)
+        self.com.updateCardSignal.connect(gsController.updateControllerCard)
+        self.com.updateAllCardsSignal.connect(gsController.updateControllerAllCards)
+        self.com.gameWonSignal.connect(gsController.gameWonSlot)
         
         #cardList contains a list of all cards present in the game, and is used to reference cards by id numbers.
         self.cardList = list()
@@ -39,8 +40,6 @@ class boardModel(object):
         
         # cardFaceUp keeps a list of how the cards are facing (up/down)
         self.cardFaceUp = list()
-        
-        self.count = 0
         
         # Create cards in cardList and facing status
         for color in range(1, 5):
@@ -54,23 +53,27 @@ class boardModel(object):
         self.com.updateAllCardsSignal.emit(self.cardFaceUp)
         self.com.updateStackSignal.emit(self.getStackDict())
     
+    
     def checkWin(self):
         '''
         Checks if the board is in a winning state.
         '''
         
-        #For each of the top stacks
+        # Count the number of cards in the top stacks (that are in order)
         count = 0
         for i in range(-14, -10):
-            rootCard = self.findRootCardInStack(i)
-            if(rootCard != None):
-                count += 1
-                card = rootCard
+            card = self.findRootCardInStack(i)
+            if(card != None):
+                count += 1 # Count the root card.
                 while(self.cardOrderDict[card][1] == card+1):
                     card = self.cardOrderDict[card][1]
-                    count += 1
+                    count += 1 # Count all the other cards on the stack.
+                    
+        # Debug message
         print("MODEL     : checkWin:", count, "of 52 cards in winning position.")
-        return (count == 52) # True if all cards counted
+        
+        # The game is won when all 52 cards are in the winning position
+        return (count == 52)
     
     
     def checkMove(self, fromStack, toStack, card):
@@ -78,11 +81,11 @@ class boardModel(object):
         The rule checking function. This could be abstracted into a rule class.
         '''
 
-        #drawable or deck stack
+        # Drawable or Deck stack
         if(toStack == -1 or toStack == -2):
             return False
         
-        #top stacks?
+        # Top stacks
         if(toStack >= -14 and toStack <= -11): 
             #You may not move more than one card each time to the top stacks
             if(self.cardOrderDict[card][1] != None):
@@ -91,33 +94,27 @@ class boardModel(object):
             topCard = self.findTopCardInStack(toStack)
             
             if(topCard == None):
-                #only aces are accepted as first card
+                # Only aces are accepted as first card
                 if(self.cardList[card].value != 1):
                     return False            
             else:
-                #the cards must be the same color
+                # The cards must be the same color
                 if(self.cardList[card].color != self.cardList[topCard].color):
                     return False
                 
-                print("VALUES")
-                print(self.cardList[card].value)
-                print(self.cardList[topCard].value)
-                print(self.cardList[card].value - self.cardList[topCard].value)
-                #the order must be increasing
+                # The order must be increasing
                 if(self.cardList[card].value - self.cardList[topCard].value != 1):
                     return False
-            
-        #bottom stacks
+        
+        # Bottom stacks
         else:               
             topCard = self.findTopCardInStack(toStack)
             
             #Can't place a stack on a back-turned card.
             if(topCard == None):
-                #if(card != 12 and card != 25 and card != 38 and card != 51):
-                #    return False            
-                # CHANGE BY BJORN: We should allow any card to be base of bottom
-                #                  stacks.
-                print("MODEL     : checkMove: Allowing any card as base in bottom.")
+                if(card != 12 and card != 25 and card != 38 and card != 51):
+                    # Can only place kings as root of bottom stacks.
+                    return False            
             else:
                 if(self.cardFaceUp[topCard] == False):
                     return False
@@ -125,7 +122,7 @@ class boardModel(object):
                 color1 = self.cardList[topCard].color
                 color2 = self.cardList[card].color
                 indexdif = card - topCard
-    
+                
                 #Is the card a king?   
                 #only allow placing of cards of different color and value 1
                 if(color1 == 1):
@@ -142,9 +139,8 @@ class boardModel(object):
                         return False       
            
         return True
-
     
-    #TODO: This logic should perhaps be part of a Rule class.
+    
     def turnCard(self, cardId): 
         '''
         Turns a card in the model if allowed.
@@ -160,15 +156,15 @@ class boardModel(object):
                 print("MODEL     : turnCard: Sending update signal to boardView.")
                 self.com.updateCardSignal.emit(cardId)
         else:
-            print("MODEL    : turnCard: Turning of card disallowed.")
-
+            print("MODEL     : turnCard: Turning of card disallowed.")
+    
     
     def turnCardUndo(self, cardId):
         '''
         Turns a card in the model back if allowed. (RE-turn, result of undo)
         Signals the controller that the turn is completed.
         ''' 
-        print("ASKING TO UNDO TURN OF CARD " + str(cardId))
+        print("MODEL     : turnCardUndo: ASKING TO UNDO TURN OF CARD " + str(cardId))
         _, top = self.cardOrderDict[cardId]
         #If the card is turned up
         if self.cardFaceUp[cardId] == True:
@@ -176,16 +172,20 @@ class boardModel(object):
             if top == None or self.findStackOfCard(cardId) == boardStacks.Deck:
                 # Turn the card and emit the signal
                 self.cardFaceUp[cardId] = False
-                print("MODEL     : turnCard: Sending update signal to boardView.")
+                print("MODEL     : turnCardUndo: Sending update signal to boardView.")
                 self.com.updateCardSignal.emit(cardId)    
         else:
-            print("MODEL    : turnCardUndo: Turning of card disallowed.")
+            print("MODEL     : turnCardUndo: Turning of card disallowed.")
 
         
     def moveCard(self, fromStack, toStack, card, allowUseOfTempStack = False):
         '''
         Slot for receiving MoveCard events from Controller.
-        Moves card to stack toStack, and updates all references to keep representation sane.
+        Moves card to stack toStack, and updates all references to keep 
+        representation sane.
+        
+        Can be used internally in boardModel, in which case the use of the temp
+        stack can be allowed. This should not be done externally.
         '''
         '''
         if(self.checkMove(fromStack, toStack, card) == False):
@@ -249,7 +249,7 @@ class boardModel(object):
         
         # Send the gameWon signal if this move finishes the game.
         if(self.checkWin()):
-            print("YOU WIN!")
+            print("MODEL     : moveCard: Winning condition reached -- sending GameWonSignal.")
             self.com.gameWonSignal.emit()
         
         return True
@@ -260,10 +260,9 @@ class boardModel(object):
         Moves all Drawable cards to the bottom of the Deck.
         '''
         bottomDrawCard = self.findRootCardInStack(boardStacks.Drawable)
-#        topDrawCard = self.findTopCardInStack(boardStacks.Drawable)
         bottomDeckCard = self.findRootCardInStack(boardStacks.Deck)
         
-        print("REENTER: Bottom Draw: ", bottomDrawCard)
+        print("MODEL     : reenterCards: Bottom Draw: ", bottomDrawCard)
         
         if(bottomDrawCard == None):
             # There is nothing to move.
@@ -272,7 +271,7 @@ class boardModel(object):
         # Turn the cards face down before returning them to the Deck
         drawableStackList = self.getStack(boardStacks.Drawable)
         for cardId in drawableStackList:
-            print("REENTER: Turning", cardId)
+            print("MODEL     : reenterCards: Turning", cardId)
             self.cardFaceUp[cardId] = False
             self.com.updateCardSignal.emit(cardId)
         
@@ -280,19 +279,17 @@ class boardModel(object):
             # The Deck stack is empty, so we just move the cards here.
             self.moveCard(boardStacks.Drawable, boardStacks.Deck, bottomDrawCard)
         else:
+            # We insert the cards between the Deck and bottom of Deck, via the
+            # temp stack.
             self.moveCard(boardStacks.Deck, boardStacks.tempStack, bottomDeckCard, True)
             self.moveCard(boardStacks.Drawable, boardStacks.Deck, bottomDrawCard, True)
             self.moveCard(boardStacks.tempStack, boardStacks.Deck, bottomDeckCard, True)
         
-            # We insert the cards between the Deck and bottom of Deck.
-            #self.cardOrderDict[bottomDeckCard] = (topDrawCard, self.cardOrderDict[bottomDeckCard][1])
-            #self.cardOrderDict[topDrawCard] = (self.cardOrderDict[topDrawCard][0], bottomDeckCard)
-            #self.cardOrderDict[bottomDrawCard] = (boardStacks.Deck, self.cardOrderDict[bottomDrawCard][1])
-        
         # Create dictionary and send in signal to controller
-        print("MODEL     : MoveCard: Sending stacks to CONTROLLER.")
+        print("MODEL     : reenterCards: Sending stacks to CONTROLLER.")
         self.com.updateStackSignal.emit(self.getStackDict())
         
+        # Return the number of affected cards, for use with undo.
         return self.findNumberOfCardsBeforeCardInStack(boardStacks.Deck, bottomDeckCard)
         
         
@@ -316,15 +313,6 @@ class boardModel(object):
         self.moveCard(boardStacks.tempStack, boardStacks.Deck, newDeckRoot, True)
         
         
-    def createSortedDeck(self):
-        '''
-        Adds all cards in self.cardList to the Deck in order.
-        '''
-        self.cardOrderDict[0] = (boardStacks.Deck, 1)
-        for i in range(1, len(self.cardList) - 1):
-            self.cardOrderDict[i] = (i-1,i+1)
-        self.cardOrderDict[len(self.cardList) - 1] = (len(self.cardList) - 2, None)
-
     def createSolitaireGame(self):
         '''
         Create a solitaire game
@@ -389,30 +377,8 @@ class boardModel(object):
         # Add last card
         self.cardOrderDict[deckOfCards[len(deckOfCards)-1]] = (deckOfCards[len(deckOfCards)-2], None)
         self.cardFaceUp[deckOfCards[len(deckOfCards)-1]] = False
-
-
-    def createRandomizedDeck(self):
-        '''
-    	Adds all cards in self.cardList to the Deck in random order.
-    	'''
-        
-        # Create list of all cards, from which we can remove added cards.
-        deckOfCards = []
-        for i in range(0, 52):
-            deckOfCards.append(i)
-            random.shuffle(deckOfCards)
-        
-        # Add first card
-        self.cardOrderDict[deckOfCards[0]] = (boardStacks.Deck, deckOfCards[1])
-        
-        # Add all but last
-        for i in range(1, len(deckOfCards)-1):
-            self.cardOrderDict[deckOfCards[i]] = (deckOfCards[i-1], deckOfCards[i+1])
-        
-        # Add last card
-        self.cardOrderDict[deckOfCards[len(deckOfCards)-1]] = (deckOfCards[len(deckOfCards)-2], None)
-        
-        
+    
+    
     def findStackOfCard(self, card):
         '''
         Returns the stack card belongs to.
@@ -421,6 +387,9 @@ class boardModel(object):
         
         while(self.cardOrderDict[tempCard][0] >= 0):
             tempCard = self.cardOrderDict[tempCard][0]
+        
+        # Debug message
+        print("MODEL     : findStackOfCard:", card, "is in stack", self.cardOrderDict[tempCard][0])
         
         return self.cardOrderDict[tempCard][0]
 
@@ -456,7 +425,7 @@ class boardModel(object):
             
     def findNthCardInStack(self, stack, Nth):
         '''
-        Returns the top-most card belonging to stack.
+        Returns the Nth card from root belonging to stack.
         '''
         oldCard = self.findRootCardInStack(stack)
         
@@ -473,7 +442,7 @@ class boardModel(object):
                 if(cardNumber == Nth):
                     return oldCard
             
-            print("cardnumber:", cardNumber, "nth:", Nth)
+            print("MODEL     : findNthCardInStack: cardnumber:", cardNumber, "nth:", Nth)
             return None            
             
     
