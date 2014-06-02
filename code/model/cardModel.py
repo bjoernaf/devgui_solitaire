@@ -6,13 +6,8 @@ Created on 7 apr 2014
 
 class cardModel(object):
     '''
-    classdocs
+    Simple class to keep track of color and value for card. Used for rule checking.
     '''
-    # Martin: The lines below don't seem to do anything useful,
-    # so I comment them out.
-#    color = None
-#    value = None
-#    faceup = False
     
     def __init__(self, color, value):
         '''
