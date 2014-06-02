@@ -1,7 +1,7 @@
 '''
 Created on 7 apr 2014
 
-@author: Sven, Bjorn
+@author: Sven, Bjorn, Max
 '''
 
 from .cardModel import cardModel
@@ -17,7 +17,6 @@ class boardModel(object):
     The main part of the model, which keeps track of where the cards are located, and offers an interface
     to move cards between stacks.
     '''
-    
     
     def __init__(self, gameStateController):
         '''
@@ -54,8 +53,30 @@ class boardModel(object):
         self.com.updateAllCardsSignal.emit(self.cardFaceUp)
         self.com.updateStackSignal.emit(self.getStackDict())
     
-    #TODO: separate to Rule class
+    def checkWin(self):
+        '''
+        Checks if the board is in a winning state.
+        This is a sketch. It has not been tested.
+        '''
+        
+        #For each of the top stacks
+        for i in range(-14, -11):
+            topCard = self.findTopCardInStack(i)
+            if(topCard != None):
+                card = topCard
+                count = 0
+                while(self.cardOrderDict[card][1] == card+1):
+                    card = self.cardOrderDict[card][1]
+                    count += 1
+                if(count > 11):
+                    return True
+            return False 
+    
+    
     def checkMove(self, fromStack, toStack, card):
+        '''
+        The rule checking function. This could be abstracted into a rule class.
+        '''
 
         #drawable or deck stack
         if(toStack == -1 or toStack == -2):
@@ -105,11 +126,6 @@ class boardModel(object):
                 color2 = self.cardList[card].color
                 indexdif = card - topCard
     
-                #print("topcard")
-                #print(topCard)
-                #print("movecard")
-                #print(card)
-                
                 #Is the card a king?   
                 #only allow placing of cards of different color and value 1
                 if(color1 == 1):
@@ -152,14 +168,14 @@ class boardModel(object):
         Turns a card in the model back if allowed. (RE-turn, result of undo)
         Signals the controller that the turn is completed.
         ''' 
-        print("ASKING TO UNDO TURN XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        print("ASKING TO UNDO TURN OF CARD " + str(cardId))
         _, top = self.cardOrderDict[cardId]
         #If the card is turned up
         if self.cardFaceUp[cardId] == True:
             # If the card is the top card or the card is on the drawable stack
-            if top == None or self.findStackOfCard(cardId) == boardStacks.Drawable:
+            if top == None or self.findStackOfCard(cardId) == boardStacks.Deck:
                 # Turn the card and emit the signal
-                self.cardFaceUp[cardId] = False    
+                self.cardFaceUp[cardId] = False
                 print("MODEL     : turnCard: Sending update signal to boardView.")
                 self.com.updateCardSignal.emit(cardId)    
         else:
@@ -195,8 +211,8 @@ class boardModel(object):
             print("MODEL     : MoveCard: Sanity check: Card", card, "is NOT in Stack", fromStack, " -- ABORTING.")
             return False
 
-        # Make sure that cards that are to be moved from Drawable to Deck (in an undo)
-        # are placed in the right order
+        # Make sure that cards that are to be moved from Drawable to Deck
+        # are placed in the right (reverse) order
         if (fromStack == boardStacks.Drawable and toStack == boardStacks.Deck):
             self.reverseStack(fromStack)
             card = self.findRootCardInStack(fromStack)
@@ -219,14 +235,18 @@ class boardModel(object):
         except:
             print("MODEL     : MoveCard: Stack", oldPrev, "is now empty.");
 
-        # Make sure that cards that have been flipped from Deck to Drawable show up
-        # in the right order
+        # Make sure that cards that have been move from Deck to Drawable show up
+        # in the right (reverse) order
         if (fromStack == boardStacks.Deck and toStack == boardStacks.Drawable):
             self.reverseStack(toStack)
         
         # Create dictionary and send in signal to controller
         print("MODEL     : MoveCard: Sending stacks to CONTROLLER.");
         self.com.updateStackSignal.emit(self.getStackDict())
+        
+        if(self.checkWin()):
+            print("YOU WIN!")
+            #do something here
         
         return True
         
@@ -243,11 +263,16 @@ class boardModel(object):
             # There is nothing to move.
             return 0
         
+        # Turn the cards face down before returning them to the Deck
+        drawableStackList = self.getStack(boardStacks.Drawable)
+        for cardId in drawableStackList:
+            self.cardFaceUp[cardId] = False
+            self.com.updateCardSignal.emit(cardId)
+        
         if(bottomDeckCard == None):
             # The Deck stack is empty, so we just move the cards here.
             self.moveCard(boardStacks.Drawable, boardStacks.Deck, bottomDrawCard)
         else:
-        
             self.moveCard(boardStacks.Deck, boardStacks.tempStack, bottomDeckCard, True)
             self.moveCard(boardStacks.Drawable, boardStacks.Deck, bottomDrawCard)
             self.moveCard(boardStacks.tempStack, boardStacks.Deck, bottomDeckCard, True)
@@ -274,6 +299,13 @@ class boardModel(object):
         
         self.moveCard(boardStacks.Deck, boardStacks.tempStack, newDeckRoot, True)
         self.moveCard(boardStacks.Deck, boardStacks.Drawable, newDrawableRoot)
+
+        # Turn the cards face up after returning them to Drawable
+        drawableStackList = self.getStack(boardStacks.Drawable)
+        for cardId in drawableStackList:
+            self.cardFaceUp[cardId] = True
+            self.com.updateCardSignal.emit(cardId)
+
         self.moveCard(boardStacks.tempStack, boardStacks.Deck, newDeckRoot, True)
         
         

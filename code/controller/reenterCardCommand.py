@@ -6,7 +6,6 @@ Created on 19 maj 2014
 
 from PyQt5.QtWidgets import QUndoCommand
 
-from model import boardModel
 
 class reenterCardCommand(QUndoCommand):
     '''
@@ -36,4 +35,3 @@ class reenterCardCommand(QUndoCommand):
         '''
         print("REECARDCOM: undo: Returning", self.numberOfCards, "cards to drawable.")
         self.model.unReenterCards(self.numberOfCards)
-        

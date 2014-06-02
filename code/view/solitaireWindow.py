@@ -4,17 +4,9 @@ Created on 13 apr 2014
 @author: Sven, Bjorn, Max
 '''
 
-'''
-Basic imports, save to use later.
-from PyQt5.QtCore import (QLineF, QMimeData, QPoint, QPointF, qrand, QRectF,
-        qsrand, Qt, QTime, QTimeLine)
-from PyQt5.QtGui import (QBrush, QColor, QDrag, QImage, QPainter, QPen,
-        QPixmap, QTransform, QFont)
-from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsTextItem, QGraphicsScene, QGraphicsView, QApplication)
-'''
 
 from PyQt5.QtCore import (QSettings, QSize, QVariant, QPoint, Qt)
-from PyQt5.QtWidgets import (QMainWindow, QAction, QMessageBox, QToolBar, QLabel)
+from PyQt5.QtWidgets import (QMainWindow, QAction, QMessageBox, QToolBar)
 from PyQt5.QtGui import QIcon
 
 from view import boardView, transSlider, controlPanel, communicator
@@ -174,7 +166,7 @@ class solitaireWindow(QMainWindow):
         '''
         if self.okToContinue():
 
-			# Close the control panel
+            # Close the control panel
             self.controlPanel.close()
             
             # Store settings

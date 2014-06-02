@@ -25,6 +25,10 @@ class stackView(QGraphicsItem):
     recty = penWidth/2 
     rectWidth = width + penWidth
     rectHeight = height + penWidth
+    
+    # Distances between stack edge and bottom card
+    distance_x = 5
+    distance_y = 5
 
 
     def __init__(self, boardView, gameStateController, id,
@@ -82,7 +86,28 @@ class stackView(QGraphicsItem):
     	'''
         return self.stackCardList
     
-
+    
+    def getDistanceX(self):
+        '''
+        Returns the x distance between the stack edge and the bottom card.
+        '''
+        return self.distance_x
+    
+    
+    def getDistanceY(self):
+        '''
+        Returns the y distance between the stack edge and the bottom card.
+        '''
+        return self.distance_x
+    
+    
+    def getCardOffsetX(self):
+        '''
+        Returns the x distance between subsequent cards in the stack.
+        '''
+        return self.offset_x
+    
+    
     def paint(self, painter, option, widget=None):
         '''
         Override of paint function. Paints a custom rounded rectangle
@@ -167,8 +192,8 @@ class stackView(QGraphicsItem):
         Sets movability and cursor of the cards depending on the stack type.
         '''
         # Base offset for first card in a stack
-        offset_x = 5
-        offset_y = 5
+        offset_x = self.distance_x
+        offset_y = self.distance_y
         index = 0
         
         # Iterate over all cards on the stack. Set position, parents and flags.
@@ -189,11 +214,12 @@ class stackView(QGraphicsItem):
                 if self.boardView.cardList[card].faceup == True:
                     self.boardView.cardList[card].setFlag(QGraphicsItem.ItemIsMovable,
                                                           True)
+                    self.boardView.cardList[card].setCursor(Qt.OpenHandCursor)
                 else:
                     self.boardView.cardList[card].setFlag(QGraphicsItem.ItemIsMovable,
                                                           False)
-                self.boardView.cardList[card].setCursor(Qt.OpenHandCursor)
-                
+                    self.boardView.cardList[card].setCursor(Qt.ArrowCursor)
+            
             # Inherit drop capabilities from the stack
             self.boardView.cardList[card].setAcceptDrops(self.acceptDrops())
             
