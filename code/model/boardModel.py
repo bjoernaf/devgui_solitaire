@@ -241,8 +241,11 @@ class boardModel(object):
             self.reverseStack(toStack)
         
         # Create dictionary and send in signal to controller
-        print("MODEL     : MoveCard: Sending stacks to CONTROLLER.");
-        self.com.updateStackSignal.emit(self.getStackDict())
+        if(allowUseOfTempStack):
+            print("MODEL     : MoveCard: Using tempstack, not sending to controller.")
+        else:
+            print("MODEL     : MoveCard: Sending stacks to CONTROLLER.")
+            self.com.updateStackSignal.emit(self.getStackDict())
         
         if(self.checkWin()):
             print("YOU WIN!")
@@ -259,6 +262,8 @@ class boardModel(object):
 #        topDrawCard = self.findTopCardInStack(boardStacks.Drawable)
         bottomDeckCard = self.findRootCardInStack(boardStacks.Deck)
         
+        print("REENTER: Bottom Draw: ", bottomDrawCard)
+        
         if(bottomDrawCard == None):
             # There is nothing to move.
             return 0
@@ -266,6 +271,7 @@ class boardModel(object):
         # Turn the cards face down before returning them to the Deck
         drawableStackList = self.getStack(boardStacks.Drawable)
         for cardId in drawableStackList:
+            print("REENTER: Turning", cardId)
             self.cardFaceUp[cardId] = False
             self.com.updateCardSignal.emit(cardId)
         
@@ -274,7 +280,7 @@ class boardModel(object):
             self.moveCard(boardStacks.Drawable, boardStacks.Deck, bottomDrawCard)
         else:
             self.moveCard(boardStacks.Deck, boardStacks.tempStack, bottomDeckCard, True)
-            self.moveCard(boardStacks.Drawable, boardStacks.Deck, bottomDrawCard)
+            self.moveCard(boardStacks.Drawable, boardStacks.Deck, bottomDrawCard, True)
             self.moveCard(boardStacks.tempStack, boardStacks.Deck, bottomDeckCard, True)
         
             # We insert the cards between the Deck and bottom of Deck.
@@ -283,7 +289,7 @@ class boardModel(object):
             #self.cardOrderDict[bottomDrawCard] = (boardStacks.Deck, self.cardOrderDict[bottomDrawCard][1])
         
         # Create dictionary and send in signal to controller
-        print("MODEL     : MoveCard: Sending stacks to CONTROLLER.");
+        print("MODEL     : MoveCard: Sending stacks to CONTROLLER.")
         self.com.updateStackSignal.emit(self.getStackDict())
         
         return self.findNumberOfCardsBeforeCardInStack(boardStacks.Deck, bottomDeckCard)
@@ -511,6 +517,11 @@ class boardModel(object):
         '''
         stackList = self.getStack(stack)
         stackSize = len(stackList)
+        
+        if(stackSize < 2):
+            # Trivially reversed.
+            return
+        
         card = stackList[stackSize - 1]
         nextCard = stackList[stackSize - 2]
         self.cardOrderDict[card] = (stack, nextCard)
