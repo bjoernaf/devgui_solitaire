@@ -171,7 +171,6 @@ class cardView(QGraphicsItem):
         '''
         self.parentItem().dragEnterEvent(event)
     
-    
     def dropEvent(self, event):
         '''
         Run when an accepted event is dropped on the card.
@@ -198,6 +197,12 @@ class cardView(QGraphicsItem):
             # Paint a rounded, anti-aliased rectangle representing the card
             painter.setPen(Qt.black)
             painter.setBrush(Qt.white)
+            
+            # Special color for tempStack when being dragged
+            if self.parentItem() != None:
+                if self.parentItem().id == boardStacks.boardStacks.tempStack:
+                    painter.setBrush(self.parentItem().paintColor)
+
             painter.drawRoundedRect(self.boundingRect(), self.cardXRad, self.cardYRad, Qt.AbsoluteSize)
     
             # Card value: Set font style and color
@@ -309,4 +314,16 @@ class cardView(QGraphicsItem):
         # Disable pulsating animation and reset it
         self.pulsateEffect.setEnabled(False)
         self.pulsateEffect.setBlurRadius(0)
+        
+    def updateToolTip(self):
+        '''
+        Updates tooltip to display appropriate text.
+        '''
+        # If card faces up, show no tooltip
+        if self.faceup == True:
+            self.setToolTip("")
+        else:
+            self.setToolTip("Double-click to flip card")
+            
+        
 

@@ -5,9 +5,9 @@ Created on 7 apr 2014
 '''
 
 from PyQt5.QtCore import Qt, QRectF, QPointF
-from PyQt5.QtGui import QPen
+from PyQt5.QtGui import QPen, QColor
 from PyQt5.QtWidgets import QGraphicsItem
-from view import communicator, cardView
+from view import communicator, feedbackWindow
 from model import boardStacks
 
 class stackView(QGraphicsItem):
@@ -60,9 +60,18 @@ class stackView(QGraphicsItem):
         self.com.moveCardSignal.connect(gameStateController.moveCard)
         
         # Accept drops on the stacks unless stack is the deck or the tempStack
-        if self.id != boardStacks.boardStacks.tempStack and self.id != boardStacks.boardStacks.Deck:
+        if self.id != boardStacks.boardStacks.tempStack:
             self.setAcceptDrops(True)
         
+        # If the stack is tempStack, create a feedbackWindow but hide it
+        if self.id == boardStacks.boardStacks.tempStack:
+            self.feedbackWindow = feedbackWindow.feedbackWindow("", self)
+            self.feedbackWindow.setPos(90,0)
+            self.feedbackWindow.setZValue(90)
+            self.feedbackWindow.hide()
+        
+        # Color to use for all cards in the stack
+        self.paintColor = Qt.white
         
     def updateStackList(self, cardList):
         '''
@@ -71,6 +80,17 @@ class stackView(QGraphicsItem):
         '''
         self.stackCardList = cardList
         self.setParents()
+
+        # If the stack is empty
+        if self.stackCardList == []:
+            # If the stack is a topStack
+            if self.id <= boardStacks.boardStacks.TopLL and self.id >= boardStacks.boardStacks.TopRR:
+                self.setToolTip("Place an Ace here.")
+            # If the stack is a bottomStack
+            elif self.id <= boardStacks.boardStacks.Bottom1 and self.id >= boardStacks.boardStacks.Bottom7:
+                self.setToolTip("Place a King here.")
+        else:
+            self.setToolTip("")
         
         
     def getid(self):
@@ -148,12 +168,16 @@ class stackView(QGraphicsItem):
                 cardId = int(rawMetaData[0])
                 fromStack = int(rawMetaData[1])
                 
-                # Ask model whether the move is valid or not, accept only if it is
-                if self.gameStateController.checkMove(fromStack, self.id, cardId) == True:
+                # Ask model whether the move is valid or not
+                moveAllowed, declineReason = self.gameStateController.checkMove(fromStack, self.id, cardId)
+                if moveAllowed == True:
+                    # If move is allowed, accept the event and paint tempStack green
                     event.accept()
                 else:
-                    # TODO: Ignore move if it is invalid, perhaps say that it's invalid in tooltip?
+                    # If move is not allowed, display reason and paint tempStack red
                     event.ignore()
+                    self.boardView.updateFeedbackWindow(declineReason)
+                    self.boardView.updatePaintColor(QColor(255, 100, 100, 220))
             else:
                 # Ignore move if invalid object is being dragged
                 event.ignore()
@@ -161,6 +185,7 @@ class stackView(QGraphicsItem):
             # Ignore move if object dragged originates from outside of Solitaire
             event.ignore()
             
+        QGraphicsItem.dragEnterEvent(self, event)
             
     def dropEvent(self, event):
         '''
@@ -225,8 +250,18 @@ class stackView(QGraphicsItem):
             
             # Update offset for next card
             offset_x += self.offset_x
-            offset_y += self.offset_y
+            # Reduce Y Offset if too many cards are on the stack
+            if len(self.stackCardList) > 7:
+                offset_y += self.offset_y/(len(self.stackCardList)*0.14)
+            else:
+                offset_y += self.offset_y
+                
+            # Increase index
             index += 1
+            
+            # If the card is the top card, set it's tooltip
+            if card == self.stackCardList[-1]:
+                self.boardView.cardList[card].updateToolTip()
             
         # Repaint stack
         self.update()
@@ -248,4 +283,29 @@ class stackView(QGraphicsItem):
         '''
         if self.stackCardList != []:
             return self.stackCardList[-1]
-                
+        
+    def updateFeedbackWindow(self, reason):
+        '''
+        Updates the text of the feedbackWindow and shows it.
+        '''
+        self.feedbackWindow.setPlainText(reason)
+        if not self.feedbackWindow.isVisible():
+            self.feedbackWindow.show()
+        
+    def hideFeedbackWindow(self):
+        '''
+        Hides the feedbackWindow if it is visible.
+        Calls paintColor to set white color.
+        '''
+        if self.feedbackWindow.isVisible():
+            self.feedbackWindow.hide()
+        
+        if self.paintColor != Qt.white:
+            self.updatePaintColor(Qt.white)
+        
+    def updatePaintColor(self, color):
+        '''
+        Sets the color the painter should use to
+        paint all cards with.
+        '''
+        self.paintColor = color

@@ -127,7 +127,6 @@ class gameStateController(object):
     def checkMove(self, fromStack, toStack, cardId):
         '''
         Function called from view requesting a check if move is valid or not.
-        TODO: Implement as signal, possibly not doable?
         '''
         return self.model.checkMove(fromStack, toStack, cardId)
 

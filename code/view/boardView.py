@@ -85,6 +85,7 @@ class boardView(QGraphicsView):
         print("Received update signal for card " + str(cardId))
         self.cardList[cardId].faceup = not self.cardList[cardId].faceup
         self.cardList[cardId].setFlag(QGraphicsItem.ItemIsMovable, self.cardList[cardId].faceup)
+        self.cardList[cardId].updateToolTip()
         
         '''
         if self.cardList[cardId].parentItem() != None:
@@ -507,3 +508,21 @@ class boardView(QGraphicsView):
         Returns the value of tutorialVisible
         '''
         return self.tutorialVisible
+    
+    def updateFeedbackWindow(self, feedback):
+        '''
+        Call for tempStack to display a window with feedback
+        '''
+        self.tempStackView.updateFeedbackWindow(feedback)
+        
+    def hideFeedbackWindow(self):
+        '''
+        Hides the feedback window
+        '''
+        self.tempStackView.hideFeedbackWindow()
+        
+    def updatePaintColor(self, color):
+        '''
+        Sets the paint color of the tempStack to color
+        '''
+        self.tempStackView.updatePaintColor(color)

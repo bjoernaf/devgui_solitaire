@@ -80,31 +80,36 @@ class boardModel(object):
         '''
         The rule checking function. This could be abstracted into a rule class.
         '''
-
-        # Drawable or Deck stack
-        if(toStack == -1 or toStack == -2):
-            return False
+        # If target is source, allow move
+        if fromStack == toStack:
+            return True, ""
+        # If target is Deck
+        if(toStack == -1):
+            return False, "Can't place cards on this stack!"
+        # If target is Drawable
+        elif(toStack == -2):
+            return False, "Can't place cards on this stack!"
         
-        # Top stacks
-        if(toStack >= -14 and toStack <= -11): 
+        # If target is one of the top stacks
+        elif(toStack >= -14 and toStack <= -11): 
             #You may not move more than one card each time to the top stacks
             if(self.cardOrderDict[card][1] != None):
-                return False
+                return False, "Move one card at a time to this stack!"
             
             topCard = self.findTopCardInStack(toStack)
             
             if(topCard == None):
                 # Only aces are accepted as first card
                 if(self.cardList[card].value != 1):
-                    return False            
+                    return False, "Only an Ace can be placed at the bottom of this stack!"         
             else:
                 # The cards must be the same color
                 if(self.cardList[card].color != self.cardList[topCard].color):
-                    return False
+                    return False, "Only cards of the same color allowed!"
                 
                 # The order must be increasing
                 if(self.cardList[card].value - self.cardList[topCard].value != 1):
-                    return False
+                    return False, "Cards must be placed in increasing order!"
         
         # Bottom stacks
         else:               
@@ -114,10 +119,10 @@ class boardModel(object):
             if(topCard == None):
                 if(card != 12 and card != 25 and card != 38 and card != 51):
                     # Can only place kings as root of bottom stacks.
-                    return False            
+                    return False, "Only a King can be placed at the bottom of this stack!"           
             else:
                 if(self.cardFaceUp[topCard] == False):
-                    return False
+                    return False, "Flip this card first!"
                 
                 color1 = self.cardList[topCard].color
                 color2 = self.cardList[card].color
@@ -127,18 +132,18 @@ class boardModel(object):
                 #only allow placing of cards of different color and value 1
                 if(color1 == 1):
                     if(indexdif != 12 and indexdif != 25):
-                        return False
+                        return False, "Cards in decreasing order only!"
                 elif(color1 == 2):
                     if(indexdif != -14 and indexdif != 25):
-                        return False
+                        return False, "Cards in decreasing order only!"
                 elif(color1 == 3):
                     if(indexdif != -27 and indexdif != 12):
-                        return False
+                        return False, "Cards in decreasing order only!"
                 elif(color1 == 4):
                     if(indexdif != -14 and indexdif != -27):
-                        return False       
+                        return False, "Cards in decreasing order only!"
            
-        return True
+        return True, ""
     
     
     def turnCard(self, cardId): 

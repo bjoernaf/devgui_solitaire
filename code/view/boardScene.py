@@ -31,6 +31,7 @@ class boardScene(QGraphicsScene):
             if event.mimeData().hasText() and "," in event.mimeData().text():
                 # Update position of the dragStack
                 self.boardView.tempStackView.updatePos(event.scenePos())
+                self.boardView.hideFeedbackWindow()
         
         # Call super        
         QGraphicsScene.dragMoveEvent(self, event)
