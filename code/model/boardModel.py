@@ -28,6 +28,7 @@ class boardModel(object):
         self.com.updateStackSignal.connect(gameStateController.updateControllerStacks)
         self.com.updateCardSignal.connect(gameStateController.updateControllerCard)
         self.com.updateAllCardsSignal.connect(gameStateController.updateControllerAllCards)
+        self.com.gameWonSignal.connect(gameStateController.gameWonSlot)
         
         #cardList contains a list of all cards present in the game, and is used to reference cards by id numbers.
         self.cardList = list()
@@ -56,21 +57,20 @@ class boardModel(object):
     def checkWin(self):
         '''
         Checks if the board is in a winning state.
-        This is a sketch. It has not been tested.
         '''
         
         #For each of the top stacks
-        for i in range(-14, -11):
-            topCard = self.findTopCardInStack(i)
-            if(topCard != None):
-                card = topCard
-                count = 0
+        count = 0
+        for i in range(-14, -10):
+            rootCard = self.findRootCardInStack(i)
+            if(rootCard != None):
+                count += 1
+                card = rootCard
                 while(self.cardOrderDict[card][1] == card+1):
                     card = self.cardOrderDict[card][1]
                     count += 1
-                if(count > 11):
-                    return True
-            return False 
+        print("MODEL     : checkWin:", count, "of 52 cards in winning position.")
+        return (count == 52) # True if all cards counted
     
     
     def checkMove(self, fromStack, toStack, card):
@@ -247,9 +247,10 @@ class boardModel(object):
             print("MODEL     : MoveCard: Sending stacks to CONTROLLER.")
             self.com.updateStackSignal.emit(self.getStackDict())
         
+        # Send the gameWon signal if this move finishes the game.
         if(self.checkWin()):
             print("YOU WIN!")
-            #do something here
+            self.com.gameWonSignal.emit()
         
         return True
         

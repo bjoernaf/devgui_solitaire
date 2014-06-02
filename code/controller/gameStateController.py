@@ -144,6 +144,13 @@ class gameStateController(object):
         self.model = boardModel.boardModel(self)
     
     
+    def gameWonSlot(self):
+        '''
+        Slot that listens to the model.communicator.gameWonSignal
+        '''
+        self.solWin.showGameWonDialog()
+    
+    
     def beginFlipMacro(self):
         self.undoStack.beginMacro("Flip cards")
     

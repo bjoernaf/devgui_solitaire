@@ -199,6 +199,7 @@ class solitaireWindow(QMainWindow):
         else:
             return False
         
+        
     def newGame(self):
         '''
         Creates a QMessageBox that prompts user if they wish to start a
@@ -207,6 +208,20 @@ class solitaireWindow(QMainWindow):
         '''
         reply = QMessageBox.question(self, "Start new game?",
                                      "Do you want to abandon your current session and start a new game?",
+                                     QMessageBox.Yes | QMessageBox.No)
+        
+        if reply == QMessageBox.Yes:
+            self.com.newGameSignal.emit()
+            
+            
+    def showGameWonDialog(self):
+        '''
+        Creates a QMessageBox that informs the user that the game has been won, 
+        and prompts user if they wish to start a new game. If reply is yes,
+        current game is destroyed and a new game is set up.
+        '''
+        reply = QMessageBox.question(self, "Game Won!",
+                                     "You have won the game! Do you wish to play again?",
                                      QMessageBox.Yes | QMessageBox.No)
         
         if reply == QMessageBox.Yes:

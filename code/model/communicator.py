@@ -14,6 +14,7 @@ class communicator(QObject):
     updateStackSignal = pyqtSignal(dict, name='updateSignal')
     updateCardSignal = pyqtSignal(int, name='updateCardSignal')
     updateAllCardsSignal = pyqtSignal(list, name='updateAllCardsSignal')
+    gameWonSignal = pyqtSignal(name='gameWonSignal')
 
     def __init__(self):
         '''
