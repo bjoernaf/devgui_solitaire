@@ -7,7 +7,7 @@ Created on 13 apr 2014
 
 from PyQt5.QtCore import (QSettings, QSize, QVariant, QPoint, Qt)
 from PyQt5.QtWidgets import (QMainWindow, QAction, QMessageBox, QToolBar)
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QFont
 
 from view import boardView, transSlider, controlPanel, communicator
 
@@ -244,7 +244,7 @@ class solitaireWindow(QMainWindow):
         '''
         Creates a QMessageBox displaying info about Solitaire.
         '''
-        text = ("<html><body style=\"font-size:11px\"><center>"
+        text = ("<html><body style=\"font-size:11px;font-family:arial;\"><center>"
                 "<h3>Solitaire version 1.0</h3>" 
                 "<p>By Group 13 for<br>" 
                 "User Interface Programming II<br>"
