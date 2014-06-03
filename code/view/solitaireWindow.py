@@ -244,17 +244,17 @@ class solitaireWindow(QMainWindow):
         '''
         Creates a QMessageBox displaying info about Solitaire.
         '''
-        text = ("<html><body><center>" +
-                "<h3>Solitaire version 1.0</h3>" + 
-                "<p>By Group 13 for<br>" + 
-                "User Interface Programming II<br>" +
-                "Uppsala University 2014<p>" +
-                "<p>Bjorn Forsberg<br>" +
-                "Martin Kjellin<br>" +
-                "Sven Lundgren<br>" +
-                "Max Pihlstrom</p>" +
-                "<p>Source code can be found " +
-                "<a href=\"https://github.com/bjoernaf/devgui_solitaire\">here</a>.</p>" +
+        text = ("<html><body style=\"font-size:11px\"><center>"
+                "<h3>Solitaire version 1.0</h3>" 
+                "<p>By Group 13 for<br>" 
+                "User Interface Programming II<br>"
+                "Uppsala University 2014<p>"
+                "<p>Bjorn Forsberg<br>"
+                "Martin Kjellin<br>"
+                "Sven Lundgren<br>"
+                "Max Pihlstrom</p>"
+                "<p>Source code available "
+                "<a href=\"https://github.com/bjoernaf/devgui_solitaire\">here</a>.</p>"
                 "</center></body></html>")
         
         QMessageBox.about(self, "About Solitaire", text)
