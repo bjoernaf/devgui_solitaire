@@ -143,25 +143,32 @@ class cardView(QGraphicsItem):
         This is called when an object is moved with the mouse pressed down.
         A drag event is created.
         '''
+        
+        # Only allow the topmost card in Drawable to be dragged.
+        if((self.parentItem().id == boardStacks.boardStacks.Drawable and self.id == self.parentItem().topCardId()) or self.parentItem().id != boardStacks.boardStacks.Drawable):
                 
-        # Create a drag event with attached mime data containing the card id and fromstack
-        drag = QDrag(event.widget())
-        mime = QMimeData()
-        drag.setMimeData(mime)
-        mime.setText(str(self.id) + "," + str(self.parentItem().id))
+            # Create a drag event with attached mime data containing the card id and fromstack
+            drag = QDrag(event.widget())
+            mime = QMimeData()
+            drag.setMimeData(mime)
+            mime.setText(str(self.id) + "," + str(self.parentItem().id))
         
-        # Signal emitted when target of drop changes (to none specifically)
-        drag.targetChanged.connect(self.illegalDropSlot)
+            # Signal emitted when target of drop changes (to none specifically)
+            drag.targetChanged.connect(self.illegalDropSlot)
         
-        # Put the dragged cards on the temp stack, to draw under mouse cursor.
-        self.boardView.updateTempStack(self.id, self.parentItem().id)
+            # Put the dragged cards on the temp stack, to draw under mouse cursor.
+            self.boardView.updateTempStack(self.id, self.parentItem().id)
         
-        # Show the dragCardStackView (tempStack)
-        self.boardView.tempStackVisible(True)
+            # Show the dragCardStackView (tempStack)
+            self.boardView.tempStackVisible(True)
         
-        #Execute drag etc
-        drag.exec_()
-        self.setCursor(Qt.OpenHandCursor)
+            #Execute drag etc
+            drag.exec_()
+            self.setCursor(Qt.OpenHandCursor)
+        
+        else:
+        
+            print("CARDVIEW  : mouseMoveEvent: Can only draw top card from Drawable stack.")
         
         
     def dragEnterEvent(self, event):
