@@ -38,7 +38,7 @@ class solitaireWindow(QMainWindow):
         
         # Get size and position, resize and move accordingly
         size = settings.value("MainWindow/Size", QSize(900,600))
-        position = settings.value("MainWindow/Position", QVariant(QPoint(0, 0)))
+        position = settings.value("MainWindow/Position", QPoint(0, 0))
         self.resize(size)
         self.move(position)
         
@@ -171,10 +171,10 @@ class solitaireWindow(QMainWindow):
             
             # Store settings
             settings = QSettings()
-            settings.setValue("MainWindow/Size", QVariant(self.size()))
-            settings.setValue("MainWindow/Position", QVariant(self.pos()))
-            settings.setValue("ControlPanel/Position", QVariant(self.controlPanel.pos()))
-            settings.setValue("TransparencySlider/Position", QVariant(self.bView.getOpacity()))
+            settings.setValue("MainWindow/Size", self.size())
+            settings.setValue("MainWindow/Position", self.pos())
+            settings.setValue("ControlPanel/Position", self.controlPanel.pos())
+            settings.setValue("TransparencySlider/Position", self.bView.getOpacity())
         else:
             event.ignore()
          

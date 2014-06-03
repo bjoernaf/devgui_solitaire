@@ -64,7 +64,7 @@ class controlPanel(QDialog):
         self.frame.setLayout(self.layout)
         
         # Get position, and move window accordingly
-        position = self.settings.value("ControlPanel/Position", QVariant(QPoint(0, 0)))
+        position = self.settings.value("ControlPanel/Position", QPoint(0, 0))
         self.move(position)
         
     
@@ -103,7 +103,7 @@ class controlPanel(QDialog):
         
         # Get stored theme from settings, enable the correct theme
         # and set the correct button
-        theme = self.settings.value("ControlPanel/Theme", QVariant(1))
+        theme = self.settings.value("ControlPanel/Theme", 1)
         self.updateTheme(theme)
         if theme == 1:
             self.redBackButton.setChecked(True)
