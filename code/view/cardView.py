@@ -103,7 +103,11 @@ class cardView(QGraphicsItem):
         Override mousePressEvent.
         Changes cursor style when appropriate.
         '''
-        if self.cursor() == Qt.OpenHandCursor:
+        parentStack = self.parentItem()
+        # Complicated way of checking if the standard cursor of the card is an open hand
+        if (self.faceup == True and
+            not (parentStack.getid() == boardStacks.boardStacks.Drawable and
+                 self.id != parentStack.topCardId())):
             self.setCursor(Qt.ClosedHandCursor)
         QGraphicsItem.mousePressEvent(self, event)
     

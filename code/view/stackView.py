@@ -34,7 +34,7 @@ class stackView(QGraphicsItem):
     distance_y = 5
 
 
-    def __init__(self, boardView, gameStateController, id,
+    def __init__(self, boardView, gameStateController, stackId,
                  x_offset = 0, y_offset = 30, faceUp = True):
         '''
         Constructor:
@@ -43,7 +43,7 @@ class stackView(QGraphicsItem):
         super(stackView, self).__init__()
         
         # The id of the stack (negative int as defined in boardStacks)
-        self.id = id
+        self.id = stackId
 
         # The cards in the stack.
         self.stackCardList = list()
@@ -76,6 +76,7 @@ class stackView(QGraphicsItem):
         
         # Color to use for all cards in the stack
         self.paintColor = Qt.white
+        
         
     def updateStackList(self, cardList):
         '''
@@ -192,7 +193,8 @@ class stackView(QGraphicsItem):
             event.ignore()
             
         QGraphicsItem.dragEnterEvent(self, event)
-            
+        
+        
     def dropEvent(self, event):
         '''
         DropEvent when an item is dropped on the stack
@@ -220,7 +222,7 @@ class stackView(QGraphicsItem):
         Sets the stack as parent for all cards.
         Sets the position of the cards to display a stack properly.
         Makes sure the cards are displayed in the correct order.
-        Sets movability and cursor of the cards depending on the stack type.
+        Sets movability and cursor of the cards.
         '''
         # Base offset for first card in a stack
         offset_x = self.distance_x
@@ -233,25 +235,14 @@ class stackView(QGraphicsItem):
             self.boardView.cardList[card].setParentItem(self)
             self.boardView.cardList[card].setZValue(index)
             
-            # If the stack is Drawable and the card is not the topmost
-            # one, cards are not movable and use an arrow cursor.
-            if self.id == boardStacks.boardStacks.Drawable and card != self.topCardId():
-                self.boardView.cardList[card].setFlag(QGraphicsItem.ItemIsMovable,
-                                                      False)
+            # Set the cursor of the card
+            if (self.boardView.cardList[card].faceup == False or
+                 (self.id == boardStacks.boardStacks.Drawable and card != self.topCardId())):
+                self.boardView.cardList[card].setFlag(QGraphicsItem.ItemIsMovable, False)
                 self.boardView.cardList[card].setCursor(Qt.ArrowCursor)
-                
-            # For all other stacks, cards are movable and use an openHandCursor
-            # if they have their faces up. Otherwise, they are not movable and use
-            # an arrow cursor.
             else:
-                if self.boardView.cardList[card].faceup == True:
-                    self.boardView.cardList[card].setFlag(QGraphicsItem.ItemIsMovable,
-                                                          True)
-                    self.boardView.cardList[card].setCursor(Qt.OpenHandCursor)
-                else:
-                    self.boardView.cardList[card].setFlag(QGraphicsItem.ItemIsMovable,
-                                                          False)
-                    self.boardView.cardList[card].setCursor(Qt.ArrowCursor)
+                self.boardView.cardList[card].setFlag(QGraphicsItem.ItemIsMovable, True)
+                self.boardView.cardList[card].setCursor(Qt.OpenHandCursor)
             
             # Inherit drop capabilities from the stack
             self.boardView.cardList[card].setAcceptDrops(self.acceptDrops())
