@@ -227,14 +227,16 @@ class stackView(QGraphicsItem):
             self.boardView.cardList[card].setParentItem(self)
             self.boardView.cardList[card].setZValue(index)
             
-            # If the stack is the Deck, cards are not movable and use an arrow cursor.
-            if self.id == boardStacks.boardStacks.Deck:
+            # If the stack is Drawable and the card is not the topmost
+            # one, cards are not movable and use an arrow cursor.
+            if self.id == boardStacks.boardStacks.Drawable and card != self.topCardId():
                 self.boardView.cardList[card].setFlag(QGraphicsItem.ItemIsMovable,
                                                       False)
                 self.boardView.cardList[card].setCursor(Qt.ArrowCursor)
                 
-            # For all other stacks, cards are movable and use an openHandCursor.
-            # Cards are movable only if faceup == True
+            # For all other stacks, cards are movable and use an openHandCursor
+            # if they have their faces up. Otherwise, they are not movable and use
+            # an arrow cursor.
             else:
                 if self.boardView.cardList[card].faceup == True:
                     self.boardView.cardList[card].setFlag(QGraphicsItem.ItemIsMovable,
@@ -259,7 +261,7 @@ class stackView(QGraphicsItem):
             # Increase index
             index += 1
             
-            # If the card is the top card, set it's tooltip
+            # If the card is the top card, set its tooltip
             if card == self.stackCardList[-1]:
                 self.boardView.cardList[card].updateToolTip()
             

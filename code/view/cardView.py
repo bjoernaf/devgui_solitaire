@@ -104,7 +104,7 @@ class cardView(QGraphicsItem):
         '''
         Override mousePressEvent
         '''
-        if self.faceup == True:
+        if self.cursor() == Qt.OpenHandCursor:
             self.setCursor(Qt.ClosedHandCursor)
         QGraphicsItem.mousePressEvent(self, event)
     
@@ -144,40 +144,34 @@ class cardView(QGraphicsItem):
         A drag event is created.
         '''
         
-        # Only allow the topmost card in Drawable to be dragged.
-        if((self.parentItem().id == boardStacks.boardStacks.Drawable and self.id == self.parentItem().topCardId()) or self.parentItem().id != boardStacks.boardStacks.Drawable):
-                
-            # Create a drag event with attached mime data containing the card id and fromstack
-            drag = QDrag(event.widget())
-            mime = QMimeData()
-            drag.setMimeData(mime)
-            mime.setText(str(self.id) + "," + str(self.parentItem().id))
+        # Create a drag event with attached mime data containing the card id and fromstack
+        drag = QDrag(event.widget())
+        mime = QMimeData()
+        drag.setMimeData(mime)
+        mime.setText(str(self.id) + "," + str(self.parentItem().id))
+    
+        # Signal emitted when target of drop changes (to none specifically)
+        drag.targetChanged.connect(self.illegalDropSlot)
+    
+        # Put the dragged cards on the temp stack, to draw under mouse cursor.
+        self.boardView.updateTempStack(self.id, self.parentItem().id)
+    
+        # Show the dragCardStackView (tempStack)
+        self.boardView.tempStackVisible(True)
+    
+        # Execute drag etc
+        drag.exec_()
+        self.setCursor(Qt.OpenHandCursor)
         
-            # Signal emitted when target of drop changes (to none specifically)
-            drag.targetChanged.connect(self.illegalDropSlot)
-        
-            # Put the dragged cards on the temp stack, to draw under mouse cursor.
-            self.boardView.updateTempStack(self.id, self.parentItem().id)
-        
-            # Show the dragCardStackView (tempStack)
-            self.boardView.tempStackVisible(True)
-        
-            #Execute drag etc
-            drag.exec_()
-            self.setCursor(Qt.OpenHandCursor)
-        
-        else:
-        
-            print("CARDVIEW  : mouseMoveEvent: Can only draw top card from Drawable stack.")
-        
-        
+            
     def dragEnterEvent(self, event):
         '''
         Run when a drag object enters the bounding rectangle of a card.
         Forward event to the parent of the card, the stack it's currently on.
         '''
         self.parentItem().dragEnterEvent(event)
-    
+        
+        
     def dropEvent(self, event):
         '''
         Run when an accepted event is dropped on the card.
@@ -237,8 +231,9 @@ class cardView(QGraphicsItem):
         '''
         Returns a bounding rectangle covering the entire card.
         '''
-        return QRectF(0, 0, self.cardWidth, self.cardHeight)    
-    
+        return QRectF(0, 0, self.cardWidth, self.cardHeight)
+        
+        
     def loadImage(self, color):
         '''
         Loads an image from file with color.png as filename.
@@ -249,6 +244,7 @@ class cardView(QGraphicsItem):
         self.image = self.image.scaled(self.imageSize, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
         if self.image.isNull():
             print("CARDVIEW  : loadImage: Error loading image")
+        
             
     def rotate(self):
         '''
@@ -267,6 +263,7 @@ class cardView(QGraphicsItem):
                 12: "Q",
                 13: "K",
                 }.get(value, str(value))
+        
              
     def hoverEnterEvent(self, event):
         '''
@@ -275,6 +272,7 @@ class cardView(QGraphicsItem):
         # Add the card to the pulsating animation engine list
         self.boardView.animationEngine.addPulsating(self)
         
+        
     def hoverLeaveEvent(self, event):
         '''
         Catches when the mouse leaves the hover area above the cardView.
@@ -282,6 +280,7 @@ class cardView(QGraphicsItem):
         # Remove the card from the pulsating animation engine list
         self.boardView.animationEngine.removePulsating(self)
         self.resetAnimation()
+        
         
     def pulsate(self):
         '''
@@ -313,6 +312,7 @@ class cardView(QGraphicsItem):
         if self.pulsateEffect.isEnabled() == False:
             self.pulsateEffect.setEnabled(True)
         
+        
     def resetAnimation(self):
         '''
         Resets all animations to original state.
@@ -321,6 +321,7 @@ class cardView(QGraphicsItem):
         # Disable pulsating animation and reset it
         self.pulsateEffect.setEnabled(False)
         self.pulsateEffect.setBlurRadius(0)
+        
         
     def updateToolTip(self):
         '''
@@ -331,6 +332,3 @@ class cardView(QGraphicsItem):
             self.setToolTip("")
         else:
             self.setToolTip("Double-click to flip card")
-            
-        
-
