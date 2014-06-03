@@ -60,6 +60,11 @@ class solitaireWindow(QMainWindow):
         self.toolbar.addSeparator()
         self.toolbar.addWidget(self.slide)
         self.addToolBar(Qt.TopToolBarArea, self.toolbar)
+        
+        self.icon = QIcon("images/1_small.png")
+        print(self.icon)
+        self.setWindowIcon(self.icon)
+        print(self.windowIcon())
 
 
     def openControlPanel(self):
@@ -146,8 +151,17 @@ class solitaireWindow(QMainWindow):
         self.tutorialAction.setEnabled(True)
         self.tutorialAction.triggered.connect(self.toggleTutorial)
         
+        self.aboutAction = QAction('About Solitaire', self)
+        self.aboutAction.setEnabled(True)
+        self.aboutAction.triggered.connect(self.about)
+        
+        self.aboutQtAction = QAction('About Qt', self)
+        self.aboutQtAction.setEnabled(True)
+        self.aboutQtAction.triggered.connect(self.aboutQt)
+        
         helpMenu.addAction(self.tutorialAction)
-        helpMenu.addAction('About')
+        helpMenu.addAction(self.aboutAction)
+        helpMenu.addAction(self.aboutQtAction)
     
     
     def toggleTutorial(self):
@@ -226,3 +240,26 @@ class solitaireWindow(QMainWindow):
         
         if reply == QMessageBox.Yes:
             self.com.newGameSignal.emit()
+            
+    def about(self):
+        '''
+        Creates a QMessageBox displaying info about Solitaire.
+        '''
+        text = ("<html><body><center>" +
+                "<h3>Solitaire version 1.0</h3>" + 
+                "<p>By Group 13 for<br>" + 
+                "User Interface Programming II<br>" +
+                "Uppsala University 2014<p>" +
+                "<p>Bjorn Forsberg<br>" +
+                "Martin Kjellin<br>" +
+                "Sven Lundgren<br>" +
+                "Max Pihlstrom</p>" +
+                "</center></body></html>")
+        
+        QMessageBox.about(self, "About Solitaire", text)
+        
+    def aboutQt(self):
+        '''
+        Creates a QMessageBox displaying info about Qt.
+        '''
+        QMessageBox.aboutQt(self)
