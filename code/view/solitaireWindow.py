@@ -253,6 +253,8 @@ class solitaireWindow(QMainWindow):
                 "Martin Kjellin<br>" +
                 "Sven Lundgren<br>" +
                 "Max Pihlstrom</p>" +
+                "<p>Source code can be found " +
+                "<a href=\"https://github.com/bjoernaf/devgui_solitaire\">here</a>.</p>" +
                 "</center></body></html>")
         
         QMessageBox.about(self, "About Solitaire", text)
