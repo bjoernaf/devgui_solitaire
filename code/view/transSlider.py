@@ -11,14 +11,13 @@ from view import communicator
 class transSlider(QSlider):
     '''
     Slider to set the transparency of cards.
-    TODO: Change to move cards only later?
     '''
     
     classCom = communicator.communicator()
     
     def __init__(self, boardView):
         '''
-        Constructor, creates the slider and sets it's value to opacity stored in gsc
+        Constructor, creates the slider and sets it's value to opacity stored in settings.
         '''
         super(transSlider, self).__init__(Qt.Horizontal)
         self.boardView = boardView
@@ -28,7 +27,7 @@ class transSlider(QSlider):
         self.setMinimum(0)
         self.setMaximum(100)
         
-        # Initialize settings and retreive saved opacity value (maximum as backup)
+        # Initialize settings and retrieve saved opacity value (maximum as backup)
         settings = QSettings()
         startOpacity = int(settings.value("TransparencySlider/Position", self.maximum()))
         self.setSliderPosition(startOpacity)
@@ -52,7 +51,6 @@ class transSlider(QSlider):
         self.setToolTip(self.toolTipString)
         
         # Set the opacity of cards
-        # TODO: Make boardView static and set it once in spreadValue instead?
         self.boardView.setOpacity(value)
         
         # Set slider position (since the value might have moved in other instance)

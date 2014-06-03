@@ -2,7 +2,6 @@
 Created on 7 apr 2014
 
 @author: Sven, Bjorn, Martin
-glassView is an QGraphicsItem representing a tutorial. 
 '''
 
 from PyQt5.QtCore import Qt, QRectF, QMimeData, QPointF, QSize
@@ -11,17 +10,17 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsDropShadowEffect
 
 class glassView(QGraphicsItem):
     '''
-    Class to create and display one single card in the QGraphicsView
+    glassView is a QGraphicsItem representing a tutorial.
     '''
 
     def __init__(self, gameStateController, boardView, width, height):
         '''
         Constructor:
-        Creates a Card in the GraphicsView.
-        Also loads the appropriate image for the card.
+        Creates the glassView and stores parameters
         '''
         super(glassView, self).__init__()
         
+        # Save height and width
         self.height = height
         self.width = width
         
@@ -72,7 +71,7 @@ class glassView(QGraphicsItem):
     def resizeEvent(self, event):
         '''
         Override of resizeEvent.
-        Called from boardView to match size of scene and glass pane
+        Keeps size relation with called (boardView).
         '''
         # Get scene position
         x = self.scenePos().x()

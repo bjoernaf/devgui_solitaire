@@ -2,10 +2,6 @@
 Created on 7 apr 2014
 
 @author: Sven, Bjorn, Martin
-
-boardView is a QGraphicsView representing a solitaire board.
-The boardView contains a QGraphicsScene that displays stacks
-(created in stackView.py) of cards (created in cardView.py).
 '''
 
 from PyQt5.QtCore import Qt, QPointF
@@ -17,15 +13,18 @@ from animation import animationEngine
 
 class boardView(QGraphicsView):
     '''
-    classdocs
+    boardView is a QGraphicsView representing a solitaire board.
+    The boardView contains a QGraphicsScene that displays stacks
+    (created in stackView.py) of cards (created in cardView.py).
     '''
     
         
     def __init__(self, windowWidth, windowHeight, gameStateController):
         '''
         Constructor:
+        Creates cards (cardView) and adds them to cardList.
         Creates a graphicsScene, calls drawContent and sets the scene
-        as active scene in boardView
+        as active scene in boardView.
         '''
         super(boardView,self).__init__()
         
@@ -41,8 +40,10 @@ class boardView(QGraphicsView):
                                                        index, False))
                 index += 1
         
+        # Store a reference to gameStateController
         self.gameStateController = gameStateController
         
+        # Create a communicator and connect relevant signals to slots
         self.com = communicator.communicator()
         self.com.moveCardSignal.connect(gameStateController.moveCard)
         
@@ -61,7 +62,8 @@ class boardView(QGraphicsView):
     
     def updateAllCards(self, cardFaceUp):
         '''
-        Slot for signal which updates the facing of the cards
+        Slot for signal which updates the facing of all cards in cardList,
+        and sets their movable flag to the value of faceup.
         '''
         # Loop over all cards
         for cardId in range(0, 52):
@@ -80,36 +82,29 @@ class boardView(QGraphicsView):
     
     def updateCard(self, cardId):
         '''
-        Slot for signal which updates the facing of one card
+        Slot for signal which updates the facing of one card,
+        and sets it's movable flag to the value of faceUp.
+        Also calls for a card tooltip update.
         '''
         print("Received update signal for card " + str(cardId))
         self.cardList[cardId].faceup = not self.cardList[cardId].faceup
         self.cardList[cardId].setFlag(QGraphicsItem.ItemIsMovable, self.cardList[cardId].faceup)
-        self.cardList[cardId].updateToolTip()
-        
-        '''
-        if self.cardList[cardId].parentItem() != None:
-                # If not in Deck, set correct itemIsMovable
-                if self.cardList[cardId].parentItem().id != boardStacks.boardStacks.Deck:
-                    self.cardList[cardId].setFlag(QGraphicsItem.ItemIsMovable, self.cardList[cardId].faceup)
-                # Else, set itemIsMovable to false
-                else:
-                    self.cardList[cardId].setFlag(QGraphicsItem.ItemIsMovable, False)
-        '''
-           
+        self.cardList[cardId].updateToolTip()   
         
     def updateStacks(self, stacks):
         '''
-        Slot for signal in controller. Receives new stack content if changes have
-        occurred. Notifies each stack of its new content.
+        Slot for an update signal in Controller.
+        @param stacks: The card stack structure
+        Calls for each stack to update the list of cards
+        belonging to that stack.
         '''
         print("BOARDVIEW : updateStacks: New stacks from MODEL:", stacks)
         
         # Clear the temp stack.
         self.clearTempStack()
         
+        # Iterate over all stacks
         for key in stacks.keys():
-            
             if(key == boardStacks.boardStacks.Deck):
                 self.deckStackView.updateStackList(stacks[key])
             elif(key == boardStacks.boardStacks.Drawable):
@@ -149,7 +144,7 @@ class boardView(QGraphicsView):
                 
     def drawContent(self, gameStateController):
         '''
-        set up the graphics scene and add items to it
+        Adds glassView and all stacks to the scene.
         '''
         
         #Set background color to dark green
@@ -249,15 +244,15 @@ class boardView(QGraphicsView):
     
     def flipCards(self):
         '''
-        Flips new cards from Deck to Drawable
+        Flips up to three cards from stack Deck to stack Drawable.
         '''
         
-        # Disables interaction during the flip
+        # Disables scene interaction during the flip
         items = self.scene.items()
         for item in items:
             item.setEnabled(False)
         
-        # Detach the cards to flip from the Deck
+        # Detach the correct number of cards to flip from the Deck
         oldDeckStack = self.deckStackView.getStack()
         oldDeckStackLength = len(oldDeckStack)
         if oldDeckStackLength < 3:
@@ -280,7 +275,7 @@ class boardView(QGraphicsView):
             flipCardId = oldDeckStack[i]
             flipCard = self.cardList[flipCardId]
             flipCard.setParentItem(None)
-            flipCard.hoverLeaveEvent(0)
+            flipCard.hoverLeaveEvent(0) # Forces removal from pulsating animation list.
             flipCards.append(flipCard)
         flipCards.reverse()
         
@@ -289,7 +284,7 @@ class boardView(QGraphicsView):
         
         # Pass the cards to flip, the start stack, the end stack,
         # the end position, and the scale step to the animation engine
-        scaleStep = -0.05
+        scaleStep = -0.05 # Determines how quick the animation is
         self.animationEngine.addFlippingCards(flipCards, boardStacks.boardStacks.Deck,
                                               boardStacks.boardStacks.Drawable,
                                               startPos, endPos, cardOffsetX, scaleStep)
@@ -357,15 +352,13 @@ class boardView(QGraphicsView):
             print("BOARDVIEW : UpdateTempStack: INVALID STACK!!", stackid)
             return
         
-        # TODO: Purpouse of line below? Does not work unless commented
-        #self.tempStackView.updateStackList([cardid])
         self.tempStackRoot = cardid
         self.tempStackFromStack = stackid
         
     
     def cancelTempStack(self):
         '''
-        Return the data on the temp stack to the previous stack.
+        Return the data on the temp stack to the stack it came from.
         '''
         
         if(self.tempStackRoot > 0):
@@ -405,7 +398,7 @@ class boardView(QGraphicsView):
     
     def clearTempStack(self):
         '''
-        Clear the temporary stack.
+        Clear the tempStack.
         '''
         self.tempStackView.updateStackList([])
         self.tempStackRoot = -1
@@ -421,7 +414,7 @@ class boardView(QGraphicsView):
         elif isVisible == False:
             self.tempStackView.hide()
         else:
-            print("Error")
+            print("STACKVIEW : TEMPSTACK: Error")
         
 
     def splitStackOnCard(self, cardid, stack):
@@ -436,7 +429,8 @@ class boardView(QGraphicsView):
     def resizeEvent(self, event):
         '''
         Override of resizeEvent.
-        Called from solWin, forwards resizeEvent to scene and glassView.
+        Forwards resizeEvent to scene and glassView
+        to ensure the size relation is kept.
         '''
         self.scene.resizeEvent(event)
         self.glassView.resizeEvent(event)
@@ -453,7 +447,7 @@ class boardView(QGraphicsView):
 
     def setOpacity(self, opacity):
         '''
-        Set the opacity of cards.
+        Set the opacity of cards, then trigger a repaint of all cards.
         '''
         
         self.cardOpacity = opacity
@@ -470,13 +464,15 @@ class boardView(QGraphicsView):
     def setBackImage(self, image):
         '''
         Sets the back image according to images/image.png
-        Also acts as receiving slot from control panel
+        Also acts as receiving slot from control panel theme selection.
         '''
         self.backImage = QImage("images/" + image + ".png")
         if self.backImage != None:
+            # Scale image to fit card
             self.backImage = self.backImage.scaled(80, 120, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
         else:
             print("BOARDVIEW : ERROR loading back image.")
+        # Trigger repaint of all cards
         self.repaintCards()
 
     def showTutorial(self):
@@ -502,13 +498,13 @@ class boardView(QGraphicsView):
     
     def updateFeedbackWindow(self, feedback):
         '''
-        Call for tempStack to display a window with feedback
+        Call for tempStack to display a window with card move info feedback.
         '''
         self.tempStackView.updateFeedbackWindow(feedback)
         
     def hideFeedbackWindow(self):
         '''
-        Hides the feedback window
+        Call for tempStack to hide the feedback window.
         '''
         self.tempStackView.hideFeedbackWindow()
         

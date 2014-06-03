@@ -4,25 +4,15 @@ Created on 13 apr 2014
 @author: Sven, Bjorn, Max
 '''
 
-'''
-Basic imports, save to use later.
-from PyQt5.QtCore import (QLineF, QMimeData, QPoint, QPointF, qrand, QRectF,
-        qsrand, Qt, QTime, QTimeLine)
-from PyQt5.QtGui import (QBrush, QColor, QDrag, QImage, QPainter, QPen,
-        QPixmap, QTransform, QFont)
-from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsTextItem, QGraphicsScene, QGraphicsView, QApplication)
-'''
+from PyQt5.QtCore import (QSettings, QPoint)
+from PyQt5.QtWidgets import (QDialog, QFrame, QVBoxLayout, QLabel, QButtonGroup, QRadioButton)
 
-from PyQt5.QtCore import (QSettings, QSize, QVariant, QPoint, Qt)
-from PyQt5.QtWidgets import (QDialog, QAction, QLabel, QFrame, QVBoxLayout, QLabel, QButtonGroup, QRadioButton)
-from PyQt5.QtGui import QIcon
-
-from view import boardView
 from view import transSlider
 
 class controlPanel(QDialog):
     '''
     Control panel dialog.
+    Contains card opacity slider and theme selection.
     '''
     
     winTitle = "Control panel"
@@ -30,7 +20,8 @@ class controlPanel(QDialog):
 
     def __init__(self, boardView):
         '''
-        Init function
+        Constructor:
+        Creates the control panel and adds content.
         '''
         
         super(controlPanel,self).__init__()
@@ -61,9 +52,10 @@ class controlPanel(QDialog):
         self.layout.addWidget(self.redBackButton)
         self.layout.addWidget(self.blueBackButton)
 
+        # Set frame layout
         self.frame.setLayout(self.layout)
         
-        # Get position, and move window accordingly
+        # Get position from settings, and move window accordingly
         position = self.settings.value("ControlPanel/Position", QPoint(0, 0))
         self.move(position)
         
@@ -115,7 +107,7 @@ class controlPanel(QDialog):
     def updateTheme(self, buttonId):
         '''
         Slot for signal when buttonId is clicked.
-        Sets the corresponding theme.
+        Calls boardView to set the selected theme as back image.
         '''
         if buttonId == 1:
             self.boardView.setBackImage("backRed")

@@ -12,15 +12,18 @@ from model import boardStacks
 
 class stackView(QGraphicsItem):
     '''
-    Class to display stacks
+    Class extending QGraphicsItem.
+    stackView is a stack to place cards (cardView) on.
     '''
     
+    # Stack size and attributes
     penWidth = 4
     width = 90.0
     height = 130.0
     xRadius = 9
     yRadius = 9
     
+    # Bounding rectangle size
     rectx = penWidth/2
     recty = penWidth/2 
     rectWidth = width + penWidth
@@ -34,7 +37,8 @@ class stackView(QGraphicsItem):
     def __init__(self, boardView, gameStateController, id,
                  x_offset = 0, y_offset = 30, faceUp = True):
         '''
-        Constructor
+        Constructor:
+        Creates a stack containing a list to place cards in.
         '''
         super(stackView, self).__init__()
         
@@ -78,6 +82,7 @@ class stackView(QGraphicsItem):
         Slot called by controller when the model has changed.
         Gives the stack a new set of cards.
         '''
+        # Store received list and update properties for each card in the list
         self.stackCardList = cardList
         self.setParents()
 
@@ -95,7 +100,7 @@ class stackView(QGraphicsItem):
         
     def getid(self):
         '''
-        Returns id
+        Returns stack id
         '''
         return self.id
     
@@ -133,6 +138,7 @@ class stackView(QGraphicsItem):
         Override of paint function. Paints a custom rounded rectangle
         representing a stack location.
         '''
+        # Draw all stacks but tempStack
         if self.id != boardStacks.boardStacks.tempStack:
             pen = QPen()
             pen.setStyle(Qt.DashLine)
@@ -271,7 +277,8 @@ class stackView(QGraphicsItem):
         
     def updatePos(self, pos):
         '''
-        Called by boardScene, used to track mouse position
+        Updates the position of the stack to truePos.
+        Should only be called for tempStack.
         '''
         # Translate received position to the middle of the stack, then update Pos
         x = pos.x() - self.width/2

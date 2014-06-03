@@ -17,7 +17,7 @@ class feedbackWindow(QGraphicsTextItem):
 
     def __init__(self, text, parent = None):
         '''
-        Creates a feedbackWindow with text and parent relation
+        Creates a feedbackWindow with text and parent relation.
         '''
         super(feedbackWindow, self).__init__(text, parent)
         

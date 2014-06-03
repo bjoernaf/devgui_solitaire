@@ -5,21 +5,25 @@ Created on 13 apr 2014
 '''
 
 
-from PyQt5.QtCore import (QSettings, QSize, QVariant, QPoint, Qt)
+from PyQt5.QtCore import (QSettings, QSize, QPoint, Qt)
 from PyQt5.QtWidgets import (QMainWindow, QAction, QMessageBox, QToolBar)
-from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtGui import QIcon
 
 from view import boardView, transSlider, controlPanel, communicator
 
 class solitaireWindow(QMainWindow):
     '''
-    solitaireWindow is a QMainWindow. It has a menu
+    solitaireWindow is a QMainWindow.
+    It contains a boardView, a QMenuBar with items and
+    a QToolBar with items.
     '''
 
 
     def __init__(self, title, gameStateController):
         '''
-        Init function, create a graphicsScene spawning a boardView and attach it to a graphicsView
+        Constructor:
+        Creates content of the window and attaches content
+        to the correct areas of the window.
         '''
         
         super(solitaireWindow,self).__init__()
@@ -177,6 +181,7 @@ class solitaireWindow(QMainWindow):
         '''
         Overrides closeEvent to provide confirm dialogue and save settings
         '''
+        # Create messageBox prompting exit confirm
         if self.okToContinue():
 
             # Close the control panel
@@ -194,7 +199,7 @@ class solitaireWindow(QMainWindow):
             
     def resizeEvent(self, event):
         '''
-        Overrides resizeEvent to resize the QGraphicsScene as well
+        Overrides resizeEvent to resize the QGraphicsView as well
         '''
         self.bView.resizeEvent(event)
         QMainWindow.resizeEvent(self, event)
@@ -217,7 +222,7 @@ class solitaireWindow(QMainWindow):
         '''
         Creates a QMessageBox that prompts user if they wish to start a
         new game and abandon their current session. If reply is yes,
-        current game is destroyed and a new game is set up.
+        signal to create new game is emitted.
         '''
         reply = QMessageBox.question(self, "Start new game?",
                                      "Do you want to abandon your current session and start a new game?",
@@ -231,7 +236,7 @@ class solitaireWindow(QMainWindow):
         '''
         Creates a QMessageBox that informs the user that the game has been won, 
         and prompts user if they wish to start a new game. If reply is yes,
-        current game is destroyed and a new game is set up.
+        signal to create new game is emitted.
         '''
         reply = QMessageBox.question(self, "Game Won!",
                                      "You have won the game! Do you wish to play again?",

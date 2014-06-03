@@ -1,8 +1,7 @@
 '''
 Created on 7 apr 2014
 
-@author: Sven, Bjorn, Martin
-cardView is an QGraphicsItem representing a card. 
+@author: Sven, Bjorn, Martin 
 '''
 
 from PyQt5.QtCore import Qt, QRectF, QMimeData, QPointF, QSize
@@ -13,11 +12,10 @@ from view import communicator
 
 class cardView(QGraphicsItem):
     '''
-    Class to create and display one single card in the QGraphicsView
+    cardView is a QGraphicsItem representing a playing card.
     '''
 
     # Define card size and corner rounding
-    # TODO: Smartare size?
     cardWidth = 80
     cardHeight = 120
     cardXRad = 9.0
@@ -28,18 +26,17 @@ class cardView(QGraphicsItem):
     boundingValueRight = QRectF(-cardWidth + 4, -cardHeight + 3, 12, 15)
     imagePosLeft = QPointF(4, 16)
     imagePosRight = QPointF(-cardWidth + 4, -cardHeight + 16)
-    imageSize = QSize(12,12)
+    imageSize = QSize(12,12) # Size of corner images
 
 
     def __init__(self, gameStateController, boardView, color, value, cardId, faceup):
         '''
         Constructor:
-        Creates a Card in the GraphicsView.
-        Also loads the appropriate image for the card.
+        Creates a card in the GraphicsView.
         '''
         super(cardView, self).__init__()
         
-        # Create communicator, move somewhere else???
+        # Create communicator to handle signals
         self.com = communicator.communicator()
         
         # Connect slot (moveCard) to signal (com.moveCardSignal).
@@ -55,11 +52,11 @@ class cardView(QGraphicsItem):
         self.id = cardId
         self.faceup = faceup
         
-        # Save game state controller instance
+        # Save gameStateController and boardView instance
         self.gsc = gameStateController
         self.boardView = boardView
         
-        # Load image
+        # Load corner image (spades, hearts etc)
         self.loadImage(self.color)
 
         # Set item to accept hoverEvents
@@ -90,7 +87,8 @@ class cardView(QGraphicsItem):
     def illegalDropSlot(self, target):
         '''
         Slot receiving signal when target of QDrag is changed.
-        If target is None, drop has not happened and move to tempStack should be undone.
+        If target is None, a legal drop has not happened and
+        move to tempStack should be undone.
         '''
         # If drop has failed
         if target == None:
@@ -102,7 +100,8 @@ class cardView(QGraphicsItem):
 
     def mousePressEvent(self, event):
         '''
-        Override mousePressEvent
+        Override mousePressEvent.
+        Changes cursor style when appropriate.
         '''
         if self.cursor() == Qt.OpenHandCursor:
             self.setCursor(Qt.ClosedHandCursor)
@@ -111,8 +110,9 @@ class cardView(QGraphicsItem):
 
     def mouseDoubleClickEvent(self, event):
         '''
-        Override mouseDoubleClickEvent
+        Override mouseDoubleClickEvent.
         '''
+        # If card is in Deck
         if self.parentItem().getid() == boardStacks.boardStacks.Deck:
             # Begin a command macro, so that the whole process of flipping cards
             # from Deck to Drawable can be undone in one step
@@ -123,8 +123,13 @@ class cardView(QGraphicsItem):
             
             # Flip new cards from Deck to Drawable
             self.boardView.flipCards()
+            
+        # Else if the card is at the top of it's stack
         elif self.id == self.parentItem().topCardId():
-            self.com.turnCardSignal.emit(self.id)        
+            # Attempt to turn the card
+            self.com.turnCardSignal.emit(self.id)   
+            
+        # Else, simply call super     
         else:
             QGraphicsItem.mouseDoubleClickEvent(self, event)
 
@@ -141,7 +146,7 @@ class cardView(QGraphicsItem):
     def mouseMoveEvent(self, event):
         '''
         This is called when an object is moved with the mouse pressed down.
-        A drag event is created.
+        A drag event is created with mimeData representing the card info.
         '''
         
         # Create a drag event with attached mime data containing the card id and fromstack
@@ -156,7 +161,7 @@ class cardView(QGraphicsItem):
         # Put the dragged cards on the temp stack, to draw under mouse cursor.
         self.boardView.updateTempStack(self.id, self.parentItem().id)
     
-        # Show the dragCardStackView (tempStack)
+        # Show the tempStack
         self.boardView.tempStackVisible(True)
     
         # Execute drag etc
@@ -186,6 +191,7 @@ class cardView(QGraphicsItem):
         Draws a rounded rectangle representing a card.
         Draws card number and card color symbol in upper
         and lower right corner.
+        If card is facing down, draw back of card.
         '''
         # Set opacity to paint entire card with
         painter.setOpacity(self.boardView.cardOpacity/100.0)
@@ -236,9 +242,9 @@ class cardView(QGraphicsItem):
         
     def loadImage(self, color):
         '''
-        Loads an image from file with color.png as filename.
+        Loads an image from file with color_simpleSmall.png as filename.
         Scales it to the desired image size.
-        Stores image in self.image
+        Stores scaled image in self.image
         '''
         self.image = QImage("images/" + str(self.color) + "_simpleSmall.png")
         self.image = self.image.scaled(self.imageSize, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
@@ -279,6 +285,7 @@ class cardView(QGraphicsItem):
         '''
         # Remove the card from the pulsating animation engine list
         self.boardView.animationEngine.removePulsating(self)
+        # Reset the animation
         self.resetAnimation()
         
         
@@ -315,7 +322,7 @@ class cardView(QGraphicsItem):
         
     def resetAnimation(self):
         '''
-        Resets all animations to original state.
+        Resets all animations included to original state.
         Add more animations if necessary.
         '''
         # Disable pulsating animation and reset it
@@ -325,7 +332,7 @@ class cardView(QGraphicsItem):
         
     def updateToolTip(self):
         '''
-        Updates tooltip to display appropriate text.
+        Updates tooltip of a card to display appropriate text.
         '''
         # If card faces up, show no tooltip
         if self.faceup == True:
