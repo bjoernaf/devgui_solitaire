@@ -57,17 +57,15 @@ class glassView(QGraphicsItem):
         font.setBold(True)
         painter.setFont(font)
         
-        # ****** TEMPORARY TESTING *******
+        # Draw the glass panel
         painter.drawRoundedRect(self.boundingRect(), 8, 8, Qt.AbsoluteSize)
     
-        
-        # Print help text
+        # Put text on it!
+        painter.setPen(Qt.white)
+        painter.setOpacity(1)
         painter.drawText(16, 190, "Turned up cards can be drawn to new locations.")
-        
         painter.drawText(350, 175, "Place cards of matching color in order on the top stacks, starting with ace.")
-        
         painter.drawText(80, 550, "Place lower cards of opposite color on higher cards. Cannot skip cards.")
-        
         painter.drawText(8, 175, "Double click the deck to draw new cards.")
         
         

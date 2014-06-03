@@ -152,15 +152,6 @@ class boardView(QGraphicsView):
         set up the graphics scene and add items to it
         '''
         
-        #Draw white text in the center of the window
-#        font=QFont('Decorative')
-#        font.setPointSize(25)
-#        centerText=QGraphicsTextItem('Solitaire')
-#        centerText.setFont(font)
-#        centerText.setDefaultTextColor(Qt.white)
-#        centerText.setPos(310, 170)
-#        self.scene.addItem(centerText)
-        
         #Set background color to dark green
         self.scene.setBackgroundBrush(Qt.darkGreen)
         
