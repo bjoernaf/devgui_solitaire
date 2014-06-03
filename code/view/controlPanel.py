@@ -103,7 +103,7 @@ class controlPanel(QDialog):
         
         # Get stored theme from settings, enable the correct theme
         # and set the correct button
-        theme = self.settings.value("ControlPanel/Theme", 1)
+        theme = int(self.settings.value("ControlPanel/Theme", 1))
         self.updateTheme(theme)
         if theme == 1:
             self.redBackButton.setChecked(True)
@@ -121,5 +121,3 @@ class controlPanel(QDialog):
             self.boardView.setBackImage("backRed")
         elif buttonId == 2:
             self.boardView.setBackImage("backBlue")
-        
-        

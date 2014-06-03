@@ -30,7 +30,7 @@ class transSlider(QSlider):
         
         # Initialize settings and retreive saved opacity value (maximum as backup)
         settings = QSettings()
-        startOpacity = settings.value("TransparencySlider/Position", self.maximum())
+        startOpacity = int(settings.value("TransparencySlider/Position", self.maximum()))
         self.setSliderPosition(startOpacity)
         
         # Set up and send valueChanged signal to synchronize all instances.
