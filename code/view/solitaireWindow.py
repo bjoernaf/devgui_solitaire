@@ -15,8 +15,6 @@ class solitaireWindow(QMainWindow):
     '''
     solitaireWindow is a QMainWindow. It has a menu
     '''
-    
-    winTitle = "Group 13 Solitaire"
 
 
     def __init__(self, title, gameStateController):
@@ -27,7 +25,10 @@ class solitaireWindow(QMainWindow):
         super(solitaireWindow,self).__init__()
         
         # GameStateController needed for menu to Undo/Redo
-        self.gameStateController = gameStateController
+        self.gameStateController = gameStateController  
+              
+        # Store title of window
+        self.winTitle = title
         
         # Create communicator and connect signals
         self.com = communicator.communicator()
@@ -35,7 +36,7 @@ class solitaireWindow(QMainWindow):
 
         # Set up settings to store properties (width, height etc)
         settings = QSettings()
-        
+
         # Get size and position, resize and move accordingly
         size = settings.value("MainWindow/Size", QSize(900,600))
         position = settings.value("MainWindow/Position", QPoint(0, 0))
@@ -62,9 +63,7 @@ class solitaireWindow(QMainWindow):
         self.addToolBar(Qt.TopToolBarArea, self.toolbar)
         
         self.icon = QIcon("images/1_small.png")
-        print(self.icon)
         self.setWindowIcon(self.icon)
-        print(self.windowIcon())
 
 
     def openControlPanel(self):
