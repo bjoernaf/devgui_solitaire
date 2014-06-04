@@ -123,8 +123,10 @@ class controlPanel(QDialog):
         
         # Create buttons and add them to the group
         self.detailedCardButton = QRadioButton("Detailed", self)
+        self.detailedCardButton.setToolTip("Paint card image")
         self.buttonCardGroup.addButton(self.detailedCardButton, 1)
         self.simpleCardButton = QRadioButton("Simple", self)
+        self.simpleCardButton.setToolTip("Paint card number and color")
         self.buttonCardGroup.addButton(self.simpleCardButton, 2)
 
         # Connect buttonGroup buttonClicked signal to slot
