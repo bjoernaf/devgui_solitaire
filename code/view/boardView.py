@@ -4,9 +4,9 @@ Created on 7 apr 2014
 @author: Sven, Bjorn, Martin
 '''
 
-from PyQt5.QtCore import Qt, QPointF
+from PyQt5.QtCore import Qt, QPointF, QThread
 from PyQt5.QtGui import QImage
-from PyQt5.QtWidgets import QGraphicsView, QGraphicsItem
+from PyQt5.QtWidgets import QGraphicsView, QGraphicsItem, QApplication
 from view import cardView, stackView, boardScene, communicator, glassView
 from model import boardStacks
 from animation import animationEngine
@@ -43,12 +43,19 @@ class boardView(QGraphicsView):
         # Store a reference to gameStateController
         self.gameStateController = gameStateController
         
+        # Create an animation engine and push it onto a new thread
+        self.animationEngine = animationEngine.animationEngine(self.gameStateController, self)
+        self.animationThread = QThread()
+        self.animationEngine.moveToThread(self.animationThread)
+        
+        # Start the new thread and thereby the animation engine
+        self.animationThread.started.connect(self.animationEngine.startEngine)
+        self.animationThread.start()
+        
         # Create a communicator and connect relevant signals to slots
         self.com = communicator.communicator()
         self.com.moveCardSignal.connect(gameStateController.moveCard)
-        
-        # Create animationEngine
-        self.animationEngine = animationEngine.animationEngine(gameStateController)
+        self.com.addFlipAnimationSignal.connect(self.animationEngine.addFlippingCards)
 
         # Create a scene based on the parent's size
         self.scene = boardScene.boardScene(0, 0, windowWidth, windowHeight, self)
@@ -262,32 +269,69 @@ class boardView(QGraphicsView):
         splitIndex = oldDeckStackLength - flipNumber
         newDeckStack = oldDeckStack[:splitIndex]
         self.deckStackView.updateStackList(newDeckStack)
-        
-        # Find the start and end position of the flip
-        startPos = self.cardList[oldDeckStack[0]].scenePos()
-        drawableStackPosition = self.drawableStackView.scenePos()
-        endPos = QPointF(drawableStackPosition.x() + self.drawableStackView.getDistanceX(),
-                         drawableStackPosition.y() + self.drawableStackView.getDistanceY())
-        
+
         # Create a list of the cards to flip
         flipCards = list()
         for i in range(splitIndex, oldDeckStackLength):
             flipCardId = oldDeckStack[i]
             flipCard = self.cardList[flipCardId]
+            scenePos = flipCard.scenePos()         
             flipCard.setParentItem(None)
-            flipCard.hoverLeaveEvent(0) # Forces removal from pulsating animation list.
-            flipCards.append(flipCard)
+            flipCard.setPos(scenePos) # Seems necessary in order to stop the card from moving
+#            flipCard.hoverLeaveEvent(0) # Forces removal from pulsating animation list.
+            flipCards.append(flipCardId)
         flipCards.reverse()
+
+        # Find the start and end position of the flip
+        startPos = self.cardList[oldDeckStack[0]].scenePos()
+        startPosX = startPos.x()
+        startPosY = startPos.y()
+        drawableStackPosition = self.drawableStackView.scenePos()
+        endPos = QPointF(drawableStackPosition.x() + self.drawableStackView.getDistanceX(),
+                         drawableStackPosition.y() + self.drawableStackView.getDistanceY())
+        endPosX = endPos.x()
         
         # Find the x offset between subsequent cards in the end stack
         cardOffsetX = self.drawableStackView.getCardOffsetX()
+
+        # Find the size of the cards to flip (all cards are supposed to have the same size)
+        topCard = self.cardList[flipCards[0]]
+        cardWidth = topCard.getCardWidth()
+        cardHeight = topCard.getCardHeight()
+
+        # Determines how quick the animation is
+        scaleStep = -0.05
         
-        # Pass the cards to flip, the start stack, the end stack,
-        # the end position, and the scale step to the animation engine
-        scaleStep = -0.05 # Determines how quick the animation is
-        self.animationEngine.addFlippingCards(flipCards, boardStacks.boardStacks.Deck,
-                                              boardStacks.boardStacks.Drawable,
-                                              startPos, endPos, cardOffsetX, scaleStep)
+        print("boardView/flipCards: MY THREAD IS ", QThread.currentThread())
+        print("boardView/flipCards: MY MAIN THREAD IS ", QApplication.instance().thread())
+
+        # Pass the cards to flip, the start stack, the end stack, the start position,
+        # the end position, the card offset, the card size, and the scale step to the
+        # animation engine
+        self.com.addFlipAnimationSignal.emit(flipCards, boardStacks.boardStacks.Deck,
+                                             boardStacks.boardStacks.Drawable,
+                                             startPosX, startPosY, endPosX, cardOffsetX,
+                                             cardWidth, cardHeight, scaleStep)
+        
+        
+    def setCardZValue(self, flipCardId, zValue):
+        print("boardView/setCardZValue: MY THREAD IS ", QThread.currentThread())
+        print("boardView/setCardZValue: MY MAIN THREAD IS ", QApplication.instance().thread())
+        card = self.cardList[flipCardId]
+        card.setZValue(zValue)     
+        
+        
+    def transformCard(self, flipCardId, pos, rotation, scaleFactor):
+        print("boardView/transformCard: MY THREAD IS ", QThread.currentThread())
+        print("boardView/transformCard: MY MAIN THREAD IS ", QApplication.instance().thread())
+        card = self.cardList[flipCardId]
+        card.setPos(pos)
+        card.setRotation(rotation)
+        transform = card.transform()
+        transform.setMatrix(scaleFactor, transform.m12(), transform.m13(),
+                            transform.m21(), transform.m22(), transform.m23(),
+                            transform.m31(), transform.m32(), transform.m33())
+        card.setTransform(transform)
 
 
     def updateTempStack(self, cardid, stackid):

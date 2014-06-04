@@ -4,7 +4,7 @@ Created on 24 apr 2014
 @author: Sven, Bjorn
 '''
 
-from PyQt5.QtCore import (QObject, pyqtSignal, QPointF)
+from PyQt5.QtCore import QObject, pyqtSignal, QPointF
 
 class communicator(QObject):
     '''
@@ -36,6 +36,14 @@ class communicator(QObject):
     beginFlipMacroSignal = pyqtSignal(name = 'beginFlipMacroSignal')
     
     endFlipMacroSignal = pyqtSignal(name = 'endFlipMacroSignal')
+    
+    addFlipAnimationSignal = pyqtSignal(list, int, int, int, int, int, int, int, int, float,
+                                        name = 'addFlipAnimationSignal')
+
+    setCardZValueSignal = pyqtSignal(int, int, name = 'setCardZValueSignal')
+    
+    transformCardSignal = pyqtSignal(int, QPointF, int, float, name = 'transformCardSignal')
+    
     
     def __init__(self):
         '''

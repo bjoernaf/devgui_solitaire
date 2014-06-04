@@ -4,11 +4,12 @@ Created on 7 apr 2014
 @author: Sven, Bjorn, Martin 
 '''
 
-from PyQt5.QtCore import Qt, QRectF, QMimeData, QPointF, QSize
+from PyQt5.QtCore import Qt, QRectF, QMimeData, QPointF, QSize, QThread
 from PyQt5.QtGui import QDrag, QFont, QPainter, QImage
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsDropShadowEffect
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsDropShadowEffect, QApplication
 from model import boardStacks
 from view import communicator
+
 
 class cardView(QGraphicsItem):
     '''
@@ -63,11 +64,11 @@ class cardView(QGraphicsItem):
         self.setAcceptHoverEvents(True)
         
         # Set up effect to use when animating pulsate and connect it to the cardView
-        self.pulsateEffect = QGraphicsDropShadowEffect()
-        self.pulsateEffect.setColor(Qt.white)
-        self.pulsateEffect.setOffset(0,0)
-        self.pulsateIncrease = True # True increasing, False decreasing
-        self.setGraphicsEffect(self.pulsateEffect)
+#        self.pulsateEffect = QGraphicsDropShadowEffect()
+#        self.pulsateEffect.setColor(Qt.white)
+#        self.pulsateEffect.setOffset(0,0)
+#        self.pulsateIncrease = True # True increasing, False decreasing
+#        self.setGraphicsEffect(self.pulsateEffect)
     
     
     def getCardWidth(self):
@@ -116,6 +117,8 @@ class cardView(QGraphicsItem):
         '''
         Override mouseDoubleClickEvent.
         '''
+        print("cardView/doubleClick: MY THREAD IS ", QThread.currentThread())
+        print("cardView/doubleClick: MY MAIN THREAD IS ", QApplication.instance().thread())
         # If card is in Deck
         if self.parentItem().getid() == boardStacks.boardStacks.Deck:
             # Begin a command macro, so that the whole process of flipping cards
@@ -255,14 +258,7 @@ class cardView(QGraphicsItem):
         if self.image.isNull():
             print("CARDVIEW  : loadImage: Error loading image")
         
-            
-    def rotate(self):
-        '''
-        Rotate something
-        '''
-        print("Rotating...")    
-    
-    
+        
     def toValueString(self, value):
         '''
         Returns correct string corresponding to a card value
@@ -274,64 +270,64 @@ class cardView(QGraphicsItem):
                 13: "K",
                 }.get(value, str(value))
         
-             
-    def hoverEnterEvent(self, event):
-        '''
-        Catches when the mouse enters the hover area above the cardView.
-        '''
-        # Add the card to the pulsating animation engine list
-        self.boardView.animationEngine.addPulsating(self)
+        
+#    def hoverEnterEvent(self, event):
+#        '''
+#        Catches when the mouse enters the hover area above the cardView.
+#        '''
+#        # Add the card to the pulsating animation engine list
+#        self.boardView.animationEngine.addPulsating(self)
         
         
-    def hoverLeaveEvent(self, event):
-        '''
-        Catches when the mouse leaves the hover area above the cardView.
-        '''
-        # Remove the card from the pulsating animation engine list
-        self.boardView.animationEngine.removePulsating(self)
-        # Reset the animation
-        self.resetAnimation()
+#    def hoverLeaveEvent(self, event):
+#        '''
+#        Catches when the mouse leaves the hover area above the cardView.
+#        '''
+#        # Remove the card from the pulsating animation engine list
+#        self.boardView.animationEngine.removePulsating(self)
+#        # Reset the animation
+#        self.resetAnimation()
         
         
-    def pulsate(self):
-        '''
-        Animate the card to pulsate. The animation is implemented
-        using a white QGraphicsDropShadowEffect where increased
-        blurRadius blurs the edges of the effect.
-        '''
-        # Store the current blurRadius
-        currentBlur = self.pulsateEffect.blurRadius()
+#    def pulsate(self):
+#        '''
+#        Animate the card to pulsate. The animation is implemented
+#        using a white QGraphicsDropShadowEffect where increased
+#        blurRadius blurs the edges of the effect.
+#        '''
+#        # Store the current blurRadius
+#        currentBlur = self.pulsateEffect.blurRadius()
+#        
+#        # If currentBlur is not at edge values, increase or decrease it
+#        if currentBlur > 1 and currentBlur < 59:
+#            if self.pulsateIncrease == True:
+#                self.pulsateEffect.setBlurRadius(currentBlur+1)
+#            else:
+#                self.pulsateEffect.setBlurRadius(currentBlur-1)
+#        # If currentBlur has reached 0, change to increasing Blur
+#        elif currentBlur <= 1:
+#            self.pulsateIncrease = True
+#            self.pulsateEffect.setBlurRadius(currentBlur+1)
+#        # If currentblur has reached 59, change to decreasing Blur
+#        elif currentBlur == 59:
+#            self.pulsateIncrease = False
+#            self.pulsateEffect.setBlurRadius(currentBlur-1)
+#        else:
+#            print("CARDVIEW: PULSATE: Error, wrong blurRadius!")
+#        
+#        # Enable blur effect if disabled
+#        if self.pulsateEffect.isEnabled() == False:
+#            self.pulsateEffect.setEnabled(True)
         
-        # If currentBlur is not at edge values, increase or decrease it
-        if currentBlur > 1 and currentBlur < 59:
-            if self.pulsateIncrease == True:
-                self.pulsateEffect.setBlurRadius(currentBlur+1)
-            else:
-                self.pulsateEffect.setBlurRadius(currentBlur-1)
-        # If currentBlur has reached 0, change to increasing Blur
-        elif currentBlur <= 1:
-            self.pulsateIncrease = True
-            self.pulsateEffect.setBlurRadius(currentBlur+1)
-        # If currentblur has reached 59, change to decreasing Blur
-        elif currentBlur == 59:
-            self.pulsateIncrease = False
-            self.pulsateEffect.setBlurRadius(currentBlur-1)
-        else:
-            print("CARDVIEW: PULSATE: Error, wrong blurRadius!")
         
-        # Enable blur effect if disabled
-        if self.pulsateEffect.isEnabled() == False:
-            self.pulsateEffect.setEnabled(True)
-        
-        
-    def resetAnimation(self):
-        '''
-        Resets all animations included to original state.
-        Add more animations if necessary.
-        '''
-        # Disable pulsating animation and reset it
-        self.pulsateEffect.setEnabled(False)
-        self.pulsateEffect.setBlurRadius(0)
+#    def resetAnimation(self):
+#        '''
+#        Resets all animations included to original state.
+#        Add more animations if necessary.
+#        '''
+#        # Disable pulsating animation and reset it
+#        self.pulsateEffect.setEnabled(False)
+#        self.pulsateEffect.setBlurRadius(0)
         
         
     def updateToolTip(self):
