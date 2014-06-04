@@ -205,32 +205,38 @@ class cardView(QGraphicsItem):
         
         # If the card is facing up, draw card and details
         if(self.faceup == True):
-            # Paint a rounded, anti-aliased rectangle representing the card
-            painter.setPen(Qt.black)
-            painter.setBrush(Qt.white)
             
-            # Special color for tempStack when being dragged
-            if self.parentItem() != None:
-                if self.parentItem().id == boardStacks.boardStacks.tempStack:
-                    painter.setBrush(self.parentItem().paintColor)
-
-            painter.drawRoundedRect(self.boundingRect(), self.cardXRad, self.cardYRad, Qt.AbsoluteSize)
+            # If front side image exists
+            if self.image.isNull() == False:
+                painter.drawImage(self.boundingRect(), self.image)
+            # Else, paint boring front side
+            else:
+                # Paint a rounded, anti-aliased rectangle representing the card
+                painter.setPen(Qt.black)
+                painter.setBrush(Qt.white)
+                
+                # Special color for tempStack when being dragged
+                if self.parentItem() != None:
+                    if self.parentItem().id == boardStacks.boardStacks.tempStack:
+                        painter.setBrush(self.parentItem().paintColor)
     
-            # Card value: Set font style and color
-            font = QFont("Helvetica")
-            font.setBold(True)
-            painter.setFont(font)
-            if self.color in range(2,4):
-                painter.setPen(Qt.red)
-            
-            # Paint upper left text and image
-            painter.drawText(self.boundingValueLeft, Qt.AlignTop | Qt.AlignHCenter, self.toValueString(self.value))
-            painter.drawImage(self.imagePosLeft, self.image)
+                painter.drawRoundedRect(self.boundingRect(), self.cardXRad, self.cardYRad, Qt.AbsoluteSize)
         
-            #Paint lower right text and image
-            painter.rotate(180)
-            painter.drawText(self.boundingValueRight, Qt.AlignTop | Qt.AlignHCenter, self.toValueString(self.value))
-            painter.drawImage(self.imagePosRight, self.image)
+                # Card value: Set font style and color
+                font = QFont("Helvetica")
+                font.setBold(True)
+                painter.setFont(font)
+                if self.color in range(2,4):
+                    painter.setPen(Qt.red)
+                
+                # Paint upper left text and image
+                painter.drawText(self.boundingValueLeft, Qt.AlignTop | Qt.AlignHCenter, self.toValueString(self.value))
+                painter.drawImage(self.imagePosLeft, self.smallImage)
+            
+                #Paint lower right text and image
+                painter.rotate(180)
+                painter.drawText(self.boundingValueRight, Qt.AlignTop | Qt.AlignHCenter, self.toValueString(self.value))
+                painter.drawImage(self.imagePosRight, self.smallImage)
             
         # If the card is facing down, draw the back image
         else:
@@ -250,10 +256,12 @@ class cardView(QGraphicsItem):
         Scales it to the desired image size.
         Stores scaled image in self.image
         '''
-        self.image = QImage("images/" + str(self.color) + "_simpleSmall.png")
-        self.image = self.image.scaled(self.imageSize, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+        self.image = QImage("images/" + str(self.color) + str(self.value) + ".png")
         if self.image.isNull():
-            print("CARDVIEW  : loadImage: Error loading image")
+            self.smallImage = QImage("images/" + str(self.color) + "_simpleSmall.png")
+            self.smallImage = self.smallImage.scaled(self.imageSize, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+            if self.smallImage.isNull():
+                print("CARDVIEW  : loadImage: Error loading image.")
         
             
     def rotate(self):
