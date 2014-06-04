@@ -66,7 +66,8 @@ class solitaireWindow(QMainWindow):
         self.toolbar.addWidget(self.slide)
         self.addToolBar(Qt.TopToolBarArea, self.toolbar)
         
-        self.icon = QIcon("images/1_small.png")
+        # Load and set icon to use for the application
+        self.icon = QIcon("images/icon.png")
         self.setWindowIcon(self.icon)
 
 
@@ -260,6 +261,10 @@ class solitaireWindow(QMainWindow):
                 "Max Pihlstrom</p>"
                 "<p>Source code available "
                 "<a href=\"https://github.com/bjoernaf/devgui_solitaire\">here</a>.</p>"
+                "<p>Images used within this software<br>"
+                "were taken from "
+                "<a href=\"http://sweetclipart.com/set-playing-card-suits-1247\">here</a> and "
+                "<a href=\"http://www.freedesign4.me/vectors/free-vector-playing-card-deck/\">here</a>.</p>"
                 "</center></body></html>")
         
         QMessageBox.about(self, "About Solitaire", text)
