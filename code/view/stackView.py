@@ -184,7 +184,7 @@ class stackView(QGraphicsItem):
                     # If move is not allowed, display reason and paint tempStack red
                     event.ignore()
                     self.boardView.updateFeedbackWindow(declineReason)
-                    self.boardView.updatePaintColor(QColor(255, 100, 100, 220))
+                    self.boardView.updatePaintColor(QColor(255, 100, 100))
             else:
                 # Ignore move if invalid object is being dragged
                 event.ignore()

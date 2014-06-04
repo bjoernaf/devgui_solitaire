@@ -5,7 +5,7 @@ Created on 7 apr 2014
 '''
 
 from PyQt5.QtCore import Qt, QRectF, QMimeData, QPointF, QSize
-from PyQt5.QtGui import QDrag, QFont, QPainter, QImage
+from PyQt5.QtGui import QDrag, QFont, QPainter, QImage, QColor
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsDropShadowEffect
 from model import boardStacks
 from view import communicator
@@ -51,6 +51,9 @@ class cardView(QGraphicsItem):
         self.value = value
         self.id = cardId
         self.faceup = faceup
+        
+        # Set front side type, True paints detailed image
+        self.detailedFront = True
         
         # Save gameStateController and boardView instance
         self.gsc = gameStateController
@@ -206,19 +209,34 @@ class cardView(QGraphicsItem):
         # If the card is facing up, draw card and details
         if(self.faceup == True):
             
-            # If front side image exists
-            if self.image.isNull() == False:
-                painter.drawImage(self.boundingRect(), self.image)
-            # Else, paint boring front side
+            # If front side image exists and detailed mode is set
+            if self.detailedFront == True and self.image.isNull() == False:
+                # Draw detailed image
+                if self.parentItem() != None:
+                    # # Special color and opacity for tempStack when being dragged
+                    if type(self.parentItem().paintColor) is QColor:
+                        painter.setBrush(self.parentItem().paintColor)
+                        painter.setOpacity(painter.opacity()*0.6)
+                        painter.drawImage(self.boundingRect(), self.image)
+                        painter.drawRoundedRect(self.boundingRect(), 3, 3, Qt.AbsoluteSize)
+                    # If paintColor is white
+                    else:
+                        painter.drawImage(self.boundingRect(), self.image)
+                else:
+                    painter.drawImage(self.boundingRect(), self.image)
+               
+            # Else, paint simple front side
             else:
                 # Paint a rounded, anti-aliased rectangle representing the card
                 painter.setPen(Qt.black)
                 painter.setBrush(Qt.white)
                 
-                # Special color for tempStack when being dragged
+                # Special color and opacity for tempStack when being dragged
                 if self.parentItem() != None:
                     if self.parentItem().id == boardStacks.boardStacks.tempStack:
-                        painter.setBrush(self.parentItem().paintColor)
+                        if type(self.parentItem().paintColor) is QColor:
+                            painter.setBrush(self.parentItem().paintColor)
+                            painter.setOpacity(painter.opacity()*0.85)
     
                 painter.drawRoundedRect(self.boundingRect(), self.cardXRad, self.cardYRad, Qt.AbsoluteSize)
         
@@ -252,18 +270,34 @@ class cardView(QGraphicsItem):
         
     def loadImage(self, color):
         '''
-        Loads an image from file with color_simpleSmall.png as filename.
-        Scales it to the desired image size.
-        Stores scaled image in self.image
+        Loads a large front side image and a small card color image.
+        If small image is loaded successfully, it is scaled to proper size.
         '''
-        self.image = QImage("images/" + str(self.color) + str(self.value) + ".png")
+        # Load large image
+        self.image = QImage("images/front/" + str(self.color) + str(self.value) + ".png")
         if self.image.isNull():
-            self.smallImage = QImage("images/" + str(self.color) + "_simpleSmall.png")
-            self.smallImage = self.smallImage.scaled(self.imageSize, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
-            if self.smallImage.isNull():
-                print("CARDVIEW  : loadImage: Error loading image.")
-        
+            print("CARDVIEW  : loadImage: Error loading front image " + str(self.color) + str(self.value) + ".png")
             
+        # Load small image and scale if it exists
+        self.smallImage = QImage("images/" + str(self.color) + "_simpleSmall.png")
+        if self.smallImage.isNull():
+            print("CARDVIEW  : loadImage: Error loading image" + str(self.color) + "_simpleSmall.png")
+        else:
+            self.smallImage = self.smallImage.scaled(self.imageSize, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)   
+        
+        
+    def setImage(self, imageType):
+        '''
+        Sets whether or not to paint detailed front side.
+        '''
+        if imageType == "detailed":
+            self.detailedFront = True
+        else:
+            self.detailedFront = False
+        # Queue repaint of card
+        self.update()
+     
+     
     def rotate(self):
         '''
         Rotate something

@@ -474,6 +474,15 @@ class boardView(QGraphicsView):
             print("BOARDVIEW : ERROR loading back image.")
         # Trigger repaint of all cards
         self.repaintCards()
+        
+        
+    def setFrontImage(self, image):
+        '''
+        Iterates over all cards and calls setImage.
+        Also acts as receiving slot from control panel card selection.
+        '''
+        for card in self.cardList:
+            card.setImage(image)
 
     def showTutorial(self):
         '''

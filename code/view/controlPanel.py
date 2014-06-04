@@ -41,9 +41,13 @@ class controlPanel(QDialog):
         self.slide.setFixedWidth(200)
         self.transparencyLabel = QLabel('Card opacity:')
         
-        # Create a button group to select card look
-        self.createCardButtonGroup()
+        # Create a button group to select card back look
+        self.createThemeButtonGroup()
         self.themeLabel = QLabel('Deck theme:')
+        
+        # Create a button group to select card front look
+        self.createCardButtonGroup()
+        self.cardLabel = QLabel('Card style:')
         
         # Add widgets and buttons to the control panel
         self.layout.addWidget(self.transparencyLabel)
@@ -51,6 +55,9 @@ class controlPanel(QDialog):
         self.layout.addWidget(self.themeLabel)
         self.layout.addWidget(self.redBackButton)
         self.layout.addWidget(self.blueBackButton)
+        self.layout.addWidget(self.cardLabel)
+        self.layout.addWidget(self.detailedCardButton)
+        self.layout.addWidget(self.simpleCardButton)
 
         # Set frame layout
         self.frame.setLayout(self.layout)
@@ -73,25 +80,26 @@ class controlPanel(QDialog):
         Overrides closeEvent to provide confirm dialogue and save settings
         '''
         # Save which button is checked to load theme
-        self.settings.setValue("ControlPanel/Theme", self.buttonCardGroup.checkedId())
+        self.settings.setValue("ControlPanel/Theme", self.buttonThemeGroup.checkedId())
+        self.settings.setValue("ControlPanel/CardStyle", self.buttonCardGroup.checkedId())
         print("CONTROLPAN: Close control panel")
         
-    def createCardButtonGroup(self):
+    def createThemeButtonGroup(self):
         '''
         Creates a button group to select back of card color
         '''
         
         # Create a button group to ensure buttons are exclusive
-        self.buttonCardGroup = QButtonGroup()
+        self.buttonThemeGroup = QButtonGroup()
         
         # Create buttons and add them to the group
         self.redBackButton = QRadioButton("Red", self)
-        self.buttonCardGroup.addButton(self.redBackButton, 1)
+        self.buttonThemeGroup.addButton(self.redBackButton, 1)
         self.blueBackButton = QRadioButton("Blue", self)
-        self.buttonCardGroup.addButton(self.blueBackButton, 2)
+        self.buttonThemeGroup.addButton(self.blueBackButton, 2)
 
         # Connect buttonGroup buttonClicked signal to slot
-        self.buttonCardGroup.buttonClicked[int].connect(self.updateTheme)
+        self.buttonThemeGroup.buttonClicked[int].connect(self.updateTheme)
         
         # Get stored theme from settings, enable the correct theme
         # and set the correct button
@@ -102,7 +110,45 @@ class controlPanel(QDialog):
         else:
             self.blueBackButton.setChecked(True)
             
+    
+    def createCardButtonGroup(self):
+        '''
+        Creates a button group to select the look of a card.
+        Detailed displays a full card image, simple draws a
+        simple card using text and a color image.
+        '''
         
+        # Create a button group to ensure buttons are exclusive
+        self.buttonCardGroup = QButtonGroup()
+        
+        # Create buttons and add them to the group
+        self.detailedCardButton = QRadioButton("Detailed", self)
+        self.buttonCardGroup.addButton(self.detailedCardButton, 1)
+        self.simpleCardButton = QRadioButton("Simple", self)
+        self.buttonCardGroup.addButton(self.simpleCardButton, 2)
+
+        # Connect buttonGroup buttonClicked signal to slot
+        self.buttonCardGroup.buttonClicked[int].connect(self.updateCard)
+        
+        # Get stored theme from settings, enable the correct theme
+        # and set the correct button
+        cardStyle = int(self.settings.value("ControlPanel/CardStyle", 1))
+        self.updateCard(cardStyle)
+        if cardStyle == 1:
+            self.detailedCardButton.setChecked(True)
+        else:
+            self.simpleCardButton.setChecked(True)
+            
+        
+    def updateCard(self, buttonId):
+        '''
+        Slot for signal when buttonId is clicked.
+        Calls boardView to set the selected image as front image.
+        '''
+        if buttonId == 1:
+            self.boardView.setFrontImage("detailed")
+        elif buttonId == 2:
+            self.boardView.setFrontImage("simple")
         
     def updateTheme(self, buttonId):
         '''
