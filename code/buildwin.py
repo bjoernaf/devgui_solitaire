@@ -17,7 +17,8 @@ if sys.platform == 'win32':
 
 options = {
     'build_exe': {
-        'includes': 'atexit'
+        'includes': 'atexit',
+        'include_files': ['images/']
     }
 }
 
@@ -26,8 +27,9 @@ executables = [
 ]
 
 setup(name='Solitaire',
-      version='0.1',
+      version='1.0',
       description='Solitaire game',
+      author='Group 13',
       options=options,
       executables=executables
       )
