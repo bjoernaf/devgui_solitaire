@@ -4,9 +4,9 @@ Created on 7 apr 2014
 @author: Sven, Bjorn, Martin 
 '''
 
-from PyQt5.QtCore import Qt, QRectF, QMimeData, QPointF, QSize, QThread
+from PyQt5.QtCore import Qt, QRectF, QMimeData, QPointF, QSize
 from PyQt5.QtGui import QDrag, QFont, QPainter, QImage, QColor
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsDropShadowEffect, QApplication
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsDropShadowEffect
 from model import boardStacks
 from view import communicator
 
@@ -121,8 +121,6 @@ class cardView(QGraphicsItem):
         '''
         Override mouseDoubleClickEvent.
         '''
-        print("cardView/doubleClick: MY THREAD IS ", QThread.currentThread())
-        print("cardView/doubleClick: MY MAIN THREAD IS ", QApplication.instance().thread())
         # If card is in Deck
         if self.parentItem().getid() == boardStacks.boardStacks.Deck:
             # Begin a command macro, so that the whole process of flipping cards
@@ -147,7 +145,7 @@ class cardView(QGraphicsItem):
             
     def mouseReleaseEvent(self, event):
         '''
-        Override mouseReleaseEvent
+        Override mouseReleaseEvent.
         Changes cursor to open hand.
         '''
         self.setCursor(Qt.OpenHandCursor)
@@ -159,7 +157,6 @@ class cardView(QGraphicsItem):
         This is called when an object is moved with the mouse pressed down.
         A drag event is created with mimeData representing the card info.
         '''
-        
         # Create a drag event with attached mime data containing the card id and fromstack
         drag = QDrag(event.widget())
         mime = QMimeData()
@@ -320,16 +317,8 @@ class cardView(QGraphicsItem):
         Catches when the mouse enters the hover area above the cardView.
         Starts a pulsating animation.
         '''
-<<<<<<< HEAD
-        # If the card is facing up or is top card in the stack,
-        # add it to pulsating animation
-        if self.faceup:
-            # Enable the pulsating animation effect
-            self.pulsateEffect.setEnabled(True)
-
-            # Make the animation engine animate the card
-            self.com.addPulsatingAnimationSignal.emit(self.id)
-        elif self.parentItem != None:
+        # If the card is the top card in the stack, start a pulsating animation.
+        if self.parentItem() != None:
             if self.id == self.parentItem().topCardId():
                 # Enable the pulsating animation effect
                 self.pulsateEffect.setEnabled(True)
@@ -343,7 +332,6 @@ class cardView(QGraphicsItem):
         Catches when the mouse leaves the hover area above the cardView.
         Stops a pulsating animation.
         '''
-        
         # Disable the pulsating animation effect and reset the blur radius
         self.pulsateEffect.setEnabled(False)
         self.pulsateEffect.setBlurRadius(1)
@@ -358,7 +346,6 @@ class cardView(QGraphicsItem):
         The animation is implemented using a white QGraphicsDropShadowEffect
         where increased blurRadius blurs the edges of the effect.
         '''
-        
         self.graphicsEffect().setBlurRadius(blurRadius)
         
         

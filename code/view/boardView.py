@@ -4,9 +4,9 @@ Created on 7 apr 2014
 @author: Sven, Bjorn, Martin
 '''
 
-from PyQt5.QtCore import Qt, QPointF, QThread
+from PyQt5.QtCore import Qt, QPointF
 from PyQt5.QtGui import QImage
-from PyQt5.QtWidgets import QGraphicsView, QGraphicsItem, QApplication
+from PyQt5.QtWidgets import QGraphicsView, QGraphicsItem
 from view import cardView, stackView, boardScene, communicator, glassView
 from model import boardStacks
 from animation import animationEngine
@@ -308,9 +308,6 @@ class boardView(QGraphicsView):
         # Determines how quick the animation is
         scaleStep = -0.05
         
-        print("boardView/flipCards: MY THREAD IS ", QThread.currentThread())
-        print("boardView/flipCards: MY MAIN THREAD IS ", QApplication.instance().thread())
-
         # Pass the cards to flip, the start stack, the end stack, the start position,
         # the end position, the card offset, the card size, and the scale step to the
         # animation engine
@@ -325,8 +322,6 @@ class boardView(QGraphicsView):
         Sets the z value of a card.
         '''
         
-        print("boardView/setCardZValue: MY THREAD IS ", QThread.currentThread())
-        print("boardView/setCardZValue: MY MAIN THREAD IS ", QApplication.instance().thread())
         card = self.cardList[flipCardId]
         card.setZValue(zValue)     
         
@@ -336,8 +331,6 @@ class boardView(QGraphicsView):
         Moves, rotates and scales a card (as part of a flipping animation).
         '''
         
-        print("boardView/transformCard: MY THREAD IS ", QThread.currentThread())
-        print("boardView/transformCard: MY MAIN THREAD IS ", QApplication.instance().thread())
         card = self.cardList[flipCardId]
         card.setPos(pos)
         card.setRotation(rotation)
@@ -361,7 +354,6 @@ class boardView(QGraphicsView):
         '''
         Updates the contents of the temp stack.
         '''
-        
         
         if(stackid == boardStacks.boardStacks.Deck):
             newStacks = self.splitStackOnCard(cardid, self.deckStackView.getStack())

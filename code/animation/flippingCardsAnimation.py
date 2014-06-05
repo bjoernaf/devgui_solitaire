@@ -4,8 +4,7 @@ Created on 18 May 2014
 @author: Martin
 '''
 
-from PyQt5.QtCore import QObject, QPointF, QThread
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtCore import QObject, QPointF
 from animation import communicator
 
 
@@ -74,9 +73,6 @@ class flippingCardsAnimation(QObject):
         Performs one step in the flipping animation and removes the animation
         from the animation engine if the end of the animation has been reached.
         '''
-        print("flippingCardsAnimation/flip: MY THREAD IS ", QThread.currentThread())
-        print("flippingCardsAnimation/flip: MY MAIN THREAD IS ", QApplication.instance().thread())
-
         self.scaleFactor = self.scaleFactor + self.scaleStep        
         
         if self.scaleFactor <= 0.0: # Flipping of current card is half-finished 

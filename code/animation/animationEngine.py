@@ -4,8 +4,7 @@ Created on 12 May 2014
 @author: Sven, Martin
 '''
 
-from PyQt5.QtCore import QObject, QTimer, QThread
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtCore import QObject, QTimer
 from animation import flippingCardsAnimation, pulsatingCardAnimation
 from controller import communicator
 
@@ -32,7 +31,6 @@ class animationEngine(QObject):
         '''
         Sets up a timer to synchronize animations and creates a list for animations.
         '''
-        
         self.flippingCards = list()
         self.pulsatingCards = list()
 
@@ -48,7 +46,6 @@ class animationEngine(QObject):
         '''
         Makes all animations take a step forward.
         '''
-
         for animation in self.flippingCards:
             animation.step()
         
@@ -61,8 +58,6 @@ class animationEngine(QObject):
         '''
         Starts a flipping cards animation.
         '''
-        print("animationEngine/addFlippingCards: MY THREAD IS ", QThread.currentThread())
-        print("animationEngine/addFlippingCards: MY MAIN THREAD IS ", QApplication.instance().thread())
         animation = flippingCardsAnimation.flippingCardsAnimation(cardList,
                                                                   startStack,
                                                                   endStack,
