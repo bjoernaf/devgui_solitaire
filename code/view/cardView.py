@@ -325,6 +325,16 @@ class cardView(QGraphicsItem):
 
                 # Make the animation engine animate the card
                 self.com.addPulsatingAnimationSignal.emit(self.id)
+            
+            # Else, if the card is faceup and not in Drawable or Deck, start the animation anyway.
+            elif (self.parentItem().id != boardStacks.boardStacks.Deck and
+                  self.parentItem().id != boardStacks.boardStacks.Drawable) and self.faceup:
+                # Enable the pulsating animation effect
+                self.pulsateEffect.setEnabled(True)
+
+                # Make the animation engine animate the card
+                self.com.addPulsatingAnimationSignal.emit(self.id)
+                
         
         
     def hoverLeaveEvent(self, event):
