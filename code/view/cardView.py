@@ -4,11 +4,12 @@ Created on 7 apr 2014
 @author: Sven, Bjorn, Martin 
 '''
 
-from PyQt5.QtCore import Qt, QRectF, QMimeData, QPointF, QSize
+from PyQt5.QtCore import Qt, QRectF, QMimeData, QPointF, QSize, QThread
 from PyQt5.QtGui import QDrag, QFont, QPainter, QImage, QColor
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsDropShadowEffect
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsDropShadowEffect, QApplication
 from model import boardStacks
 from view import communicator
+
 
 class cardView(QGraphicsItem):
     '''
@@ -45,6 +46,8 @@ class cardView(QGraphicsItem):
         self.com.turnCardSignal.connect(gameStateController.turnCard)
         self.com.reenterCardSignal.connect(gameStateController.reenterCard)
         self.com.beginFlipMacroSignal.connect(gameStateController.beginFlipMacro)
+        self.com.addPulsatingAnimationSignal.connect(gameStateController.addPulsatingAnimation)
+        self.com.removePulsatingAnimationSignal.connect(gameStateController.removePulsatingAnimation)
         
         # Store color, value, cardId and faceup status
         self.color = color
@@ -68,8 +71,7 @@ class cardView(QGraphicsItem):
         # Set up effect to use when animating pulsate and connect it to the cardView
         self.pulsateEffect = QGraphicsDropShadowEffect()
         self.pulsateEffect.setColor(Qt.white)
-        self.pulsateEffect.setOffset(0,0)
-        self.pulsateIncrease = True # True increasing, False decreasing
+        self.pulsateEffect.setOffset(0, 0)
         self.setGraphicsEffect(self.pulsateEffect)
     
     
@@ -119,6 +121,8 @@ class cardView(QGraphicsItem):
         '''
         Override mouseDoubleClickEvent.
         '''
+        print("cardView/doubleClick: MY THREAD IS ", QThread.currentThread())
+        print("cardView/doubleClick: MY MAIN THREAD IS ", QApplication.instance().thread())
         # If card is in Deck
         if self.parentItem().getid() == boardStacks.boardStacks.Deck:
             # Begin a command macro, so that the whole process of flipping cards
@@ -276,6 +280,7 @@ class cardView(QGraphicsItem):
         # Load large image
         self.image = QImage("images/front/" + str(self.color) + str(self.value) + ".png")
         if self.image.isNull():
+
             print("CARDVIEW  : loadImage: Error loading front image " + str(self.color) + str(self.value) + ".png")
             
         # Load small image and scale if it exists
@@ -297,14 +302,7 @@ class cardView(QGraphicsItem):
         # Queue repaint of card
         self.update()
      
-     
-    def rotate(self):
-        '''
-        Rotate something
-        '''
-        print("Rotating...")    
-    
-    
+
     def toValueString(self, value):
         '''
         Returns correct string corresponding to a card value
@@ -316,69 +314,52 @@ class cardView(QGraphicsItem):
                 13: "K",
                 }.get(value, str(value))
         
-             
+        
     def hoverEnterEvent(self, event):
         '''
         Catches when the mouse enters the hover area above the cardView.
+        Starts a pulsating animation.
         '''
+<<<<<<< HEAD
         # If the card is facing up or is top card in the stack,
         # add it to pulsating animation
         if self.faceup:
-            self.boardView.animationEngine.addPulsating(self)
+            # Enable the pulsating animation effect
+            self.pulsateEffect.setEnabled(True)
+
+            # Make the animation engine animate the card
+            self.com.addPulsatingAnimationSignal.emit(self.id)
         elif self.parentItem != None:
             if self.id == self.parentItem().topCardId():
-                self.boardView.animationEngine.addPulsating(self)
+                # Enable the pulsating animation effect
+                self.pulsateEffect.setEnabled(True)
+
+                # Make the animation engine animate the card
+                self.com.addPulsatingAnimationSignal.emit(self.id)
         
         
     def hoverLeaveEvent(self, event):
         '''
         Catches when the mouse leaves the hover area above the cardView.
+        Stops a pulsating animation.
         '''
-        # Remove the card from the pulsating animation engine list
-        self.boardView.animationEngine.removePulsating(self)
-        # Reset the animation
-        self.resetAnimation()
         
-        
-    def pulsate(self):
-        '''
-        Animate the card to pulsate. The animation is implemented
-        using a white QGraphicsDropShadowEffect where increased
-        blurRadius blurs the edges of the effect.
-        '''
-        # Store the current blurRadius
-        currentBlur = self.pulsateEffect.blurRadius()
-        
-        # If currentBlur is not at edge values, increase or decrease it
-        if currentBlur > 1 and currentBlur < 59:
-            if self.pulsateIncrease == True:
-                self.pulsateEffect.setBlurRadius(currentBlur+1)
-            else:
-                self.pulsateEffect.setBlurRadius(currentBlur-1)
-        # If currentBlur has reached 0, change to increasing Blur
-        elif currentBlur <= 1:
-            self.pulsateIncrease = True
-            self.pulsateEffect.setBlurRadius(currentBlur+1)
-        # If currentblur has reached 59, change to decreasing Blur
-        elif currentBlur == 59:
-            self.pulsateIncrease = False
-            self.pulsateEffect.setBlurRadius(currentBlur-1)
-        else:
-            print("CARDVIEW: PULSATE: Error, wrong blurRadius!")
-        
-        # Enable blur effect if disabled
-        if self.pulsateEffect.isEnabled() == False:
-            self.pulsateEffect.setEnabled(True)
-        
-        
-    def resetAnimation(self):
-        '''
-        Resets all animations included to original state.
-        Add more animations if necessary.
-        '''
-        # Disable pulsating animation and reset it
+        # Disable the pulsating animation effect and reset the blur radius
         self.pulsateEffect.setEnabled(False)
-        self.pulsateEffect.setBlurRadius(0)
+        self.pulsateEffect.setBlurRadius(1)
+        
+        # Stop the animation engine from animating the card
+        self.com.removePulsatingAnimationSignal.emit(self.id)
+        
+        
+    def pulsate(self, blurRadius):
+        '''
+        Makes the card take one step in a pulsating animation.
+        The animation is implemented using a white QGraphicsDropShadowEffect
+        where increased blurRadius blurs the edges of the effect.
+        '''
+        
+        self.graphicsEffect().setBlurRadius(blurRadius)
         
         
     def updateToolTip(self):

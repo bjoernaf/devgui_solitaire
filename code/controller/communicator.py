@@ -16,6 +16,17 @@ class communicator(QObject):
     updateCardSignal = pyqtSignal(int, name='updateCardSignal')
     
     updateAllCardsSignal = pyqtSignal(list, name='updateAllCardsSignal')
+    
+    # Signal to start a flip animation
+    addFlipAnimationSignal = pyqtSignal(list, int, int, int, int, int, int, int, int, float,
+                                        name = 'addFlipAnimationSignal')
+    
+    # Signal to start a pulsating animation
+    addPulsatingAnimationSignal = pyqtSignal(int, name = 'addPulsatingAnimationSignal')
+    
+    # Signal to stop a pulsating animation
+    removePulsatingAnimationSignal = pyqtSignal(int, name = 'removePulsatingAnimationSignal')
+
 
     def __init__(self):
         '''
