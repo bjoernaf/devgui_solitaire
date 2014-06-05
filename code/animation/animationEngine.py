@@ -6,15 +6,14 @@ Created on 12 May 2014
 
 from PyQt5.QtCore import QObject, QTimer
 from animation import flippingCardsAnimation, pulsatingCardAnimation
-from controller import communicator
 
 class animationEngine(QObject):
     '''
     An engine controlling animations to be performed.
     The engine can handle several types of animations through
     different lists that are iterated over each time a timer
-    timeouts. The respective animation function for each object
-    is called upon to perform one step of the animation.
+    timeouts. A function in each animation is called
+    to perform one step of the animation.
     '''
 
     def __init__(self, gameStateController, boardView):
@@ -29,8 +28,11 @@ class animationEngine(QObject):
         
     def startEngine(self):
         '''
-        Sets up a timer to synchronize animations and creates a list for animations.
+        Sets up a timer to synchronize animations and creates animation lists.
+        Not done in the constructor, since creating objects there might make
+        them end up on the wrong (main) thread.
         '''
+        # Animation lists
         self.flippingCards = list()
         self.pulsatingCards = list()
 
@@ -44,7 +46,7 @@ class animationEngine(QObject):
         
     def animate(self):
         '''
-        Makes all animations take a step forward.
+        Makes all animations perform one step.
         '''
         for animation in self.flippingCards:
             animation.step()

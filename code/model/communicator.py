@@ -1,5 +1,5 @@
 '''
-Created on 24 apr 2014
+Created on 24 April 2014
 
 @author: Sven, Max, Bjorn
 '''
@@ -8,16 +8,18 @@ from PyQt5.QtCore import (QObject, pyqtSignal)
 
 class communicator(QObject):
     '''
-    Communicator for signals 
+    Contains signals used in the model package.
     '''
-    # Update stack signal from model to view
     updateStackSignal = pyqtSignal(dict, name='updateSignal')
+    
     updateCardSignal = pyqtSignal(int, name='updateCardSignal')
+    
     updateAllCardsSignal = pyqtSignal(list, name='updateAllCardsSignal')
+    
     gameWonSignal = pyqtSignal(name='gameWonSignal')
 
     def __init__(self):
         '''
-        Constructor
+        Constructor.
         '''
         super(communicator, self).__init__()

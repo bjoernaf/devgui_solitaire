@@ -1,8 +1,9 @@
 '''
-Created on 9 maj 2014
+Created on 9 May 2014
 
 @author: Max, Sven, Bjorn
 '''
+
 from PyQt5.QtWidgets import QSlider
 from PyQt5.QtCore import Qt, QSettings
 from view import communicator
@@ -17,7 +18,7 @@ class transSlider(QSlider):
     
     def __init__(self, boardView):
         '''
-        Constructor, creates the slider and sets it's value to opacity stored in settings.
+        Constructor, creates the slider and sets its value to opacity stored in settings.
         '''
         super(transSlider, self).__init__(Qt.Horizontal)
         self.boardView = boardView

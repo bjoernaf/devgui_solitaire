@@ -4,8 +4,8 @@ Created on 13 apr 2014
 @author: Sven, Bjorn, Max
 '''
 
-from PyQt5.QtCore import (QSettings, QPoint)
-from PyQt5.QtWidgets import (QDialog, QFrame, QVBoxLayout, QLabel, QButtonGroup, QRadioButton)
+from PyQt5.QtCore import QSettings, QPoint
+from PyQt5.QtWidgets import QDialog, QFrame, QVBoxLayout, QLabel, QButtonGroup, QRadioButton
 
 from view import transSlider
 
@@ -20,8 +20,7 @@ class controlPanel(QDialog):
 
     def __init__(self, boardView):
         '''
-        Constructor:
-        Creates the control panel and adds content.
+        Constructor. Creates the control panel and adds content.
         '''
         
         super(controlPanel,self).__init__()
@@ -84,11 +83,11 @@ class controlPanel(QDialog):
         self.settings.setValue("ControlPanel/CardStyle", self.buttonCardGroup.checkedId())
         print("CONTROLPAN: Close control panel")
         
+        
     def createThemeButtonGroup(self):
         '''
         Creates a button group to select back of card color
         '''
-        
         # Create a button group to ensure buttons are exclusive
         self.buttonThemeGroup = QButtonGroup()
         
@@ -154,6 +153,7 @@ class controlPanel(QDialog):
         
         # Call updateTheme to use correct theme version
         self.updateTheme(self.buttonThemeGroup.checkedId())
+        
         
     def updateTheme(self, buttonId):
         '''

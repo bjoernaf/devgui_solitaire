@@ -1,5 +1,5 @@
 '''
-Created on 19 maj 2014
+Created on 19 May 2014
 
 @author: Sven
 '''
@@ -10,13 +10,12 @@ from model import boardModel
 
 class turnCardCommand(QUndoCommand):
     '''
-    A QUndoCommand created to turn a card. (up / down)
+    A QUndoCommand to turn a card (change its facing).
     '''
-
 
     def __init__(self, model, cardId):
         '''
-        Constructor
+        Constructor.
         '''
         super(turnCardCommand, self).__init__()
         self.model = model
@@ -25,14 +24,13 @@ class turnCardCommand(QUndoCommand):
     
     def redo(self):
         '''
-        Call to perform or redo a moveCardCommand
+        Performs or redoes the command.
         '''
         self.model.turnCard(self.cardId)
         
         
     def undo(self):
         '''
-        Call to undo a moveCardCommand
+        Undoes the command.
         '''
         self.model.turnCardUndo(self.cardId)
-        

@@ -1,5 +1,5 @@
 '''
-Created on 7 apr 2014
+Created on 7 April 2014
 
 @author: Sven, Bjorn, Martin
 '''
@@ -287,12 +287,14 @@ class stackView(QGraphicsItem):
         truePos = QPointF(x, y)
         self.setPos(truePos)
         
+        
     def topCardId(self):
         '''
         Returns the card id of the top card
         '''
         if self.stackCardList != []:
             return self.stackCardList[-1]
+        
         
     def updateFeedbackWindow(self, reason):
         '''
@@ -301,6 +303,7 @@ class stackView(QGraphicsItem):
         self.feedbackWindow.setPlainText(reason)
         if not self.feedbackWindow.isVisible():
             self.feedbackWindow.show()
+        
         
     def hideFeedbackWindow(self):
         '''
@@ -313,12 +316,14 @@ class stackView(QGraphicsItem):
         if self.paintColor != Qt.white:
             self.updatePaintColor(Qt.white)
         
+        
     def updatePaintColor(self, color):
         '''
         Sets the color the painter should use to
         paint all cards with.
         '''
         self.paintColor = color
+        
         
     def loadImage(self):
         '''

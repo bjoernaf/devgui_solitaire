@@ -8,9 +8,8 @@ from PyQt5.QtCore import QObject, pyqtSignal, QPointF
 
 class communicator(QObject):
     '''
-    Communicator contains signals used in the view package.
+    Contains signals used in the animation package.
     '''
-    
     # Signal to move cards between stacks
     moveCardSignal = pyqtSignal(int, int, int, name='moveCard')
     
@@ -32,6 +31,6 @@ class communicator(QObject):
 
     def __init__(self):
         '''
-        Constructor simply calls super.
+        Constructor.
         '''
         super(communicator, self).__init__()

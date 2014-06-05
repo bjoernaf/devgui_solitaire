@@ -1,5 +1,5 @@
 '''
-Created on 19 maj 2014
+Created on 19 May 2014
 
 @author: Sven
 '''
@@ -9,13 +9,12 @@ from PyQt5.QtWidgets import QUndoCommand
 
 class reenterCardCommand(QUndoCommand):
     '''
-    A QUndoCommand created to turn a card. (up / down)
+    A QUndoCommand to move cards from the Drawable stack to the bottom of the Deck.
     '''
-
 
     def __init__(self, model):
         '''
-        Constructor
+        Constructor.
         '''
         super(reenterCardCommand, self).__init__()
         self.model = model
@@ -23,15 +22,15 @@ class reenterCardCommand(QUndoCommand):
     
     def redo(self):
         '''
-        Call to perform or redo a reenterCard Command
+        Performs or redoes the command.
         '''
         self.numberOfCards = self.model.reenterCards()
-        print("REECARDCOM: redo: Put", self.numberOfCards, "cards back on deck.")
+        print("REECARDCOM: redo: Put", self.numberOfCards, "cards back on Deck.")
                 
         
     def undo(self):
         '''
-        Call to undo a moveCardCommand
+        Undoes the command.
         '''
-        print("REECARDCOM: undo: Returning", self.numberOfCards, "cards to drawable.")
+        print("REECARDCOM: undo: Returning", self.numberOfCards, "cards to Drawable.")
         self.model.unReenterCards(self.numberOfCards)

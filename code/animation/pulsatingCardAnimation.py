@@ -7,16 +7,14 @@ Created on 5 June 2014
 from PyQt5.QtCore import QObject
 from animation import communicator
 
-
 class pulsatingCardAnimation(QObject):
     '''
     An animation that makes the edge of a card pulsate.
     '''
 
-
     def __init__(self, cardId, boardView):
         '''
-        Constructor
+        Constructor.
         '''
         super(pulsatingCardAnimation, self).__init__()
         
@@ -24,6 +22,7 @@ class pulsatingCardAnimation(QObject):
         self.blurRadius = 1
         self.increaseBlurRadius = True
         
+        # Set up signals
         self.com = communicator.communicator()
         self.com.pulsateCardSignal.connect(boardView.pulsateCard)
         

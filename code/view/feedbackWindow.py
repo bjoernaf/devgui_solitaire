@@ -1,5 +1,5 @@
 '''
-Created on 2 jun 2014
+Created on 2 June 2014
 
 @author: Sven
 '''
@@ -13,7 +13,6 @@ class feedbackWindow(QGraphicsTextItem):
     on why a card move is invalid. It should only be attached
     to the tempStack.
     '''
-
 
     def __init__(self, text, parent = None):
         '''

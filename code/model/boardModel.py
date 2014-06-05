@@ -1,7 +1,7 @@
 '''
-Created on 7 apr 2014
+Created on 7 April 2014
 
-@author: Sven, Bjorn, Max
+@author: Sven, Bjorn, Max, Martin
 '''
 
 from .cardModel import cardModel
@@ -10,7 +10,6 @@ from .boardStacks import boardStacks
 
 # Allows us to randomize deck.
 import random
-
 
 class boardModel(object):
     '''
@@ -48,7 +47,6 @@ class boardModel(object):
                 self.cardFaceUp.append(False)
                        
         # Create deck of cards and notify view
-        #self.createRandomizedDeck() #createSortedDeck()
         self.createSolitaireGame()
         self.com.updateAllCardsSignal.emit(self.cardFaceUp)
         self.com.updateStackSignal.emit(self.getStackDict())
@@ -125,7 +123,6 @@ class boardModel(object):
                     return False, "Flip this card first!"
                 
                 color1 = self.cardList[topCard].color
-                color2 = self.cardList[card].color
                 indexdif = card - topCard
                 
                 #Is the card a king?   
@@ -192,10 +189,9 @@ class boardModel(object):
         Can be used internally in boardModel, in which case the use of the temp
         stack can be allowed. This should not be done externally.
         '''
-        '''
-        if(self.checkMove(fromStack, toStack, card) == False):
-            return False
-        '''
+        
+        # if(self.checkMove(fromStack, toStack, card) == False):
+        #     return False
         
         print("MODEL     : MoveCard: Entering moveCard with arguments (", fromStack, ", ", toStack, ", ", card, ")");
         

@@ -1,5 +1,5 @@
 '''
-Created on 2 maj 2014
+Created on 2 May 2014
 
 @author: Sven
 '''
@@ -10,14 +10,13 @@ from model import boardModel
 
 class moveCardCommand(QUndoCommand):
     '''
-    A QUndoCommand created to move a card(cardModel) from one stack to another
+    A QUndoCommand to move a card from one stack to another
     with options to undo and redo.
     '''
 
-
     def __init__(self, model, fromStack, toStack, cardID):
         '''
-        Constructor
+        Constructor.
         '''
         super(moveCardCommand, self).__init__()
         self.model = model
@@ -28,14 +27,13 @@ class moveCardCommand(QUndoCommand):
     
     def redo(self):
         '''
-        Call to perform or redo a moveCardCommand
+        Perform or redoes the command.
         '''
         self.model.moveCard(self.fromStack, self.toStack, self.cardID)
         
         
     def undo(self):
         '''
-        Call to undo a moveCardCommand
+        Undoes the command
         '''
         self.model.moveCard(self.toStack, self.fromStack, self.cardID)
-        

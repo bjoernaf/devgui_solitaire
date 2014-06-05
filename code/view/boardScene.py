@@ -1,5 +1,5 @@
 '''
-Created on 10 maj 2014
+Created on 10 May 2014
 
 @author: Sven
 '''
@@ -46,6 +46,7 @@ class boardScene(QGraphicsScene):
         '''
         self.boardView.tempStackView.updatePos(event.scenePos())
         QGraphicsScene.mouseMoveEvent(self, event)
+        
         
     def resizeEvent(self, event):
         '''

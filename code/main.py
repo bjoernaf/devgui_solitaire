@@ -1,5 +1,5 @@
 '''
-Created on 7 apr 2014
+Created on 7 April 2014
 
 @author: Sven, Bjorn, Martin
 '''

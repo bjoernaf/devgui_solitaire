@@ -1,5 +1,5 @@
 '''
-Created on 7 apr 2014
+Created on 7 April 2014
 
 @author: Sven, Bjorn, Martin
 '''
@@ -18,7 +18,6 @@ class boardView(QGraphicsView):
     (created in stackView.py) of cards (created in cardView.py).
     '''
     
-        
     def __init__(self, windowWidth, windowHeight, gameStateController):
         '''
         Constructor:
@@ -42,17 +41,6 @@ class boardView(QGraphicsView):
         
         # Store a reference to gameStateController
         self.gameStateController = gameStateController
-        
-        #=======================================================================
-        # # Create an animation engine and push it onto a new thread
-        # self.animationEngine = animationEngine.animationEngine(self.gameStateController, self)
-        # self.animationThread = QThread()
-        # self.animationEngine.moveToThread(self.animationThread)
-        # 
-        # # Start the new thread and thereby the animation engine
-        # self.animationThread.started.connect(self.animationEngine.startEngine)
-        # self.animationThread.start()
-        #=======================================================================
         
         # Create a communicator and connect relevant signals to slots
         self.com = communicator.communicator()
@@ -96,7 +84,7 @@ class boardView(QGraphicsView):
     def updateCard(self, cardId):
         '''
         Slot for signal which updates the facing of one card,
-        and sets it's movable flag to the value of faceUp.
+        and sets its movable flag to the value of faceUp.
         Also calls for a card tooltip update.
         '''
         print("Received update signal for card " + str(cardId))
@@ -106,10 +94,9 @@ class boardView(QGraphicsView):
         
     def updateStacks(self, stacks):
         '''
-        Slot for an update signal in Controller.
-        @param stacks: The card stack structure
-        Calls for each stack to update the list of cards
-        belonging to that stack.
+        Slot for an signal transferring the current stack
+        structure. Calls for each stack to update the list
+        of cards belonging to that stack.
         '''
         print("BOARDVIEW : updateStacks: New stacks from MODEL:", stacks)
         
@@ -164,7 +151,7 @@ class boardView(QGraphicsView):
         self.scene.setBackgroundBrush(Qt.darkGreen)
         
         # Add glass pane tutorial to boardview.
-        self.glassView = glassView.glassView(gameStateController, self, self.width(), self.height())
+        self.glassView = glassView.glassView(self.width(), self.height())
         self.glassView.setPos(1, 1)
         self.glassView.setZValue(100) # Just to show on top of rest, 100 not important.
         self.glassView.hide()
@@ -244,13 +231,13 @@ class boardView(QGraphicsView):
         self.bottom7StackView.setPos(670, 240)
         self.scene.addItem(self.bottom7StackView)
         
-     
         
         # The tempStack with no location and temporarily hidden
         self.tempStackView = stackView.stackView(self, gameStateController,
                                                  boardStacks.boardStacks.tempStack)
         self.scene.addItem(self.tempStackView)
         self.tempStackView.hide()
+        
         # Initialize the tempstack
         self.clearTempStack()
 
@@ -544,7 +531,8 @@ class boardView(QGraphicsView):
         self.cardStyle = image
         for card in self.cardList:
             card.setImage(image)
-
+        
+        
     def showTutorial(self):
         '''
         Shows tutorial window on top of everything else.
@@ -553,6 +541,7 @@ class boardView(QGraphicsView):
         self.glassView.show()
         self.tutorialVisible = True
         
+        
     def hideTutorial(self):
         '''
         Hides tutorial window and sets visible flag to False.
@@ -560,23 +549,27 @@ class boardView(QGraphicsView):
         self.glassView.hide()
         self.tutorialVisible = False
         
+        
     def isTutorialVisible(self):
         '''
         Returns the value of tutorialVisible
         '''
         return self.tutorialVisible
-    
+        
+        
     def updateFeedbackWindow(self, feedback):
         '''
         Call for tempStack to display a window with card move info feedback.
         '''
         self.tempStackView.updateFeedbackWindow(feedback)
         
+        
     def hideFeedbackWindow(self):
         '''
         Call for tempStack to hide the feedback window.
         '''
         self.tempStackView.hideFeedbackWindow()
+        
         
     def updatePaintColor(self, color):
         '''

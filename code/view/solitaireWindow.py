@@ -1,9 +1,8 @@
 '''
-Created on 13 apr 2014
+Created on 13 April 2014
 
 @author: Sven, Bjorn, Max
 '''
-
 
 from PyQt5.QtCore import (QSettings, QSize, QPoint, Qt)
 from PyQt5.QtWidgets import (QMainWindow, QAction, QMessageBox, QToolBar)
@@ -17,7 +16,6 @@ class solitaireWindow(QMainWindow):
     It contains a boardView, a QMenuBar with items and
     a QToolBar with items.
     '''
-
 
     def __init__(self, title, gameStateController):
         '''
@@ -47,10 +45,11 @@ class solitaireWindow(QMainWindow):
         self.resize(size)
         self.move(position)
         
-        # Create a boardView and set it as central widget, create Menu
+        # Create a boardView and set it as central widget,
+        # set window title, create menu
         self.bView = boardView.boardView(500, 300, gameStateController)
         self.setCentralWidget(self.bView)
-        self.createUI()
+        self.setWindowTitle(self.winTitle)
         self.createMenu()
         
         # Create control panel
@@ -58,6 +57,7 @@ class solitaireWindow(QMainWindow):
         
         # Create a transparency slider for the cards
         self.slide = transSlider.transSlider(self.bView)
+        
         # Create a toolbar and add appropriate actions and widgets to it
         self.toolbar = QToolBar()
         self.toolbar.addAction(self.undoAction)
@@ -78,13 +78,6 @@ class solitaireWindow(QMainWindow):
         self.controlPanel.show()
         self.controlPanel.raise_()
         self.controlPanel.activateWindow()
-        
-    
-    def createUI(self):
-        '''
-        Creates UI... (sets window title only... unnessecary?)
-        '''
-        self.setWindowTitle(self.winTitle)
         
         
     def updateMenuUndo(self, canUndo):
@@ -245,7 +238,8 @@ class solitaireWindow(QMainWindow):
         
         if reply == QMessageBox.Yes:
             self.com.newGameSignal.emit()
-            
+        
+        
     def about(self):
         '''
         Creates a QMessageBox displaying info about Solitaire.
@@ -269,6 +263,7 @@ class solitaireWindow(QMainWindow):
                 "</center></body></html>")
         
         QMessageBox.about(self, "About Solitaire", text)
+        
         
     def aboutQt(self):
         '''

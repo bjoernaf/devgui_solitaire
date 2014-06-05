@@ -1,10 +1,10 @@
 '''
-Created on 7 apr 2014
+Created on 7 April 2014
 
-@author: Sven, Bjorn
+@author: Sven, Bjorn, Martin
 '''
 
-from PyQt5.QtCore import QThread
+from PyQt5.QtCore import QObject, QThread
 from PyQt5.QtWidgets import QUndoStack
 
 from model import boardModel, boardStacks
@@ -12,31 +12,31 @@ from view import solitaireWindow, boardView
 from controller import communicator, moveCardCommand, turnCardCommand, reenterCardCommand
 from animation import animationEngine
 
-class gameStateController(object):
+class gameStateController(QObject):
     '''
-    gameStateController is the controller in an MVC pattern.
-    It interprets signals from the view and calls appropriate method in the model.
+    The controller in a model--view--controller attern.
+    It interprets signals from the other parts of the
+    program and takes appropriate actions.
     '''
 
     def __init__(self):
         '''
-        Constructor
+        Constructor.
         '''
         super(gameStateController,self).__init__()
         
-        # Initialize communicator
+        # Initialize communicator (contains signals)
         self.com = communicator.communicator()
         
-        # Create the main window (View), pass controller as parameter
+        # Create the main window, pass controller as parameter
         self.solWin = solitaireWindow.solitaireWindow("Solitaire", self)
         self.solWin.show()
         
-        # Create undoStack
+        # Create an undo stack
         self.undoStack = QUndoStack()
         
         # Create an animation engine and push it onto a new thread
-        self.animationEngine = animationEngine.animationEngine(self,
-                                                               self.solWin.centralWidget())
+        self.animationEngine = animationEngine.animationEngine(self, self.solWin.centralWidget())
         self.animationThread = QThread()
         self.animationEngine.moveToThread(self.animationThread)
         
@@ -44,7 +44,7 @@ class gameStateController(object):
         self.animationThread.started.connect(self.animationEngine.startEngine)
         self.animationThread.start()
 
-        # Connect animation signals to slots in animation engine
+        # Connect animation signals to slots in the animation engine
         self.com.addFlipAnimationSignal.connect(self.animationEngine.addFlippingCards)
         self.com.addPulsatingAnimationSignal.connect(self.animationEngine.addPulsatingCard)
         self.com.removePulsatingAnimationSignal.connect(self.animationEngine.removePulsatingCard)
@@ -53,12 +53,9 @@ class gameStateController(object):
         self.undoStack.canUndoChanged.connect(self.solWin.updateMenuUndo)
         self.undoStack.canRedoChanged.connect(self.solWin.updateMenuRedo)
         
-        # Connect updateSignal to slot in view
+        # Connect update signals to slots in view
         self.com.updateSignal.connect(self.solWin.bView.updateStacks)
-        
-        # Connect updateCardSignal to slot in view
         self.com.updateCardSignal.connect(self.solWin.bView.updateCard)
-        
         self.com.updateAllCardsSignal.connect(self.solWin.bView.updateAllCards)
         
         # Create the model, pass controller as parameter
@@ -67,8 +64,8 @@ class gameStateController(object):
         
     def undo(self):
         '''
-        Slot receiving a signal from the Edit menu's undo function.
-        Calls the undo function of the undoStack
+        Slot receiving undo signals.
+        Calls the undo function of the undoStack.
         '''
         print("CONTROLLER: Undo: Performing undo operation.")
         self.undoStack.undo()
@@ -76,55 +73,55 @@ class gameStateController(object):
         
     def redo(self):
         '''
-        Slot receiving a signal from the Edit menu's redo function.
-        Calls the redo function of the undoStack
-        TODO: Find out how this works
+        Slot receiving redo signals.
+        Calls the redo function of the undoStack.
         '''
         print("CONTROLLER: Redo: Performing redo operation.")
         self.undoStack.redo()
 
   
     def updateControllerAllCards(self, cardFaceUp):
-        print("CONTROLLER: updateControllerAllCards: Forward cardFacUp from MODEL to BOARDVIEW.")
+        '''
+        Slot receiving updates from the model regarding how cards
+        are facing (up or down).
+        '''
+        print("CONTROLLER: updateControllerAllCards: Forward cardFaceUp from MODEL to BOARDVIEW.")
         self.com.updateAllCardsSignal.emit(cardFaceUp)
 
 
     def updateControllerStacks(self, stacks):
         '''
-        Slot receiving stack update from model
+        Slot receiving updates of the stacks from the model.
         '''
-        # Forward stacks to view
         print("CONTROLLER: UpdateControllerStacks: Forward stacks from MODEL to BOARDVIEW.")
         self.com.updateSignal.emit(stacks)
 
 
     def updateControllerCard(self, cardId):
         '''
-        Slot receiving card update from model
+        Slot receiving signals regarding single cards
+        whose facing should be changed.
         '''
-        # Forward stacks to view
         print("CONTROLLER: updateControllerCard: Forward card from MODEL to BOARDVIEW.")
         self.com.updateCardSignal.emit(cardId)
         
         
     def moveCard(self, fromStack, toStack, cardID):
         '''
-        Slot receiving signals from view. Creates a moveCardCommand(QUndoCommand)
-        and pushes it on the undoStack.
+        Slot receiving signals from view. Creates a move card command
+        and pushes it onto the undo stack.
         '''
-
-        print("CONTROLLER: moveCardCommand: Ask MODEL to MoveCard(", fromStack, ",", toStack, ",", cardID, ")")
+        print("CONTROLLER: moveCardCommand: Ask MODEL to move card ",
+              cardID, " from ", fromStack, " to ", toStack, ".")
         
-        # Create moveCardCommand
         aMoveCardCommand = moveCardCommand.moveCardCommand(self.model, fromStack, toStack, cardID)
+        self.undoStack.push(aMoveCardCommand) # Undo stack automatically performs redo()
         
-        # Push command to undoStack, undoStack automatically performs command redo()
-        self.undoStack.push(aMoveCardCommand)
-            
         
     def reenterCard(self):
         '''
-        Slot for moving Drawable cards from Drawable to Deck again.
+        Slot receiving signals to move cards from the Drawable stack
+        to the bottom of the Deck.
         '''
         aReenterCardCommand = reenterCardCommand.reenterCardCommand(self.model)
         self.undoStack.push(aReenterCardCommand)
@@ -132,12 +129,9 @@ class gameStateController(object):
         
     def turnCard(self, cardId):
         '''
-        Slot receiving signal from view requesting the turning of a card.
+        Slot receiving signals from view requesting the turning of a card.
         '''
-        # Create turnCardCommand for card cardId
         aTurnCardCommand = turnCardCommand.turnCardCommand(self.model, cardId)
-        
-        # Push command on undoStack, automatically calls redo() function of command
         self.undoStack.push(aTurnCardCommand)
 
         
@@ -150,48 +144,59 @@ class gameStateController(object):
     
     def startNewGame(self):
         '''
-        Slot receiving a signal to start a new game.
-        Clear the undoStack and create a new model.
+        Slot receiving signals to start a new game.
+        Clears the undoStack and creates a new model.
         '''
-        # Clear the undoStack
         self.undoStack.clear()
-        
-        # Create a new model
         self.model = boardModel.boardModel(self)
     
     
     def gameWonSlot(self):
         '''
-        Slot that listens to the model.communicator.gameWonSignal
+        Slot receiving signals indicating that the game has been won.
         '''
         self.solWin.showGameWonDialog()
     
     
     def beginFlipMacro(self):
+        '''
+        Slot receiving signals to begin an undo macro when a flip animation
+        is to be performed. The macro makes it possible to undo the whole operation
+        in one step.
+        '''
         self.undoStack.beginMacro("Flip cards")
     
     
     def endFlipMacro(self):
+        '''
+        Slot receiving signals to end an undo macro after a flip animation
+        has been performed.
+        '''
         self.undoStack.endMacro()
         
     
     def addFlipAnimation(self, cardList, startStack, endStack, startPosX, startPosY, endPosX,
                          cardOffsetX, cardWidth, cardHeight, scaleStep):
         '''
-        Slot that forwards a signal to the animation engine to start a flip animation
+        Slot receiving signals to start a flip animation. The signals are
+        forwarded to the animation engine.
         '''
         self.com.addFlipAnimationSignal.emit(cardList, startStack, endStack, startPosX,
                                              startPosY, endPosX, cardOffsetX, cardWidth,
                                              cardHeight, scaleStep)
     
+    
     def addPulsatingAnimation(self, cardId):
         '''
-        Slot that forwards a signal to the animation engine to start a pulsating animation
+        Slot receiving signals to start a pulsating animation. The signals are
+        forwarded to the animation engine.
         '''
         self.com.addPulsatingAnimationSignal.emit(cardId)
-        
+    
+    
     def removePulsatingAnimation(self, cardId):
         '''
-        Slot that forwards a signal to the animation engine to stop a pulsating animation
+        Slot receiving signals to stop a pulsating animation. The signals are
+        forwarded to the animation engine.
         '''
         self.com.removePulsatingAnimationSignal.emit(cardId)

@@ -1,20 +1,18 @@
 '''
-Created on 24 apr 2014
+Created on 24 April 2014
 
-@author: Sven
+@author: Sven, Martin
 '''
 
 from PyQt5.QtCore import (QObject, pyqtSignal)
 
 class communicator(QObject):
     '''
-    Communicator for signals 
+    Contains signals used in the controller package.
     '''
-    # just a test signal to move a card
+    # Signals to update the view
     updateSignal = pyqtSignal(dict, name='updateSignal')
-
     updateCardSignal = pyqtSignal(int, name='updateCardSignal')
-    
     updateAllCardsSignal = pyqtSignal(list, name='updateAllCardsSignal')
     
     # Signal to start a flip animation
@@ -30,6 +28,6 @@ class communicator(QObject):
 
     def __init__(self):
         '''
-        Constructor
+        Constructor.
         '''
         super(communicator, self).__init__()

@@ -1,19 +1,19 @@
 '''
-Created on 7 apr 2014
+Created on 7 April 2014
 
-@author: Sven, Bjorn, Martin
+@author: Sven, Bjorn
 '''
 
-from PyQt5.QtCore import Qt, QRectF, QMimeData, QPointF, QSize
-from PyQt5.QtGui import QDrag, QFont, QPainter, QImage
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsDropShadowEffect
+from PyQt5.QtCore import Qt, QRectF
+from PyQt5.QtGui import QFont, QPainter
+from PyQt5.QtWidgets import QGraphicsItem
 
 class glassView(QGraphicsItem):
     '''
     glassView is a QGraphicsItem representing a tutorial.
     '''
 
-    def __init__(self, gameStateController, boardView, width, height):
+    def __init__(self, width, height):
         '''
         Constructor:
         Creates the glassView and stores parameters
@@ -23,10 +23,6 @@ class glassView(QGraphicsItem):
         # Save height and width
         self.height = height
         self.width = width
-        
-        # Save game state controller instance
-        self.gsc = gameStateController
-        self.boardView = boardView
                 
 
     def boundingRect(self):
@@ -35,12 +31,10 @@ class glassView(QGraphicsItem):
         '''
         return QRectF(0, 0, self.width, self.height) 
     
+    
     def paint(self, painter, option, widget=None): 
         '''
         Override of the default paint function.
-        Draws a rounded rectangle representing a card.
-        Draws card number and card color symbol in upper
-        and lower right corner.
         '''
         
         # Set opacity to paint entire card with
@@ -71,7 +65,6 @@ class glassView(QGraphicsItem):
     def resizeEvent(self, event):
         '''
         Override of resizeEvent.
-        Keeps size relation with called (boardView).
         '''
         # Get scene position
         x = self.scenePos().x()
@@ -81,5 +74,3 @@ class glassView(QGraphicsItem):
         # Scene width or height - 2 * relative scene position
         self.width = event.size().width() - 2*x
         self.height = event.size().height() - 2*y
-#       
-

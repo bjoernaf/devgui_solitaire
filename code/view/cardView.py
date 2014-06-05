@@ -1,5 +1,5 @@
 '''
-Created on 7 apr 2014
+Created on 7 April 2014
 
 @author: Sven, Bjorn, Martin 
 '''
@@ -133,7 +133,7 @@ class cardView(QGraphicsItem):
             # Flip new cards from Deck to Drawable
             self.boardView.flipCards()
             
-        # Else if the card is at the top of it's stack
+        # Else if the card is at the top of its stack
         elif self.id == self.parentItem().topCardId():
             # Attempt to turn the card
             self.com.turnCardSignal.emit(self.id)   
