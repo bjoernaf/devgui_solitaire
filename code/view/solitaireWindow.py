@@ -263,7 +263,8 @@ class solitaireWindow(QMainWindow):
                 "<a href=\"https://github.com/bjoernaf/devgui_solitaire\">here</a>.</p>"
                 "<p>Images used within this software<br>"
                 "were taken from "
-                "<a href=\"http://sweetclipart.com/set-playing-card-suits-1247\">here</a> and "
+                "<a href=\"http://sweetclipart.com/set-playing-card-suits-1247\">here</a>, "
+                "<a href=\"http://pixabay.com/en/photos/?q=card+back\">here</a> and "
                 "<a href=\"http://www.freedesign4.me/vectors/free-vector-playing-card-deck/\">here</a>.</p>"
                 "</center></body></html>")
         
