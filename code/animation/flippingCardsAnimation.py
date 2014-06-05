@@ -6,7 +6,7 @@ Created on 18 May 2014
 
 from PyQt5.QtCore import QObject, QPointF, QThread
 from PyQt5.QtWidgets import QApplication
-from view import communicator
+from animation import communicator
 
 
 class flippingCardsAnimation(QObject):
@@ -69,7 +69,7 @@ class flippingCardsAnimation(QObject):
         self.endPos = QPointF(endPosX, self.startPosY)
         
         
-    def flip(self):
+    def step(self):
         '''
         Performs one step in the flipping animation and removes the animation
         from the animation engine if the end of the animation has been reached.
@@ -104,7 +104,7 @@ class flippingCardsAnimation(QObject):
         # and update the model.
         if self.scaleFactor == 1.0:
             if self.cardListIndex == len(self.cardList) - 1:
-                self.animationEngine.removeFlipping(self)
+                self.animationEngine.removeFlippingCards(self)
                 self.com.moveCardSignal.emit(self.startStack, self.endStack, self.flipCard)
                 self.com.endFlipMacroSignal.emit()
             else:

@@ -43,19 +43,21 @@ class boardView(QGraphicsView):
         # Store a reference to gameStateController
         self.gameStateController = gameStateController
         
-        # Create an animation engine and push it onto a new thread
-        self.animationEngine = animationEngine.animationEngine(self.gameStateController, self)
-        self.animationThread = QThread()
-        self.animationEngine.moveToThread(self.animationThread)
-        
-        # Start the new thread and thereby the animation engine
-        self.animationThread.started.connect(self.animationEngine.startEngine)
-        self.animationThread.start()
+        #=======================================================================
+        # # Create an animation engine and push it onto a new thread
+        # self.animationEngine = animationEngine.animationEngine(self.gameStateController, self)
+        # self.animationThread = QThread()
+        # self.animationEngine.moveToThread(self.animationThread)
+        # 
+        # # Start the new thread and thereby the animation engine
+        # self.animationThread.started.connect(self.animationEngine.startEngine)
+        # self.animationThread.start()
+        #=======================================================================
         
         # Create a communicator and connect relevant signals to slots
         self.com = communicator.communicator()
         self.com.moveCardSignal.connect(gameStateController.moveCard)
-        self.com.addFlipAnimationSignal.connect(self.animationEngine.addFlippingCards)
+        self.com.addFlipAnimationSignal.connect(gameStateController.addFlipAnimation)
 
         # Create a scene based on the parent's size
         self.scene = boardScene.boardScene(0, 0, windowWidth, windowHeight, self)
@@ -278,7 +280,7 @@ class boardView(QGraphicsView):
             scenePos = flipCard.scenePos()         
             flipCard.setParentItem(None)
             flipCard.setPos(scenePos) # Seems necessary in order to stop the card from moving
-#            flipCard.hoverLeaveEvent(0) # Forces removal from pulsating animation list.
+            flipCard.hoverLeaveEvent(0) # Forces removal from pulsating animation list.
             flipCards.append(flipCardId)
         flipCards.reverse()
 
@@ -315,6 +317,10 @@ class boardView(QGraphicsView):
         
         
     def setCardZValue(self, flipCardId, zValue):
+        '''
+        Sets the z value of a card.
+        '''
+        
         print("boardView/setCardZValue: MY THREAD IS ", QThread.currentThread())
         print("boardView/setCardZValue: MY MAIN THREAD IS ", QApplication.instance().thread())
         card = self.cardList[flipCardId]
@@ -322,6 +328,10 @@ class boardView(QGraphicsView):
         
         
     def transformCard(self, flipCardId, pos, rotation, scaleFactor):
+        '''
+        Moves, rotates and scales a card (as part of a flipping animation).
+        '''
+        
         print("boardView/transformCard: MY THREAD IS ", QThread.currentThread())
         print("boardView/transformCard: MY MAIN THREAD IS ", QApplication.instance().thread())
         card = self.cardList[flipCardId]
@@ -332,6 +342,15 @@ class boardView(QGraphicsView):
                             transform.m21(), transform.m22(), transform.m23(),
                             transform.m31(), transform.m32(), transform.m33())
         card.setTransform(transform)
+
+    
+    def pulsateCard(self, cardId, blurRadius):
+        '''
+        Makes a card take one step in a pulsating animation.
+        '''
+        
+        card = self.cardList[cardId]
+        card.pulsate(blurRadius)
 
 
     def updateTempStack(self, cardid, stackid):

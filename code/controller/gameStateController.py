@@ -4,11 +4,13 @@ Created on 7 apr 2014
 @author: Sven, Bjorn
 '''
 
+from PyQt5.QtCore import QThread
 from PyQt5.QtWidgets import QUndoStack
 
 from model import boardModel, boardStacks
 from view import solitaireWindow, boardView
 from controller import communicator, moveCardCommand, turnCardCommand, reenterCardCommand
+from animation import animationEngine
 
 class gameStateController(object):
     '''
@@ -32,6 +34,21 @@ class gameStateController(object):
         # Create undoStack
         self.undoStack = QUndoStack()
         
+        # Create an animation engine and push it onto a new thread
+        self.animationEngine = animationEngine.animationEngine(self,
+                                                               self.solWin.centralWidget())
+        self.animationThread = QThread()
+        self.animationEngine.moveToThread(self.animationThread)
+        
+        # Start the new thread and thereby the animation engine
+        self.animationThread.started.connect(self.animationEngine.startEngine)
+        self.animationThread.start()
+
+        # Connect animation signals to slots in animation engine
+        self.com.addFlipAnimationSignal.connect(self.animationEngine.addFlippingCards)
+        self.com.addPulsatingAnimationSignal.connect(self.animationEngine.addPulsatingCard)
+        self.com.removePulsatingAnimationSignal.connect(self.animationEngine.removePulsatingCard)
+        
         # Send signal if possibility to undo/redo changes
         self.undoStack.canUndoChanged.connect(self.solWin.updateMenuUndo)
         self.undoStack.canRedoChanged.connect(self.solWin.updateMenuRedo)
@@ -39,7 +56,7 @@ class gameStateController(object):
         # Connect updateSignal to slot in view
         self.com.updateSignal.connect(self.solWin.bView.updateStacks)
         
-        #Connect updateCardSignal to slot in view
+        # Connect updateCardSignal to slot in view
         self.com.updateCardSignal.connect(self.solWin.bView.updateCard)
         
         self.com.updateAllCardsSignal.connect(self.solWin.bView.updateAllCards)
@@ -156,3 +173,25 @@ class gameStateController(object):
     
     def endFlipMacro(self):
         self.undoStack.endMacro()
+        
+    
+    def addFlipAnimation(self, cardList, startStack, endStack, startPosX, startPosY, endPosX,
+                         cardOffsetX, cardWidth, cardHeight, scaleStep):
+        '''
+        Slot that forwards a signal to the animation engine to start a flip animation
+        '''
+        self.com.addFlipAnimationSignal.emit(cardList, startStack, endStack, startPosX,
+                                             startPosY, endPosX, cardOffsetX, cardWidth,
+                                             cardHeight, scaleStep)
+    
+    def addPulsatingAnimation(self, cardId):
+        '''
+        Slot that forwards a signal to the animation engine to start a pulsating animation
+        '''
+        self.com.addPulsatingAnimationSignal.emit(cardId)
+        
+    def removePulsatingAnimation(self, cardId):
+        '''
+        Slot that forwards a signal to the animation engine to stop a pulsating animation
+        '''
+        self.com.removePulsatingAnimationSignal.emit(cardId)

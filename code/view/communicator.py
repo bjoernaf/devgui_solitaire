@@ -33,16 +33,18 @@ class communicator(QObject):
     # transSlider signal
     opacitySignal = pyqtSignal(int, name = 'opacitySignal')
     
+    # Signal to begin an undo macro
     beginFlipMacroSignal = pyqtSignal(name = 'beginFlipMacroSignal')
     
-    endFlipMacroSignal = pyqtSignal(name = 'endFlipMacroSignal')
-    
+    # Signal to start a flip animation
     addFlipAnimationSignal = pyqtSignal(list, int, int, int, int, int, int, int, int, float,
                                         name = 'addFlipAnimationSignal')
-
-    setCardZValueSignal = pyqtSignal(int, int, name = 'setCardZValueSignal')
     
-    transformCardSignal = pyqtSignal(int, QPointF, int, float, name = 'transformCardSignal')
+    # Signal to start a pulsating animation
+    addPulsatingAnimationSignal = pyqtSignal(int, name = 'addPulsatingAnimationSignal')
+
+    # Signal to stop a pulsating animation
+    removePulsatingAnimationSignal = pyqtSignal(int, name = 'removePulsatingAnimationSignal')
     
     
     def __init__(self):
