@@ -56,6 +56,10 @@ class boardView(QGraphicsView):
         # Ensure initialization of opacity.
         self.setOpacity(100)
         
+        # Store card style and back image
+        self.cardStyle = "Detailed"
+        self.cardBackImage = "backRed"
+        
         # Call drawContent to draw stacks etc, then set scene as active in the view (boardView)
         self.drawContent(gameStateController)
         self.setScene(self.scene)
@@ -466,7 +470,7 @@ class boardView(QGraphicsView):
         Sets the back image according to images/image.png
         Also acts as receiving slot from control panel theme selection.
         '''
-        self.backImage = QImage("images/" + image + ".png")
+        self.backImage = QImage("images/" + image + self.cardStyle + ".png")
         if self.backImage != None:
             # Scale image to fit card
             self.backImage = self.backImage.scaled(80, 120, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
@@ -481,6 +485,8 @@ class boardView(QGraphicsView):
         Iterates over all cards and calls setImage.
         Also acts as receiving slot from control panel card selection.
         '''
+        # Store card style
+        self.cardStyle = image
         for card in self.cardList:
             card.setImage(image)
 

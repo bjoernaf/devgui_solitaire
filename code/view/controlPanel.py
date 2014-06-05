@@ -40,7 +40,7 @@ class controlPanel(QDialog):
         self.slide = transSlider.transSlider(self.boardView)
         self.slide.setFixedWidth(200)
         self.transparencyLabel = QLabel('Card opacity:')
-        
+                
         # Create a button group to select card back look
         self.createThemeButtonGroup()
         self.themeLabel = QLabel('Deck theme:')
@@ -148,9 +148,12 @@ class controlPanel(QDialog):
         Calls boardView to set the selected image as front image.
         '''
         if buttonId == 1:
-            self.boardView.setFrontImage("detailed")
+            self.boardView.setFrontImage("Detailed")
         elif buttonId == 2:
-            self.boardView.setFrontImage("simple")
+            self.boardView.setFrontImage("Simple")
+        
+        # Call updateTheme to use correct theme version
+        self.updateTheme(self.buttonThemeGroup.checkedId())
         
     def updateTheme(self, buttonId):
         '''

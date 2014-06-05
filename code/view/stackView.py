@@ -5,7 +5,7 @@ Created on 7 apr 2014
 '''
 
 from PyQt5.QtCore import Qt, QRectF, QPointF
-from PyQt5.QtGui import QPen, QColor
+from PyQt5.QtGui import QPen, QColor, QImage
 from PyQt5.QtWidgets import QGraphicsItem
 from view import communicator, feedbackWindow
 from model import boardStacks
@@ -66,6 +66,9 @@ class stackView(QGraphicsItem):
         # Accept drops on the stacks unless stack is the deck or the tempStack
         if self.id != boardStacks.boardStacks.tempStack:
             self.setAcceptDrops(True)
+            
+        # Load image to use as stack edge
+        self.loadImage()
         
         # If the stack is tempStack, create a feedbackWindow but hide it
         if self.id == boardStacks.boardStacks.tempStack:
@@ -139,15 +142,22 @@ class stackView(QGraphicsItem):
         Override of paint function. Paints a custom rounded rectangle
         representing a stack location.
         '''
-        # Draw all stacks but tempStack
-        if self.id != boardStacks.boardStacks.tempStack:
-            pen = QPen()
-            pen.setStyle(Qt.DashLine)
-            pen.setColor(Qt.white)
-            pen.setWidth(4)
-            painter.setPen(pen)
-            painter.drawRoundedRect(0, 0, 90, 130, 9.0, 9.0, Qt.AbsoluteSize)
-            painter.setPen(Qt.white)
+        # Draw border for all stacks but Deck and tempStack
+        if (self.id != boardStacks.boardStacks.tempStack and
+            self.id != boardStacks.boardStacks.Deck):
+            
+            # If the border image exists, draw it
+            if not self.image.isNull():
+                painter.drawImage(self.boundingRect(), self.image)
+            # Else, draw simplified border
+            else:
+                pen = QPen()
+                pen.setStyle(Qt.DashLine)
+                pen.setColor(Qt.white)
+                pen.setWidth(4)
+                painter.setPen(pen)
+                painter.drawRoundedRect(0, 0, 90, 130, 9.0, 9.0, Qt.AbsoluteSize)
+                painter.setPen(Qt.white)
         
         
     def boundingRect(self):
@@ -309,3 +319,12 @@ class stackView(QGraphicsItem):
         paint all cards with.
         '''
         self.paintColor = color
+        
+    def loadImage(self):
+        '''
+        Loads the image to be used for the stack border-
+        '''
+        if self.id == boardStacks.boardStacks.Drawable:
+            self.image = QImage("images/stackDrawable.png")
+        else:
+            self.image = QImage("images/stackRegular.png")

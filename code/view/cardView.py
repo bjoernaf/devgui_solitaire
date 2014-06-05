@@ -290,7 +290,7 @@ class cardView(QGraphicsItem):
         '''
         Sets whether or not to paint detailed front side.
         '''
-        if imageType == "detailed":
+        if imageType == "Detailed":
             self.detailedFront = True
         else:
             self.detailedFront = False
@@ -321,8 +321,13 @@ class cardView(QGraphicsItem):
         '''
         Catches when the mouse enters the hover area above the cardView.
         '''
-        # Add the card to the pulsating animation engine list
-        self.boardView.animationEngine.addPulsating(self)
+        # If the card is facing up or is top card in the stack,
+        # add it to pulsating animation
+        if self.faceup:
+            self.boardView.animationEngine.addPulsating(self)
+        elif self.parentItem != None:
+            if self.id == self.parentItem().topCardId():
+                self.boardView.animationEngine.addPulsating(self)
         
         
     def hoverLeaveEvent(self, event):
